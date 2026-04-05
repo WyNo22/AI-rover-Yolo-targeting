@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# YOLO model weights (too large for git — see README for download)
+*.onnx
+*.onnx.txt
+*.pt
+yolo26n.py
+
+# IDE / Editor
+.windsurf/
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# PowerPoint (generated)
+*.pptx
+
+# Backup / temp
+*.bak
+*.tmp
+*.log
