@@ -207,7 +207,7 @@ python yolo_test.py                     # caméra 0 ; sinon --source 1, 2…
 ```
 Touches : `q` quitter, `s` capture, `c` personnes ↔ toutes les classes.
 
-**Tourelle** : double-clic sur `lancer_tourelle.bat` (Arduino branché, `turret_rover.ino` flashé, interrupteur RC sur AUTO) → l'interface s'ouvre sur http://localhost:8082, clic sur une personne pour la suivre.
+**Tourelle** : double-clic sur `lancer_tourelle.bat` (Arduino branché avec `turret_click.ino` pour la tourelle seule, ou `turret_rover.ino` pour tourelle + moteurs + RC, interrupteur RC sur AUTO) → l'interface s'ouvre sur http://localhost:8082, clic sur une personne pour la suivre.
 
 ---
 
