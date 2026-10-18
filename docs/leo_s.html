@@ -90,15 +90,15 @@ ul.src{font-size:.88rem;color:var(--muted);padding-left:1.2em;margin:0}
 
 <header class="titleblock">
   <div>
-    <div class="eyebrow">Avant-projet · Rév. A</div>
+    <div class="eyebrow">Avant-projet · Rév. B</div>
     <h1>Bipède LEO-S</h1>
-    <p class="lede">Un LEONARDO simplifié : 3 servos par jambe, 4 propulseurs aux épaules qui tiennent l'équilibre pendant la marche et portent le robot pendant les sauts. Dimensionné pour franchir un muret de 30 cm.</p>
+    <p class="lede">Un LEONARDO simplifié : 4 servos par jambe pour marcher seul et stable, 4 propulseurs aux épaules qui se déclenchent pour rattraper une perte d'équilibre et pour sauter. Dimensionné pour franchir un muret de 30 cm.</p>
   </div>
   <div class="cart" aria-label="Cartouche">
     <div>Projet</div><div>LEO-S</div>
     <div>Hauteur</div><div>≈ 710 mm</div>
-    <div>Masse visée</div><div>1,8 – 2,1 kg</div>
-    <div>Actionneurs</div><div>6 servos + 4 prop.</div>
+    <div>Masse visée</div><div>≈ 2,1 kg</div>
+    <div>Actionneurs</div><div>8 servos + 4 prop.</div>
     <div>Cotes</div><div>mm</div>
     <div>Date</div><div>18/10/2026</div>
   </div>
@@ -107,12 +107,13 @@ ul.src{font-size:.88rem;color:var(--muted);padding-left:1.2em;margin:0}
 <section>
   <h2>Ce que fait le vrai LEONARDO</h2>
   <p>LEO (LEgs ONboARD drOne, Caltech, publié dans <i>Science Robotics</i> en 2021) mesure environ 0,7 à 0,76 m. Chaque jambe a <b>trois articulations motorisées</b> et <b>quatre hélices inclinées</b> sont montées aux épaules. Les jambes, légères, portent l'essentiel du poids ; les hélices, pilotées en même temps que les articulations, tiennent le buste droit. C'est ce couplage qui lui permet de marcher sur une corde, de faire du skate et de sauter des obstacles. Une seule source donne sa masse (2,58 kg) ; elle n'est pas confirmée par Caltech.</p>
+  <p class="note">Rév. B : la cheville devient motorisée pour que le robot tienne debout et marche sans propulseurs. Le schéma d'ensemble ci-dessous date de la Rév. A (cheville passive) ; la chaîne cinématique à jour est dans la section suivante.</p>
   <p>LEO-S garde ce principe et simplifie ce qui coûte cher ou complique la fabrication : servos bus du commerce, cheville passive à ressort, contrôleur de vol FPV standard pour les propulseurs.</p>
   <div class="tw"><table>
     <thead><tr><th>Élément</th><th>LEONARDO (Caltech)</th><th>LEO-S (ce projet)</th></tr></thead>
     <tbody>
-      <tr><td>Articulations par jambe</td><td>3 motorisées</td><td>3 servos bus : hanche roulis, hanche tangage, genou</td></tr>
-      <tr><td>Cheville</td><td>pied simple</td><td>passive, rappel par tendon d'Achille élastique, semelle TPU</td></tr>
+      <tr><td>Articulations par jambe</td><td>3 motorisées</td><td>4 servos bus : hanche roulis, hanche tangage, genou, cheville tangage</td></tr>
+      <tr><td>Équilibre en marche</td><td>assuré par les hélices, en continu</td><td>assuré par les jambes ; propulseurs au ralenti, déclenchés au-delà de ~8° d'inclinaison</td></tr>
       <tr><td>Genou</td><td>actionneur seul</td><td>servo + ressort parallèle (stocke l'énergie à l'accroupi)</td></tr>
       <tr><td>Propulsion</td><td>4 hélices inclinées aux épaules</td><td>4 propulseurs carénés inclinés de 15°, choix hélice carénée ou EDF après banc</td></tr>
       <tr><td>Stabilisation en l'air</td><td>contrôleur de recherche</td><td>contrôleur de vol FPV en mode angle, consignes envoyées par le Pico</td></tr>
@@ -367,6 +368,90 @@ ul.src{font-size:.88rem;color:var(--muted);padding-left:1.2em;margin:0}
 </section>
 
 <section>
+  <h2>Chaîne cinématique d'une jambe</h2>
+  <figure>
+    <div class="scroll">
+    <svg viewBox="0 0 760 580" role="img" aria-label="Schéma cinématique d'une jambe vue de côté : bassin, hanche lacet facultative, hanche roulis, hanche tangage, cuisse 170 mm, genou, tibia 170 mm, cheville tangage, cheville roulis facultative, pied 85 mm.">
+      <defs>
+        <marker id="ka" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+        <marker id="kd" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9" fill="none" stroke="currentColor" stroke-width="1.4"/></marker>
+      </defs>
+      <!-- bassin (bâti) -->
+      <line class="ln" x1="200" y1="40" x2="320" y2="40"/>
+      <g class="thin"><line x1="210" y1="40" x2="202" y2="30"/><line x1="230" y1="40" x2="222" y2="30"/><line x1="250" y1="40" x2="242" y2="30"/><line x1="270" y1="40" x2="262" y2="30"/><line x1="290" y1="40" x2="282" y2="30"/><line x1="310" y1="40" x2="302" y2="30"/></g>
+      <text class="lbls" x="196" y="44" text-anchor="end">bassin</text>
+      <!-- liaisons -->
+      <line class="ln" x1="260" y1="40" x2="260" y2="72"/>
+      <rect x="252" y="72" width="16" height="26" rx="2" class="pjoint" stroke-dasharray="3 3"/>
+      <line class="ln" x1="260" y1="98" x2="260" y2="118"/>
+      <rect x="242" y="118" width="36" height="14" rx="2" class="joint"/>
+      <line class="ln" x1="260" y1="132" x2="260" y2="156"/>
+      <circle cx="260" cy="165" r="9" class="joint"/>
+      <line class="ln" x1="260" y1="165" x2="292" y2="315"/>
+      <circle cx="292" cy="315" r="9" class="joint"/>
+      <line class="ln" x1="292" y1="315" x2="260" y2="465"/>
+      <circle cx="260" cy="465" r="9" class="joint"/>
+      <line class="ln" x1="260" y1="474" x2="260" y2="484"/>
+      <rect x="242" y="484" width="36" height="12" rx="2" class="pjoint" stroke-dasharray="3 3"/>
+      <line class="ln" x1="260" y1="496" x2="260" y2="508"/>
+      <line class="ln" x1="222" y1="510" x2="298" y2="510" stroke-width="4"/>
+      <line class="thin" x1="190" y1="520" x2="330" y2="520"/>
+      <g class="thin"><line x1="200" y1="520" x2="192" y2="530"/><line x1="220" y1="520" x2="212" y2="530"/><line x1="240" y1="520" x2="232" y2="530"/><line x1="260" y1="520" x2="252" y2="530"/><line x1="280" y1="520" x2="272" y2="530"/><line x1="300" y1="520" x2="292" y2="530"/><line x1="320" y1="520" x2="312" y2="530"/></g>
+      <!-- ressort de genou -->
+      <polyline class="spr" points="276,240 285,250 280,262 292,270 288,282 300,290 304,308"/>
+      <polyline class="spr" points="304,322 300,340 290,346 294,358 282,364 286,376 276,390"/>
+      <!-- étiquettes -->
+      <g class="thin"><line x1="272" y1="85" x2="356" y2="85"/><line x1="282" y1="125" x2="356" y2="125"/><line x1="271" y1="165" x2="356" y2="165"/><line x1="303" y1="315" x2="356" y2="315"/><line x1="271" y1="465" x2="356" y2="465"/><line x1="282" y1="490" x2="356" y2="495"/></g>
+      <text class="lbl" x="362" y="81"><tspan font-weight="600">q0 hanche lacet</tspan> · axe z</text><text class="lbls" x="362" y="96">facultatif : tourner sur place</text>
+      <text class="lbl" x="362" y="121"><tspan font-weight="600">q1 hanche roulis</tspan> · axe x</text><text class="lbls" x="362" y="136">obligatoire : déplacer le poids sur la jambe d'appui</text>
+      <text class="lbl" x="362" y="161"><tspan font-weight="600">q2 hanche tangage</tspan> · axe y</text><text class="lbls" x="362" y="176">obligatoire : avancer la jambe, impulsion du saut</text>
+      <text class="lbl" x="362" y="311"><tspan font-weight="600">q3 genou</tspan> · axe y</text><text class="lbls" x="362" y="326">obligatoire : lever le pied, s'accroupir, sauter</text>
+      <text class="lbl" x="362" y="461"><tspan font-weight="600">q4 cheville tangage</tspan> · axe y</text><text class="lbls" x="362" y="476">obligatoire : tenir debout sans propulseurs</text>
+      <text class="lbl" x="362" y="499"><tspan font-weight="600">q5 cheville roulis</tspan> · axe x</text><text class="lbls" x="362" y="514">facultatif : terrain irrégulier</text>
+      <text class="sprt" x="318" y="232">ressort parallèle</text>
+      <!-- cotes -->
+      <line class="dim" x1="170" y1="165" x2="170" y2="315" marker-start="url(#kd)" marker-end="url(#kd)"/>
+      <text class="dimt" x="162" y="244" text-anchor="end">L1 = 170</text>
+      <line class="dim" x1="170" y1="315" x2="170" y2="465" marker-start="url(#kd)" marker-end="url(#kd)"/>
+      <text class="dimt" x="162" y="394" text-anchor="end">L2 = 170</text>
+      <line class="dim" x1="170" y1="465" x2="170" y2="510" marker-start="url(#kd)" marker-end="url(#kd)"/>
+      <text class="dimt" x="162" y="492" text-anchor="end">h = 50</text>
+      <line class="dim" x1="222" y1="548" x2="298" y2="548" marker-start="url(#kd)" marker-end="url(#kd)"/>
+      <text class="dimt" x="260" y="566" text-anchor="middle">pied 85</text>
+      <line class="dim" x1="164" y1="165" x2="250" y2="165" stroke-dasharray="2 3"/>
+      <!-- repère -->
+      <g transform="translate(50,130)">
+        <line class="thin" x1="0" y1="0" x2="50" y2="0" marker-end="url(#ka)"/>
+        <line class="thin" x1="0" y1="0" x2="0" y2="-50" marker-end="url(#ka)"/>
+        <circle class="thin" cx="0" cy="0" r="6"/><circle cx="0" cy="0" r="1.8" fill="currentColor"/>
+        <text class="lbls" x="56" y="4">x (avant)</text>
+        <text class="lbls" x="6" y="-54">z</text>
+        <text class="lbls" x="10" y="20">y (vers vous)</text>
+      </g>
+    </svg>
+    </div>
+    <div class="legend">
+      <span><i class="sw servo"></i>rotation d'axe y (tangage)</span>
+      <span><i class="sw servo" style="border-radius:2px;width:18px;height:8px"></i>rotation d'axe x (roulis) ou z (lacet)</span>
+      <span><i class="sw pass" style="border-radius:2px;border-style:dashed"></i>articulation facultative</span>
+      <span><i class="sw spr"></i>ressort parallèle au genou</span>
+    </div>
+    <figcaption>Vue de côté, cotes en mm, jambe légèrement fléchie. Ordre des liaisons depuis le bassin : (lacet) → roulis → tangage hanche → genou → tangage cheville → (roulis cheville). Mettre le roulis de hanche au-dessus du tangage permet de garder le servo de roulis dans le bassin, loin de la jambe qui bouge.</figcaption>
+  </figure>
+  <div class="tw" style="margin-top:16px"><table>
+    <thead><tr><th>Liaison</th><th>Statut</th><th>Débattement</th><th>Servo V1</th></tr></thead>
+    <tbody>
+      <tr><td>q1 hanche roulis</td><td><span class="tag ok">obligatoire</span></td><td>−20° / +30°</td><td>STS3215 12 V</td></tr>
+      <tr><td>q2 hanche tangage</td><td><span class="tag ok">obligatoire</span></td><td>−30° / +90°</td><td>STS3215 12 V, STS3250 si besoin</td></tr>
+      <tr><td>q3 genou</td><td><span class="tag ok">obligatoire</span></td><td>0° / 130°</td><td>STS3215 12 V + ressort, STS3250 si besoin</td></tr>
+      <tr><td>q4 cheville tangage</td><td><span class="tag ok">obligatoire</span></td><td>±45°</td><td>STS3215 12 V</td></tr>
+      <tr><td>q0 hanche lacet</td><td><span class="tag warn">facultatif</span></td><td>±30°</td><td>place réservée dans le bassin</td></tr>
+      <tr><td>q5 cheville roulis</td><td><span class="tag warn">facultatif</span></td><td>±20°</td><td>V2, terrain irrégulier</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
   <h2>Dimensionnement</h2>
   <div class="two">
     <div>
@@ -374,7 +459,7 @@ ul.src{font-size:.88rem;color:var(--muted);padding-left:1.2em;margin:0}
       <div class="tw"><table>
         <thead><tr><th>Élément</th><th class="n">g</th></tr></thead>
         <tbody>
-          <tr><td>6 servos bus de jambe (≈ 55 g)</td><td class="n">330</td></tr>
+          <tr><td>8 servos bus de jambe (≈ 55 g)</td><td class="n">440</td></tr>
           <tr><td>Structure jambes (tubes carbone + PETG)</td><td class="n">220</td></tr>
           <tr><td>Pieds, ressorts de genou, tendons</td><td class="n">80</td></tr>
           <tr><td>Torse et bassin</td><td class="n">220</td></tr>
@@ -386,10 +471,10 @@ ul.src{font-size:.88rem;color:var(--muted);padding-left:1.2em;margin:0}
           <tr><td>Pico, régulateurs, capteurs</td><td class="n">40</td></tr>
           <tr><td>Tête : caméra + 2 micro-servos + coque</td><td class="n">60</td></tr>
           <tr><td>Câbles, visserie</td><td class="n">120</td></tr>
-          <tr class="tot"><td>Total</td><td class="n">≈ 1 835</td></tr>
+          <tr class="tot"><td>Total</td><td class="n">≈ 1 945</td></tr>
         </tbody>
       </table></div>
-      <p class="note">Avec des EDF de 64 mm à la place des hélices carénées : environ +200 g. Prévoir 10 à 15 % de marge, d'où la cible de 1,8 à 2,1 kg.</p>
+      <p class="note">Avec des EDF de 64 mm à la place des hélices carénées : environ +200 g. Avec une marge de 10 %, la cible est d'environ 2,1 kg.</p>
     </div>
     <div>
       <h3>Couple au genou</h3>
