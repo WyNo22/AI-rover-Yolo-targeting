@@ -1,0 +1,479 @@
+<title>Bipède LEO-S</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout : feuille de plan technique — cartouche en tête, figures pleine largeur, tableaux de calcul en dessous. */
+:root{
+  --paper:#F1F3EF; --sheet:#FAFBF8; --ink:#1C2320; --muted:#5F6B66; --rule:#C9D0CB;
+  --thrust:#C9411A; --spring:#1F68A8; --ok:#2E7D4F; --warn:#A86A00;
+  --f-display:"Barlow Condensed","Arial Narrow",sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#121715; --sheet:#181E1B; --ink:#E2E8E4; --muted:#93A099; --rule:#2E3833;
+  --thrust:#FF7B4D; --spring:#62AEEA; --ok:#5CC18A; --warn:#E3A43A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#121715; --sheet:#181E1B; --ink:#E2E8E4; --muted:#93A099; --rule:#2E3833;
+  --thrust:#FF7B4D; --spring:#62AEEA; --ok:#5CC18A; --warn:#E3A43A; color-scheme:dark}
+body{background:var(--paper);color:var(--ink);font:15px/1.6 var(--f-body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 48px}
+main{max-width:1040px;margin:0 auto;display:grid;gap:40px}
+h1,h2,h3{font-family:var(--f-display);font-weight:600;letter-spacing:.01em;line-height:1.1;text-wrap:balance;margin:0}
+h1{font-size:clamp(2.2rem,5vw,3.4rem);font-weight:700}
+h2{font-size:1.75rem;margin-bottom:12px}
+h3{font-size:1.25rem;margin:18px 0 8px}
+p{margin:0 0 10px;max-width:68ch}
+section{min-width:0}
+.eyebrow{font:500 .75rem/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+/* cartouche */
+.titleblock{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:end;border:1.5px solid var(--ink);background:var(--sheet);padding:20px}
+.titleblock .lede{color:var(--muted);margin-top:8px}
+.cart{display:grid;grid-template-columns:auto auto;border:1px solid var(--ink);font:12px/1.3 var(--f-mono)}
+.cart div{padding:5px 10px;border-bottom:1px solid var(--rule)}
+.cart div:nth-child(odd){color:var(--muted);border-right:1px solid var(--rule)}
+.cart div:nth-last-child(-n+2){border-bottom:0}
+@media (max-width:720px){.titleblock{grid-template-columns:1fr}}
+/* figures */
+figure{margin:0;background:var(--sheet);border:1px solid var(--rule);padding:16px}
+.scroll{overflow-x:auto}
+figure svg{display:block;width:100%;height:auto;min-width:640px;color:var(--ink)}
+figcaption{font-size:.9rem;color:var(--muted);margin-top:10px;max-width:none}
+.legend{display:flex;flex-wrap:wrap;gap:8px 20px;font:12px var(--f-mono);margin-top:10px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:12px;height:12px;border-radius:50%;display:inline-block}
+.sw.servo{background:var(--ink)} .sw.pass{border:2px solid var(--ink)}
+.sw.thr{background:var(--thrust);border-radius:2px} .sw.spr{background:var(--spring);border-radius:2px}
+/* svg classes */
+.ln{stroke:currentColor;fill:none;stroke-width:2.2}
+.body{stroke:currentColor;fill:var(--sheet);stroke-width:1.6}
+.thin{stroke:currentColor;fill:none;stroke-width:1}
+.dim{stroke:var(--muted);fill:none;stroke-width:1}
+.dimt{fill:var(--muted);font:11px var(--f-mono)}
+.lbl{fill:currentColor;font:12px var(--f-body)}
+.lbls{fill:var(--muted);font:11px var(--f-body)}
+.ttl{fill:currentColor;font:600 13px var(--f-display);letter-spacing:.08em}
+.joint{fill:currentColor;stroke:currentColor}
+.pjoint{fill:var(--sheet);stroke:currentColor;stroke-width:2}
+.thr{stroke:var(--thrust);fill:none;stroke-width:2.4}
+.thrf{fill:var(--thrust)}
+.thrt{fill:var(--thrust);font:600 12px var(--f-mono)}
+.spr{stroke:var(--spring);fill:none;stroke-width:2}
+.sprt{fill:var(--spring);font:12px var(--f-body)}
+.duct{stroke:currentColor;fill:var(--paper);stroke-width:1.6}
+.box{stroke:currentColor;fill:var(--paper);stroke-width:1.4}
+.boxk{stroke:var(--thrust);fill:var(--paper);stroke-width:1.8}
+.bt{fill:currentColor;font:600 14px var(--f-display);letter-spacing:.02em}
+.grid{stroke:var(--rule);stroke-width:1}
+.dash{stroke:var(--muted);stroke-dasharray:4 4;fill:none}
+/* tables */
+.tw{overflow-x:auto;border:1px solid var(--rule);background:var(--sheet)}
+table{border-collapse:collapse;width:100%;font-size:.92rem}
+th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font:600 .78rem var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--paper)}
+td.n,th.n{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.tot td{font-weight:600;border-top:1.5px solid var(--ink)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+@media (max-width:780px){.two{grid-template-columns:1fr}}
+.calc{font:13px/1.7 var(--f-mono);background:var(--sheet);border:1px solid var(--rule);border-left:3px solid var(--ink);padding:12px 14px;overflow-x:auto}
+.tag{display:inline-block;font:600 .7rem/1 var(--f-mono);letter-spacing:.06em;padding:4px 6px;border-radius:3px;border:1px solid currentColor}
+.tag.ok{color:var(--ok)} .tag.warn{color:var(--warn)} .tag.no{color:var(--thrust)}
+ol.steps{margin:0;padding-left:1.4em;display:grid;gap:8px;max-width:75ch}
+ol.steps b{font-family:var(--f-display);font-size:1.05rem;letter-spacing:.02em}
+.note{font-size:.88rem;color:var(--muted)}
+a{color:inherit;text-underline-offset:2px}
+a:focus-visible{outline:2px solid var(--spring);outline-offset:2px}
+ul.src{font-size:.88rem;color:var(--muted);padding-left:1.2em;margin:0}
+</style>
+
+<main>
+
+<header class="titleblock">
+  <div>
+    <div class="eyebrow">Avant-projet · Rév. A</div>
+    <h1>Bipède LEO-S</h1>
+    <p class="lede">Un LEONARDO simplifié : 3 servos par jambe, 4 propulseurs aux épaules qui tiennent l'équilibre pendant la marche et portent le robot pendant les sauts. Dimensionné pour franchir un muret de 30 cm.</p>
+  </div>
+  <div class="cart" aria-label="Cartouche">
+    <div>Projet</div><div>LEO-S</div>
+    <div>Hauteur</div><div>≈ 710 mm</div>
+    <div>Masse visée</div><div>1,8 – 2,1 kg</div>
+    <div>Actionneurs</div><div>6 servos + 4 prop.</div>
+    <div>Cotes</div><div>mm</div>
+    <div>Date</div><div>18/10/2026</div>
+  </div>
+</header>
+
+<section>
+  <h2>Ce que fait le vrai LEONARDO</h2>
+  <p>LEO (LEgs ONboARD drOne, Caltech, publié dans <i>Science Robotics</i> en 2021) mesure environ 0,7 à 0,76 m. Chaque jambe a <b>trois articulations motorisées</b> et <b>quatre hélices inclinées</b> sont montées aux épaules. Les jambes, légères, portent l'essentiel du poids ; les hélices, pilotées en même temps que les articulations, tiennent le buste droit. C'est ce couplage qui lui permet de marcher sur une corde, de faire du skate et de sauter des obstacles. Une seule source donne sa masse (2,58 kg) ; elle n'est pas confirmée par Caltech.</p>
+  <p>LEO-S garde ce principe et simplifie ce qui coûte cher ou complique la fabrication : servos bus du commerce, cheville passive à ressort, contrôleur de vol FPV standard pour les propulseurs.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Élément</th><th>LEONARDO (Caltech)</th><th>LEO-S (ce projet)</th></tr></thead>
+    <tbody>
+      <tr><td>Articulations par jambe</td><td>3 motorisées</td><td>3 servos bus : hanche roulis, hanche tangage, genou</td></tr>
+      <tr><td>Cheville</td><td>pied simple</td><td>passive, rappel par tendon d'Achille élastique, semelle TPU</td></tr>
+      <tr><td>Genou</td><td>actionneur seul</td><td>servo + ressort parallèle (stocke l'énergie à l'accroupi)</td></tr>
+      <tr><td>Propulsion</td><td>4 hélices inclinées aux épaules</td><td>4 propulseurs carénés inclinés de 15°, choix hélice carénée ou EDF après banc</td></tr>
+      <tr><td>Stabilisation en l'air</td><td>contrôleur de recherche</td><td>contrôleur de vol FPV en mode angle, consignes envoyées par le Pico</td></tr>
+      <tr><td>Vision</td><td>—</td><td>Pi 5 + Hailo-8, caméra dans la tête, gestes et détection du muret</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2>Schéma d'ensemble</h2>
+  <figure>
+    <div class="scroll">
+    <svg viewBox="0 0 900 640" role="img" aria-label="Vue de face et vue de côté du bipède LEO-S : deux jambes à trois servos, cheville passive, ressort de genou et tendon d'Achille, quatre propulseurs aux épaules inclinés de 15 degrés, hauteur 710 mm.">
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="thrf"/></marker>
+        <marker id="dh" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9" fill="none" stroke="currentColor" stroke-width="1.4"/></marker>
+      </defs>
+
+      <!-- ===== VUE DE FACE ===== -->
+      <g>
+        <line class="thin" x1="120" y1="580" x2="380" y2="580"/>
+        <g class="thin"><line x1="130" y1="580" x2="122" y2="588"/><line x1="160" y1="580" x2="152" y2="588"/><line x1="190" y1="580" x2="182" y2="588"/><line x1="220" y1="580" x2="212" y2="588"/><line x1="250" y1="580" x2="242" y2="588"/><line x1="280" y1="580" x2="272" y2="588"/><line x1="310" y1="580" x2="302" y2="588"/><line x1="340" y1="580" x2="332" y2="588"/><line x1="370" y1="580" x2="362" y2="588"/></g>
+        <!-- pieds -->
+        <rect class="body" x="182.5" y="566" width="45" height="14" rx="3"/>
+        <rect class="body" x="272.5" y="566" width="45" height="14" rx="3"/>
+        <!-- jambes -->
+        <line class="ln" x1="205" y1="557" x2="205" y2="303"/>
+        <line class="ln" x1="295" y1="557" x2="295" y2="303"/>
+        <circle class="pjoint" cx="205" cy="557" r="5"/><circle class="pjoint" cx="295" cy="557" r="5"/>
+        <circle class="joint" cx="205" cy="430" r="7"/><circle class="joint" cx="295" cy="430" r="7"/>
+        <circle class="joint" cx="205" cy="303" r="7"/><circle class="joint" cx="295" cy="303" r="7"/>
+        <rect class="joint" x="195" y="280" width="20" height="13" rx="2"/><rect class="joint" x="285" y="280" width="20" height="13" rx="2"/>
+        <!-- torse -->
+        <rect class="body" x="190" y="137" width="120" height="143" rx="6"/>
+        <text class="lbls" x="250" y="205" text-anchor="middle">batteries</text>
+        <text class="lbls" x="250" y="221" text-anchor="middle">Pi 5 + Hailo</text>
+        <text class="lbls" x="250" y="237" text-anchor="middle">Pico, FC, ESC</text>
+        <!-- tête -->
+        <line class="ln" x1="250" y1="137" x2="250" y2="123"/>
+        <rect class="body" x="216" y="48" width="68" height="75" rx="8"/>
+        <circle class="thin" cx="250" cy="88" r="11"/><circle class="joint" cx="250" cy="88" r="4"/>
+        <!-- bras et propulseurs -->
+        <line class="ln" x1="190" y1="150" x2="122" y2="150"/>
+        <line class="ln" x1="310" y1="150" x2="378" y2="150"/>
+        <rect class="duct" x="84.5" y="132" width="75" height="36" rx="4" transform="rotate(-15 122 150)"/>
+        <rect class="duct" x="340.5" y="132" width="75" height="36" rx="4" transform="rotate(15 378 150)"/>
+        <line class="thr" x1="117" y1="128" x2="100" y2="66" marker-end="url(#ah)"/>
+        <line class="thr" x1="383" y1="128" x2="400" y2="66" marker-end="url(#ah)"/>
+        <text class="thrt" x="96" y="56" text-anchor="middle">T1 + T2</text>
+        <text class="thrt" x="404" y="56" text-anchor="middle">T3 + T4</text>
+        <text class="lbls" x="122" y="192" text-anchor="middle">15°</text>
+        <text class="lbls" x="378" y="192" text-anchor="middle">15°</text>
+        <!-- étiquettes articulations -->
+        <g class="thin"><line x1="307" y1="286" x2="330" y2="278"/><line x1="303" y1="305" x2="330" y2="312"/><line x1="303" y1="430" x2="330" y2="430"/><line x1="301" y1="557" x2="330" y2="552"/></g>
+        <text class="lbl" x="334" y="282">hanche roulis</text>
+        <text class="lbl" x="334" y="316">hanche tangage</text>
+        <text class="lbl" x="334" y="434">genou</text>
+        <text class="lbl" x="334" y="556">cheville passive</text>
+        <!-- cotes -->
+        <line class="dim" x1="60" y1="48" x2="60" y2="580" marker-start="url(#dh)" marker-end="url(#dh)"/>
+        <line class="dim" x1="54" y1="48" x2="70" y2="48"/>
+        <text class="dimt" x="52" y="320" text-anchor="middle" transform="rotate(-90 52 320)">710</text>
+        <line class="dim" x1="92" y1="303" x2="92" y2="580" marker-start="url(#dh)" marker-end="url(#dh)"/>
+        <line class="dim" x1="86" y1="303" x2="198" y2="303" stroke-dasharray="2 3"/>
+        <text class="dimt" x="84" y="445" text-anchor="middle" transform="rotate(-90 84 445)">hanche 370</text>
+        <line class="dim" x1="122" y1="24" x2="378" y2="24" marker-start="url(#dh)" marker-end="url(#dh)"/>
+        <text class="dimt" x="250" y="18" text-anchor="middle">340 entre axes propulseurs</text>
+        <line class="dim" x1="205" y1="600" x2="295" y2="600" marker-start="url(#dh)" marker-end="url(#dh)"/>
+        <text class="dimt" x="250" y="614" text-anchor="middle">120</text>
+        <text class="ttl" x="250" y="634" text-anchor="middle">VUE DE FACE</text>
+      </g>
+
+      <!-- ===== VUE DE CÔTÉ ===== -->
+      <g>
+        <line class="thin" x1="520" y1="580" x2="800" y2="580"/>
+        <g class="thin"><line x1="530" y1="580" x2="522" y2="588"/><line x1="560" y1="580" x2="552" y2="588"/><line x1="590" y1="580" x2="582" y2="588"/><line x1="620" y1="580" x2="612" y2="588"/><line x1="650" y1="580" x2="642" y2="588"/><line x1="680" y1="580" x2="672" y2="588"/><line x1="710" y1="580" x2="702" y2="588"/><line x1="740" y1="580" x2="732" y2="588"/><line x1="770" y1="580" x2="762" y2="588"/></g>
+        <!-- pied -->
+        <path class="body" d="M628,580 L628,571 Q660,562 692,571 L692,580 Z"/>
+        <!-- jambe (genou légèrement fléchi) -->
+        <line class="ln" x1="650" y1="557" x2="672" y2="432"/>
+        <line class="ln" x1="672" y1="432" x2="650" y2="310"/>
+        <circle class="pjoint" cx="650" cy="557" r="5"/>
+        <circle class="joint" cx="672" cy="432" r="7"/>
+        <circle class="joint" cx="650" cy="310" r="7"/>
+        <!-- ressort de genou : cuisse → poulie rotule → tibia -->
+        <polyline class="spr" points="662,380 670,387.9 666.1,398.5 676.6,402.3 672.7,412.9 683.2,416.7 684,428"/>
+        <circle class="spr" cx="685" cy="432" r="4"/>
+        <polyline class="spr" points="684,436 683.6,445.8 673.4,448.2 677.6,457.8 667.4,460.2 671.6,469.8 664,476"/>
+        <!-- tendon d'Achille : tibia → talon -->
+        <polyline class="spr" points="648,522 648.1,532.7 637.9,536.6 642.7,546.5 632.7,550.4 637.3,560.3 630,568"/>
+        <!-- torse et tête -->
+        <rect class="body" x="616" y="137" width="68" height="165" rx="6"/>
+        <line class="ln" x1="650" y1="137" x2="650" y2="123"/>
+        <rect class="body" x="618" y="48" width="64" height="75" rx="8"/>
+        <rect class="joint" x="680" y="80" width="8" height="16" rx="2"/>
+        <!-- propulseurs avant / arrière -->
+        <line class="ln" x1="684" y1="150" x2="725" y2="150"/>
+        <line class="ln" x1="616" y1="150" x2="575" y2="150"/>
+        <rect class="duct" x="687.5" y="132" width="75" height="36" rx="4"/>
+        <rect class="duct" x="537.5" y="132" width="75" height="36" rx="4"/>
+        <line class="thr" x1="725" y1="128" x2="725" y2="66" marker-end="url(#ah)"/>
+        <line class="thr" x1="575" y1="128" x2="575" y2="66" marker-end="url(#ah)"/>
+        <text class="thrt" x="725" y="56" text-anchor="middle">avant</text>
+        <text class="thrt" x="575" y="56" text-anchor="middle">arrière</text>
+        <!-- étiquettes -->
+        <g class="thin"><line x1="642" y1="310" x2="606" y2="310"/><line x1="680" y1="432" x2="712" y2="432"/><line x1="644" y1="557" x2="606" y2="552"/><line x1="688" y1="88" x2="712" y2="88"/></g>
+        <text class="lbl" x="602" y="314" text-anchor="end">hanche</text>
+        <text class="lbl" x="716" y="436">genou</text>
+        <text class="lbl" x="602" y="556" text-anchor="end">cheville</text>
+        <text class="lbl" x="716" y="92">caméra</text>
+        <g class="spr" stroke-width="1"><line x1="680" y1="402" x2="740" y2="388"/><line x1="636" y1="546" x2="590" y2="520"/></g>
+        <text class="sprt" x="744" y="384">ressort</text>
+        <text class="sprt" x="744" y="399">de genou</text>
+        <text class="sprt" x="586" y="508" text-anchor="end">tendon</text>
+        <text class="sprt" x="586" y="523" text-anchor="end">d'Achille</text>
+        <text class="lbls" x="660" y="604" text-anchor="middle">semelle TPU</text>
+        <!-- cotes -->
+        <line class="dim" x1="575" y1="24" x2="725" y2="24" marker-start="url(#dh)" marker-end="url(#dh)"/>
+        <text class="dimt" x="650" y="18" text-anchor="middle">200</text>
+        <line class="dim" x1="790" y1="310" x2="790" y2="432" marker-start="url(#dh)" marker-end="url(#dh)"/>
+        <line class="dim" x1="790" y1="432" x2="790" y2="557" marker-start="url(#dh)" marker-end="url(#dh)"/>
+        <text class="dimt" x="800" y="375">cuisse 170</text>
+        <text class="dimt" x="800" y="500">tibia 170</text>
+        <text class="ttl" x="660" y="634" text-anchor="middle">VUE DE CÔTÉ — AVANT À DROITE</text>
+      </g>
+    </svg>
+    </div>
+    <div class="legend">
+      <span><i class="sw servo"></i>servo (articulation motorisée)</span>
+      <span><i class="sw pass"></i>articulation passive</span>
+      <span><i class="sw spr"></i>élément élastique</span>
+      <span><i class="sw thr"></i>poussée</span>
+    </div>
+    <figcaption>Proportions à l'échelle, cotes en mm. Les propulseurs sont inclinés de 15° vers l'extérieur, comme sur LEO : la différence de poussée gauche/droite et avant/arrière contrôle roulis et tangage, l'inclinaison donne un peu d'autorité en lacet. L'axe de poussée doit passer au-dessus du centre de gravité, situé vers le bas du torse.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Qui commande quoi</h2>
+  <figure>
+    <div class="scroll">
+    <svg viewBox="0 0 900 400" role="img" aria-label="Architecture : le Pi 5 décide, le Pico RP2040 pilote les 6 servos et envoie des consignes au contrôleur de vol, qui stabilise le buste avec les 4 propulseurs. La radio FS-iA6B garde un arrêt d'urgence.">
+      <defs>
+        <marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker>
+        <marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="thrf"/></marker>
+      </defs>
+      <!-- rangée 1 -->
+      <rect class="box" x="20" y="20" width="200" height="56" rx="4"/>
+      <text class="bt" x="120" y="44" text-anchor="middle">PC / téléphone</text>
+      <text class="lbls" x="120" y="62" text-anchor="middle">interface web, gestes, missions</text>
+      <rect class="box" x="350" y="20" width="200" height="56" rx="4"/>
+      <text class="bt" x="450" y="44" text-anchor="middle">Pi 5 + Hailo-8</text>
+      <text class="lbls" x="450" y="62" text-anchor="middle">vision 30 Hz, comportement</text>
+      <rect class="box" x="680" y="20" width="200" height="56" rx="4"/>
+      <text class="bt" x="780" y="44" text-anchor="middle">Tête</text>
+      <text class="lbls" x="780" y="62" text-anchor="middle">caméra CSI + 2 micro-servos</text>
+      <!-- rangée 2 -->
+      <rect class="boxk" x="20" y="170" width="200" height="56" rx="4"/>
+      <text class="bt" x="120" y="194" text-anchor="middle">Radio FS-iA6B</text>
+      <text class="lbls" x="120" y="212" text-anchor="middle">armement, arrêt d'urgence</text>
+      <rect class="box" x="350" y="170" width="200" height="56" rx="4"/>
+      <text class="bt" x="450" y="194" text-anchor="middle">Pico RP2040</text>
+      <text class="lbls" x="450" y="212" text-anchor="middle">marche 200 Hz, séquence de saut</text>
+      <rect class="box" x="680" y="170" width="200" height="56" rx="4"/>
+      <text class="bt" x="780" y="194" text-anchor="middle">Capteurs</text>
+      <text class="lbls" x="780" y="212" text-anchor="middle">contacts pieds, ToF frontal</text>
+      <!-- rangée 3 -->
+      <rect class="box" x="180" y="320" width="200" height="56" rx="4"/>
+      <text class="bt" x="280" y="344" text-anchor="middle">6 servos bus</text>
+      <text class="lbls" x="280" y="362" text-anchor="middle">jambes (position + retour)</text>
+      <rect class="box" x="470" y="320" width="200" height="56" rx="4"/>
+      <text class="bt" x="570" y="344" text-anchor="middle">Contrôleur de vol FPV</text>
+      <text class="lbls" x="570" y="362" text-anchor="middle">mode angle, IMU, ESC 4-en-1</text>
+      <rect class="box" x="720" y="320" width="160" height="56" rx="4"/>
+      <text class="bt" x="800" y="344" text-anchor="middle">4 propulseurs</text>
+      <text class="lbls" x="800" y="362" text-anchor="middle">carénés, 4S</text>
+      <!-- liaisons -->
+      <line class="thin" x1="222" y1="48" x2="348" y2="48" marker-start="url(#a2)" marker-end="url(#a2)"/>
+      <text class="lbls" x="285" y="40" text-anchor="middle">Wi-Fi</text>
+      <text class="lbls" x="285" y="64" text-anchor="middle">vidéo + ordres</text>
+      <line class="thin" x1="678" y1="48" x2="552" y2="48" marker-start="url(#a2)" marker-end="url(#a2)"/>
+      <text class="lbls" x="615" y="40" text-anchor="middle">CSI</text>
+      <text class="lbls" x="615" y="64" text-anchor="middle">pan / tilt</text>
+      <line class="thin" x1="450" y1="78" x2="450" y2="168" marker-start="url(#a2)" marker-end="url(#a2)"/>
+      <text class="lbls" x="458" y="112">UART ↓ vitesse, virage, SAUT</text>
+      <text class="lbls" x="458" y="130">↑ état, contacts, attitude</text>
+      <line class="thr" x1="222" y1="198" x2="348" y2="198" marker-end="url(#a3)"/>
+      <text class="thrt" x="285" y="190" text-anchor="middle">iBUS</text>
+      <text class="lbls" x="285" y="216" text-anchor="middle">kill prioritaire</text>
+      <line class="thin" x1="678" y1="198" x2="552" y2="198" marker-end="url(#a2)"/>
+      <text class="lbls" x="615" y="190" text-anchor="middle">GPIO / I²C</text>
+      <line class="thin" x1="410" y1="228" x2="300" y2="318" marker-end="url(#a2)"/>
+      <text class="lbls" x="300" y="268" text-anchor="end">bus série 1 Mbit/s</text>
+      <line class="thin" x1="490" y1="228" x2="560" y2="318" marker-start="url(#a2)" marker-end="url(#a2)"/>
+      <text class="lbls" x="536" y="262">→ CRSF : gaz, roulis, tangage, lacet</text>
+      <text class="lbls" x="536" y="278">← MSP : attitude</text>
+      <line class="thr" x1="672" y1="348" x2="718" y2="348" marker-end="url(#a3)"/>
+      <text class="thrt" x="695" y="340" text-anchor="middle">DShot</text>
+    </svg>
+    </div>
+    <figcaption>Trois boucles à trois vitesses. Le contrôleur de vol tient l'assiette du buste à plusieurs kHz, le Pico gère la marche et la séquence de saut à 200 Hz, le Pi décide à 30 Hz. Le Pico se fait passer pour un récepteur radio auprès du contrôleur de vol (protocole CRSF) : c'est le contrôleur FPV que tu connais déjà, sans firmware à écrire. La radio passe par le Pico et coupe tout, quoi que dise le Pi.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Séquence de saut</h2>
+  <figure>
+    <div class="scroll">
+    <svg viewBox="0 0 900 300" role="img" aria-label="Profil de poussée pendant un saut : 0,4 fois le poids à l'accroupi, 1,3 à l'impulsion, environ 1,05 en vol, 0,85 à la descente, puis retour à zéro après le contact.">
+      <!-- grille -->
+      <line class="grid" x1="70" y1="40" x2="870" y2="40"/><line class="grid" x1="70" y1="110" x2="870" y2="110"/><line class="grid" x1="70" y1="180" x2="870" y2="180"/>
+      <line class="thin" x1="70" y1="250" x2="870" y2="250"/><line class="thin" x1="70" y1="40" x2="70" y2="250"/>
+      <!-- séparateurs de phase -->
+      <line class="dash" x1="270" y1="34" x2="270" y2="250"/><line class="dash" x1="370" y1="34" x2="370" y2="250"/><line class="dash" x1="570" y1="34" x2="570" y2="250"/><line class="dash" x1="703" y1="34" x2="703" y2="250"/>
+      <text class="ttl" x="170" y="28" text-anchor="middle">ACCROUPI</text>
+      <text class="ttl" x="320" y="28" text-anchor="middle">IMPULSION</text>
+      <text class="ttl" x="470" y="28" text-anchor="middle">VOL</text>
+      <text class="ttl" x="637" y="28" text-anchor="middle">DESCENTE</text>
+      <text class="ttl" x="787" y="28" text-anchor="middle">CONTACT</text>
+      <!-- ligne du poids -->
+      <line class="dash" x1="70" y1="110" x2="870" y2="110" stroke="currentColor"/>
+      <text class="lbls" x="866" y="104" text-anchor="end">poussée = poids</text>
+      <!-- profil -->
+      <polyline class="thr" stroke-width="3" points="70,194 270,194 290,68 370,68 380,103 570,103 580,131 703,131 803,250 870,250"/>
+      <text class="thrt" x="170" y="186" text-anchor="middle">0,4 (pré-rotation)</text>
+      <text class="thrt" x="330" y="60" text-anchor="middle">1,3</text>
+      <text class="thrt" x="470" y="95" text-anchor="middle">≈ 1,05</text>
+      <text class="thrt" x="637" y="123" text-anchor="middle">0,85</text>
+      <text class="lbls" x="170" y="226" text-anchor="middle">genoux à 60°, ressorts chargés</text>
+      <text class="lbls" x="320" y="226" text-anchor="middle">détente</text>
+      <text class="lbls" x="470" y="226" text-anchor="middle">jambes repliées</text>
+      <text class="lbls" x="637" y="226" text-anchor="middle">jambes tendues</text>
+      <text class="lbls" x="787" y="226" text-anchor="middle">genoux amortissent</text>
+      <!-- axes -->
+      <g class="dimt"><text x="62" y="254" text-anchor="end">0</text><text x="62" y="184" text-anchor="end">0,5</text><text x="62" y="114" text-anchor="end">1,0</text><text x="62" y="44" text-anchor="end">1,5</text></g>
+      <g class="dimt"><text x="70" y="268" text-anchor="middle">0</text><text x="203" y="268" text-anchor="middle">0,2</text><text x="337" y="268" text-anchor="middle">0,4</text><text x="470" y="268" text-anchor="middle">0,6</text><text x="603" y="268" text-anchor="middle">0,8</text><text x="737" y="268" text-anchor="middle">1,0</text><text x="870" y="268" text-anchor="middle">1,2</text></g>
+      <text class="dimt" x="470" y="292" text-anchor="middle">temps (s)</text>
+      <text class="dimt" x="22" y="145" text-anchor="middle" transform="rotate(-90 22 145)">poussée / poids</text>
+    </svg>
+    </div>
+    <figcaption>Valeurs indicatives, à régler aux essais. La pré-rotation à 0,4 évite le temps de démarrage des moteurs au moment de l'impulsion. Le contrôleur de vol tient l'assiette pendant tout le saut ; c'est le Pico qui fixe le niveau de gaz phase par phase.</figcaption>
+  </figure>
+  <ol class="steps">
+    <li><b>Détection.</b> La caméra (YOLO) repère l'obstacle, le capteur ToF frontal donne sa distance ; la tête qui s'incline mesure sa hauteur.</li>
+    <li><b>Approche.</b> Le robot marche jusqu'à environ 25 cm du muret et s'arrête.</li>
+    <li><b>Accroupi.</b> Genoux à 60°, les ressorts se chargent, les propulseurs montent à 0,4 fois le poids.</li>
+    <li><b>Impulsion.</b> Extension des jambes en 100 à 150 ms et gaz à 1,3 ; le contrôleur incline le buste de quelques degrés vers l'avant pour donner de la vitesse horizontale.</li>
+    <li><b>Vol.</b> Jambes repliées pour passer le haut du muret, assiette tenue par le contrôleur de vol.</li>
+    <li><b>Descente.</b> Gaz à 0,85 pour freiner, jambes tendues vers le sol.</li>
+    <li><b>Contact.</b> Les contacts de pied déclenchent la baisse des gaz sur 200 ms, genoux et semelles amortissent.</li>
+  </ol>
+</section>
+
+<section>
+  <h2>Dimensionnement</h2>
+  <div class="two">
+    <div>
+      <h3>Bilan de masse (estimations)</h3>
+      <div class="tw"><table>
+        <thead><tr><th>Élément</th><th class="n">g</th></tr></thead>
+        <tbody>
+          <tr><td>6 servos bus de jambe (≈ 55 g)</td><td class="n">330</td></tr>
+          <tr><td>Structure jambes (tubes carbone + PETG)</td><td class="n">220</td></tr>
+          <tr><td>Pieds, ressorts de genou, tendons</td><td class="n">80</td></tr>
+          <tr><td>Torse et bassin</td><td class="n">220</td></tr>
+          <tr><td>4 propulseurs carénés + bras</td><td class="n">280</td></tr>
+          <tr><td>Contrôleur de vol + ESC 4-en-1</td><td class="n">35</td></tr>
+          <tr><td>LiPo 4S 1400 mAh (propulsion)</td><td class="n">170</td></tr>
+          <tr><td>LiPo 3S 2200 mAh (servos + électronique)</td><td class="n">185</td></tr>
+          <tr><td>Pi 5 + Hailo + ventilateur</td><td class="n">95</td></tr>
+          <tr><td>Pico, régulateurs, capteurs</td><td class="n">40</td></tr>
+          <tr><td>Tête : caméra + 2 micro-servos + coque</td><td class="n">60</td></tr>
+          <tr><td>Câbles, visserie</td><td class="n">120</td></tr>
+          <tr class="tot"><td>Total</td><td class="n">≈ 1 835</td></tr>
+        </tbody>
+      </table></div>
+      <p class="note">Avec des EDF de 64 mm à la place des hélices carénées : environ +200 g. Prévoir 10 à 15 % de marge, d'où la cible de 1,8 à 2,1 kg.</p>
+    </div>
+    <div>
+      <h3>Couple au genou</h3>
+      <div class="calc">m = 1,9 kg, une seule jambe au sol<br>
+genou fléchi à 30°, cuisse 170 mm<br>
+bras de levier ≈ 170 × sin 30° = 85 mm<br>
+τ ≈ 1,9 × 9,81 × 0,085 = 1,6 N·m ≈ 16 kg·cm<br>
+accroupi à 60° sur deux jambes : ≈ 14 kg·cm par genou<br>
+impulsion (2 à 3 g) : 30 à 45 kg·cm</div>
+      <p style="margin-top:10px">Un servo bus de la classe 12 V (environ 30 kg·cm en blocage) tient la marche, mais pas l'impulsion seul. <b>Le ressort de genou et la poussée sont donc dans le dimensionnement, pas en option.</b> Un servo travaille bien en continu jusqu'au tiers environ de son couple de blocage.</p>
+      <h3>Poussée nécessaire</h3>
+      <div class="calc">poussée / poids visé au saut = 1,3<br>
+1,3 × 2,0 kg = 2,6 kg, soit 650 g par propulseur<br>
+marche assistée (LEO) : ≈ 0,3 × poids = 600 g au total</div>
+      <p style="margin-top:10px">Les EDF de 64 mm du commerce annoncent 600 à 800 g en 4S pour 26 à 43 A chacune. 650 g par propulseur est donc atteignable, mais avec peu de marge : à confirmer au banc de poussée.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Choix des propulseurs</h2>
+  <div class="tw"><table>
+    <thead><tr><th>Critère</th><th>Hélices carénées 3,5″ (type cinewhoop)</th><th>EDF 64 mm</th></tr></thead>
+    <tbody>
+      <tr><td>Poussée par unité en 4S</td><td>à mesurer, souvent comparable</td><td>600 – 800 g (fiches fabricants)</td></tr>
+      <tr><td>Rendement (grammes de poussée par watt)</td><td><span class="tag ok">meilleur</span></td><td><span class="tag warn">plus faible</span></td></tr>
+      <tr><td>Masse des 4 unités</td><td>≈ 220 g</td><td>≈ 300 – 450 g</td></tr>
+      <tr><td>Autonomie en marche assistée</td><td>≈ 10 min (estimation)</td><td>≈ 5 – 8 min (estimation)</td></tr>
+      <tr><td>Look « jet »</td><td>moyen</td><td><span class="tag ok">oui</span></td></tr>
+      <tr><td>Pièces que tu as déjà (FPV)</td><td><span class="tag ok">probablement</span></td><td>non</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note" style="margin-top:10px">Recommandation : V1 en hélices carénées (rendement, poids, pièces FPV réutilisables), EDF en V2 si le look « jet » compte. Les bras sont dessinés pour accueillir les deux diamètres.</p>
+</section>
+
+<section>
+  <h2>Alimentation</h2>
+  <div class="tw"><table>
+    <thead><tr><th>Batterie</th><th>Alimente</th><th>Pourquoi séparée</th></tr></thead>
+    <tbody>
+      <tr><td>4S 1400 mAh 140C (tu l'as)</td><td>ESC 4-en-1 → 4 propulseurs</td><td>les pointes de plus de 100 A font chuter la tension ; rien d'autre n'y est branché</td></tr>
+      <tr><td>3S 2200 mAh (tu l'as)</td><td>servos de jambe (direct ou via régulateur selon leur tension max), régulateur 5,1 V / 5 A pour le Pi et le Pico</td><td>l'électronique ne redémarre jamais pendant un saut</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note" style="margin-top:10px">Masses communes entre les deux batteries. Un interrupteur d'armement physique coupe la 4S. Vérifier la tension maximale des servos choisis avant de les brancher directement sur la 3S (12,6 V chargée).</p>
+</section>
+
+<section>
+  <h2>Plan de développement</h2>
+  <ol class="steps">
+    <li><b>Banc de poussée.</b> Carte HyPrSpace + capteur de force : poussée, courant et chauffe des deux options de propulseurs. Décide le choix hélice ou EDF.</li>
+    <li><b>Torse volant attaché.</b> Torse + 4 propulseurs + contrôleur de vol, sur rotule ou longe. Le Pico envoie les consignes en CRSF, la radio garde le kill. C'est un drone, terrain connu.</li>
+    <li><b>Jambes au banc et en simulation.</b> Export de la CAO SolidWorks en URDF, simulation MuJoCo, puis jambes suspendues qui rejouent la marche.</li>
+    <li><b>Marche assistée sous longe.</b> Les propulseurs portent environ 30 % du poids et tiennent le buste, comme LEO.</li>
+    <li><b>Sauts.</b> Sur place, puis par-dessus 10 cm, puis le muret de 30 cm.</li>
+    <li><b>Vision et missions.</b> Gestes (estimation de pose sur le Hailo), « va là-bas », « saute le muret ».</li>
+  </ol>
+</section>
+
+<section>
+  <h2>Risques à surveiller</h2>
+  <div class="tw"><table>
+    <thead><tr><th>Risque</th><th>Parade</th></tr></thead>
+    <tbody>
+      <tr><td>Axe de poussée décalé du centre de gravité : le robot bascule au décollage</td><td>batteries basses dans le torse, réglage du centre de gravité au banc, contrôleur en mode angle</td></tr>
+      <tr><td>Pignons de servo cassés à l'atterrissage</td><td>semelles TPU, ressorts, freinage par la poussée, servos à pignons métal</td></tr>
+      <tr><td>Hélices ou turbines dangereuses de près</td><td>carénages, kill radio prioritaire, essais sous longe en extérieur</td></tr>
+      <tr><td>Couplage jambes / propulseurs instable</td><td>développer chaque boucle seule (étapes 2 et 3) avant de les réunir</td></tr>
+      <tr><td>Autonomie courte</td><td>propulseurs au ralenti en marche simple, plein régime seulement pour sauter</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2>Sources et incertitudes</h2>
+  <p class="note">Les données sur LEO viennent d'articles de presse ; le papier <i>Science Robotics</i> n'a pas pu être consulté. Les masses, couples et autonomies de cette page sont des estimations d'avant-projet ; les prix ne sont pas donnés tant que les composants ne sont pas choisis.</p>
+  <ul class="src">
+    <li><a href="https://www.caltech.edu/about/news/leonardo-the-bipedal-robot-can-ride-a-skateboard-and-walk-a-slackline">Caltech : LEONARDO, the Bipedal Robot</a></li>
+    <li><a href="https://spectrum.ieee.org/bipedal-drone-robot-caltech">IEEE Spectrum : bipedal drone robot</a></li>
+    <li><a href="https://www.theengineer.co.uk/content/news/robot-leo-demonstrates-hybrid-locomotion">The Engineer : LEO demonstrates hybrid locomotion</a></li>
+    <li><a href="https://www.republicworld.com/science/space/caltech-researchers-develop-bipedal-robot-leonardo-which-can-walk-fly-and-even-skate">Republic World (masse 2,58 kg, non confirmée)</a></li>
+    <li><a href="https://ptolemy.berkeley.edu/projects/robotics/%7Eronf/PAPERS/dhaldane-iros17.pdf">Haldane et al., Salto-1P (IROS 2017)</a></li>
+    <li><a href="https://probots.co.in/aeorc-af64441a-edf-ducted-fan-with-brushless-motor-64mm-8-blade.html">Fiche EDF 64 mm AEORC AF64441A</a> · <a href="https://www.manualsdir.com/manuals/591193/e-flite-delta-v-480-65mm-edf-system-4000kv.html">Manuel E-flite Delta-V 480</a></li>
+  </ul>
+</section>
+
+</main>
