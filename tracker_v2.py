@@ -260,11 +260,15 @@ class NullDetector:
 class UltralyticsDetector:
     def __init__(self, path, conf, imgsz):
         from ultralytics import YOLO
+        import torch
+        self.device = "0" if torch.cuda.is_available() else "cpu"
         self.model, self.conf, self.imgsz = YOLO(path), conf, imgsz
+        gpu = torch.cuda.get_device_name(0) if self.device != "cpu" else "CPU (PyTorch sans CUDA)"
+        print(f"[YOLO] {os.path.basename(path)} sur {gpu}")
 
     def detect(self, img, classes=None):
-        r = self.model.predict(img, imgsz=self.imgsz, conf=self.conf,
-                               classes=classes, verbose=False)[0]
+        r = self.model.predict(img, imgsz=self.imgsz, conf=self.conf, classes=classes,
+                               device=self.device, verbose=False)[0]
         out = []
         for b in r.boxes:
             x1, y1, x2, y2 = b.xyxy[0].tolist()
@@ -278,10 +282,11 @@ def make_detector(model, conf, imgsz):
     if model == "none":
         return NullDetector()
     path = model if os.path.isabs(model) else os.path.join(_SCRIPT_DIR, model)
+    if path.endswith(".pt"):
+        # nom nu si absent : ultralytics télécharge alors le modèle officiel
+        return UltralyticsDetector(path if os.path.exists(path) else model, conf, imgsz)
     if not os.path.exists(path):
         raise SystemExit(f"[YOLO] Modèle introuvable : {path}")
-    if path.endswith(".pt"):
-        return UltralyticsDetector(path, conf, imgsz)
     from yolo_onnx import YOLODetector
     return YOLODetector(path, conf=conf, imgsz=imgsz)
 
@@ -428,13 +433,25 @@ def open_serial(port):
             return None
         port = cands[0]
     try:
-        ser = serial.Serial(port, SERIAL_BAUD, timeout=0, write_timeout=0.05)
-        time.sleep(0.5)
+        ser = serial.Serial(port, SERIAL_BAUD, timeout=0.1, write_timeout=0.05)
+        time.sleep(2.0)       # l'ouverture du port redémarre l'Arduino : attendre la fin du bootloader
         print(f"[SERIAL] Arduino : {port}")
+        threading.Thread(target=_serial_reader, args=(ser,), daemon=True, name="serial-rx").start()
         return ser
     except (serial.SerialException, OSError) as e:
         print(f"[SERIAL] Erreur {port} : {e} – mode vision seule")
         return None
+
+
+def _serial_reader(ser):
+    """Vide le tampon de réception et affiche les messages utiles de l'Arduino (mode RC/AUTO, PID…)."""
+    while True:
+        try:
+            line = ser.readline().decode(errors="replace").strip()
+        except (serial.SerialException, OSError, TypeError):
+            return
+        if line and not line.startswith(("[RC]", "[MOT]")):
+            print(f"[ARDUINO] {line}")
 
 
 class ControlLoop:
@@ -702,6 +719,11 @@ def local_ip():
 
 
 def default_model():
+    try:
+        import ultralytics  # noqa: F401
+        return "yolov8n.pt"
+    except ImportError:
+        pass
     for name in ("yolo26n.onnx", "yolov8n.onnx", "yolo11n.onnx"):
         if os.path.exists(os.path.join(_SCRIPT_DIR, name)):
             return name
@@ -721,7 +743,9 @@ def main():
     p.add_argument("--classes", default="0", help="classes COCO, ex. '0' (personne) ou 'all'")
     p.add_argument("--no-reduce", action="store_true", help="décoder en pleine résolution pour YOLO")
     p.add_argument("--serial", default=None, help="port Arduino (auto par défaut), 'none' pour désactiver")
-    p.add_argument("--cmd-rate", type=float, default=30, help="fréquence d'envoi des consignes (Hz)")
+    p.add_argument("--cmd-rate", type=float, default=15,
+                   help="fréquence d'envoi des consignes (Hz). Le tilt de turret_rover.ino avance d'un pas "
+                        "par message : 15 Hz = réglage d'origine, plus haut = tilt plus nerveux")
     p.add_argument("--no-predict", action="store_true", help="désactive l'extrapolation de la cible")
     p.add_argument("--cam-latency", type=float, default=0, help="latence caméra estimée (ms) à compenser")
     p.add_argument("--auto", action="store_true", help="verrouille automatiquement la cible la plus centrale")

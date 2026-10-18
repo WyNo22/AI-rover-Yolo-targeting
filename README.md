@@ -207,6 +207,8 @@ python yolo_test.py                     # caméra 0 ; sinon --source 1, 2…
 ```
 Touches : `q` quitter, `s` capture, `c` personnes ↔ toutes les classes.
 
+**Tourelle** : double-clic sur `lancer_tourelle.bat` (Arduino branché, `turret_rover.ino` flashé, interrupteur RC sur AUTO) → l'interface s'ouvre sur http://localhost:8082, clic sur une personne pour la suivre.
+
 ---
 
 ## ⚡ Tracker v2 — pipeline découplé (`tracker_v2.py`)
@@ -215,7 +217,7 @@ Nouvelle version qui sépare la vidéo de la détection :
 
 - **Vidéo** : le MJPEG de la caméra est relayé **tel quel** au navigateur (via ffmpeg `-c:v copy`) → 1080p30 sans ré-encodage, quelle que soit la vitesse de YOLO.
 - **Détection** : un thread prend toujours **la dernière image** (jamais de file d'attente), la décode à demi-résolution et lance YOLO.
-- **Contrôle** : consigne envoyée à fréquence fixe (30 Hz par défaut) avec extrapolation de la position de la cible. Protocole série **inchangé** (`err_x err_y bbox_h`, repère 640×480) → `turret_rover.ino` n'a pas besoin d'être reflashé.
+- **Contrôle** : consigne envoyée à fréquence fixe (15 Hz par défaut, comme l'ancien code) avec extrapolation de la position de la cible. Protocole série **inchangé** (`err_x err_y bbox_h`, repère 640×480) → `turret_rover.ino` n'a pas besoin d'être reflashé.
 - **Interface** (`http://<ip>:8082`) : boîtes dessinées côté navigateur, clic pour verrouiller, Drive/Auto/Reset, et métriques (FPS caméra, FPS YOLO, temps de décodage et d'inférence, âge de l'image au moment de la décision).
 
 ```bash
