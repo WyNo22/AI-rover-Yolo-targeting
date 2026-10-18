@@ -269,4 +269,4 @@ class SimpleTracker:
         area_a = (boxes_a[:, 2] - boxes_a[:, 0]) * (boxes_a[:, 3] - boxes_a[:, 1])
         area_b = (boxes_b[:, 2] - boxes_b[:, 0]) * (boxes_b[:, 3] - boxes_b[:, 1])
         union = area_a[:, None] + area_b[None, :] - inter + 1e-6
-        return inter / unio
+        return inter / union

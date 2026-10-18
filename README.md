@@ -197,6 +197,30 @@ Or use any YOLOv8 nano ONNX model with 640×640 input and person detection (clas
 
 ---
 
+## ⚡ Tracker v2 — pipeline découplé (`tracker_v2.py`)
+
+Nouvelle version qui sépare la vidéo de la détection :
+
+- **Vidéo** : le MJPEG de la caméra est relayé **tel quel** au navigateur (via ffmpeg `-c:v copy`) → 1080p30 sans ré-encodage, quelle que soit la vitesse de YOLO.
+- **Détection** : un thread prend toujours **la dernière image** (jamais de file d'attente), la décode à demi-résolution et lance YOLO.
+- **Contrôle** : consigne envoyée à fréquence fixe (30 Hz par défaut) avec extrapolation de la position de la cible. Protocole série **inchangé** (`err_x err_y bbox_h`, repère 640×480) → `turret_rover.ino` n'a pas besoin d'être reflashé.
+- **Interface** (`http://<ip>:8082`) : boîtes dessinées côté navigateur, clic pour verrouiller, Drive/Auto/Reset, et métriques (FPS caméra, FPS YOLO, temps de décodage et d'inférence, âge de l'image au moment de la décision).
+
+```bash
+pip install opencv-python onnxruntime pyserial numpy      # + ffmpeg dans le PATH (recommandé)
+yolo export model=yolov8n.pt format=onnx                  # une fois, sur PC, pour obtenir le modèle
+
+python tracker_v2.py --source test --model demo           # test sans caméra ni modèle
+python tracker_v2.py --list-devices                       # Windows : noms des caméras
+python tracker_v2.py --source "dshow:<nom DJI>" --size 1920x1080 --model yolov8n.onnx
+python tracker_v2.py --source 0 --size 1920x1080          # Linux / Raspberry Pi : /dev/video0
+python tracker_v2.py --source 0 --backend opencv          # sans ffmpeg (le flux est alors ré-encodé)
+```
+
+`python tracker_v2.py -h` liste toutes les options (`--cmd-rate`, `--cam-latency`, `--auto`, `--serial none`…).
+
+---
+
 ## ⚙️ Serial Protocol (Python → Arduino)
 
 ```
