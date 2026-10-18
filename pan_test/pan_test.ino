@@ -1,18 +1,18 @@
 /*
  * pan_test.ino
- * Test minimal du servo PAN (pin 9), sans Python ni PC.
+ * Test minimal du servo PAN (pin 8), sans Python ni PC.
  * Cycle : gauche 2 s → stop 1 s → droite 2 s → stop 1 s, en boucle.
  * Le Serial Monitor (115200) affiche l'étape en cours.
  *
  * Servo à rotation continue : il tourne dans un sens puis dans l'autre.
  * Servo 180° : il va à une position à gauche puis à droite (marche aussi).
  *
- * Câblage : signal → D9 | + → LiPo/BEC | − → GND commun avec l'Arduino
+ * Câblage : signal → D8 | + → LiPo/BEC | − → GND commun avec l'Arduino
  */
 
 #include <Servo.h>
 
-#define PIN_PAN   9
+#define PIN_PAN   8     // D8 pour le test (n importe quelle broche marche avec la lib Servo)
 #define STOP_US   1500   // neutre
 #define DELTA_US  250    // écart au neutre (vitesse) : 1250 µs = un sens, 1750 µs = l'autre
 
