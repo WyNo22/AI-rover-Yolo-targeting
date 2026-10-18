@@ -197,6 +197,18 @@ Or use any YOLOv8 nano ONNX model with 640×640 input and person detection (clas
 
 ---
 
+## 🧪 Test rapide YOLO (`yolo_test.py`)
+
+Caméra → YOLO → fenêtre vidéo annotée, sans Arduino ni servos.
+
+```bash
+pip install ultralytics opencv-python   # yolov8n.pt se télécharge tout seul, GPU utilisé si dispo
+python yolo_test.py                     # caméra 0 ; sinon --source 1, 2…
+```
+Touches : `q` quitter, `s` capture, `c` personnes ↔ toutes les classes.
+
+---
+
 ## ⚡ Tracker v2 — pipeline découplé (`tracker_v2.py`)
 
 Nouvelle version qui sépare la vidéo de la détection :
