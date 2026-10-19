@@ -59,6 +59,10 @@ figcaption{font-size:.9rem;color:var(--muted);margin-top:10px;max-width:none}
 .thrf{fill:var(--thrust)}
 .thrt{fill:var(--thrust);font:600 12px var(--f-mono)}
 .spr{stroke:var(--spring);fill:none;stroke-width:2}
+.tube{stroke:currentColor;stroke-width:7;stroke-linecap:round;fill:none;opacity:.8}
+.rod{stroke:currentColor;stroke-width:2.2;fill:none}
+.servo{fill:var(--paper);stroke:currentColor;stroke-width:1.4}
+.opt{stroke-dasharray:5 4}
 .sprt{fill:var(--spring);font:12px var(--f-body)}
 .duct{stroke:currentColor;fill:var(--paper);stroke-width:1.6}
 .box{stroke:currentColor;fill:var(--paper);stroke-width:1.4}
@@ -90,7 +94,7 @@ ul.src{font-size:.88rem;color:var(--muted);padding-left:1.2em;margin:0}
 
 <header class="titleblock">
   <div>
-    <div class="eyebrow">Avant-projet · Rév. B</div>
+    <div class="eyebrow">Avant-projet · Rév. C</div>
     <h1>Bipède LEO-S</h1>
     <p class="lede">Un LEONARDO simplifié : 4 servos par jambe pour marcher seul et stable, 4 propulseurs aux épaules qui se déclenchent pour rattraper une perte d'équilibre et pour sauter. Dimensionné pour franchir un muret de 30 cm.</p>
   </div>
@@ -449,6 +453,134 @@ ul.src{font-size:.88rem;color:var(--muted);padding-left:1.2em;margin:0}
       <tr><td>q5 cheville roulis</td><td><span class="tag warn">facultatif</span></td><td>±20°</td><td>V2, terrain irrégulier</td></tr>
     </tbody>
   </table></div>
+</section>
+
+<section>
+  <h2>Jambe à bielles (Rév. C)</h2>
+  <p>Les 4 servos sont regroupés en haut de la jambe. Le servo du genou est fixé <b>sur la cuisse</b>, juste sous la hanche, et entraîne le genou par une bielle. Le servo de la cheville est fixé <b>en haut du tibia</b> et entraîne le talon par une seconde bielle. Chaque bielle forme un parallélogramme (bras du servo = levier de l'articulation = 22 mm) : l'articulation reproduit l'angle du servo avec le même couple, et bouger la hanche ne fait pas bouger le genou.</p>
+  <figure>
+    <div class="scroll">
+    <svg viewBox="0 0 780 540" role="img" aria-label="Schéma cinématique d'une jambe vue de côté : servos de hanche roulis et tangage au bassin, servo du genou fixé sur la cuisse avec bielle vers un levier derrière le genou, servo de cheville fixé en haut du tibia avec bielle vers le talon, ressort de genou sur came, tibia télescopique en option, semelle TPU.">
+      <defs>
+        <marker id="jd" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9" fill="none" stroke="currentColor" stroke-width="1.4"/></marker>
+      </defs>
+      <!-- bassin -->
+      <line class="ln" x1="180" y1="22" x2="320" y2="22"/>
+      <g class="thin"><line x1="190" y1="22" x2="182" y2="12"/><line x1="210" y1="22" x2="202" y2="12"/><line x1="230" y1="22" x2="222" y2="12"/><line x1="250" y1="22" x2="242" y2="12"/><line x1="270" y1="22" x2="262" y2="12"/><line x1="290" y1="22" x2="282" y2="12"/><line x1="310" y1="22" x2="302" y2="12"/></g>
+      <text class="lbls" x="176" y="26" text-anchor="end">bassin</text>
+      <!-- S1 hanche roulis (axe x) -->
+      <rect class="servo" x="226" y="30" width="48" height="16" rx="2"/>
+      <rect class="joint" x="240" y="46" width="20" height="8" rx="1"/>
+      <line class="ln" x1="250" y1="54" x2="250" y2="70"/>
+      <!-- S2 hanche tangage : corps du servo + axe H -->
+      <rect class="servo" x="206" y="70" width="44" height="20" rx="2"/>
+      <circle class="joint" cx="250" cy="80" r="7"/>
+      <!-- cuisse -->
+      <line class="tube" x1="250" y1="80" x2="294" y2="244"/>
+      <!-- S3 genou, fixé sur la cuisse -->
+      <rect class="servo" x="226.2" y="105.1" width="20" height="40" rx="2" transform="rotate(-15 236.2 125.1)"/>
+      <line class="ln" x1="250" y1="98" x2="240" y2="112"/>
+      <line class="ln" x1="236.2" y1="125.1" x2="214.9" y2="119.4" stroke-width="3"/>
+      <circle class="joint" cx="236.2" cy="125.1" r="5"/>
+      <!-- bielle B1 -->
+      <line class="rod" x1="214.9" y1="119.4" x2="272.7" y2="238.3"/>
+      <circle class="pjoint" cx="214.9" cy="119.4" r="3.5"/><circle class="pjoint" cx="272.7" cy="238.3" r="3.5"/>
+      <!-- levier genou (solidaire du tibia) -->
+      <line class="ln" x1="294" y1="244" x2="272.7" y2="238.3" stroke-width="3"/>
+      <!-- ressort de genou : sur la cuisse, câble vers came -->
+      <circle cx="294" cy="244" r="15" class="spr" stroke-dasharray="3 3"/>
+      <polyline class="spr" points="290,172 296,178 290,184 298,189 292,195 300,200 294,206 301,211"/>
+      <line class="spr" x1="301" y1="211" x2="309" y2="240" stroke-width="1.2"/>
+      <line class="thin" x1="282" y1="170" x2="292" y2="171"/>
+      <!-- genou (pivot passif) -->
+      <circle class="pjoint" cx="294" cy="244" r="7"/>
+      <!-- tibia : haut rigide + partie télescopique en option -->
+      <line class="tube" x1="294" y1="244" x2="268" y2="341"/>
+      <line class="tube opt" x1="268" y1="341" x2="250" y2="408"/>
+      <polyline class="spr" points="270,334 262,338 274,343 264,348 276,352 266,357"/>
+      <rect class="pjoint" x="256" y="330" width="9" height="9" rx="1" transform="rotate(15 260 334)"/>
+      <!-- S4 cheville, fixé en haut du tibia -->
+      <rect class="servo" x="249.4" y="256.1" width="20" height="40" rx="2" transform="rotate(15 259.4 276.1)"/>
+      <line class="ln" x1="285" y1="268" x2="268" y2="272"/>
+      <line class="ln" x1="259.4" y1="276.1" x2="237.4" y2="276.1" stroke-width="3"/>
+      <circle class="joint" cx="259.4" cy="276.1" r="5"/>
+      <!-- bielle B2 -->
+      <line class="rod" x1="237.4" y1="276.1" x2="228" y2="408"/>
+      <circle class="pjoint" cx="237.4" cy="276.1" r="3.5"/><circle class="pjoint" cx="228" cy="408" r="3.5"/>
+      <!-- pied : levier talon + bloc + semelle -->
+      <line class="ln" x1="250" y1="408" x2="228" y2="408" stroke-width="3"/>
+      <line class="ln" x1="250" y1="408" x2="250" y2="446" stroke-width="3"/>
+      <line class="ln" x1="208" y1="446" x2="300" y2="446" stroke-width="4"/>
+      <rect x="208" y="448" width="92" height="8" rx="3" class="spr" fill="none"/>
+      <circle class="pjoint" cx="250" cy="408" r="7"/>
+      <!-- sol -->
+      <line class="thin" x1="170" y1="458" x2="340" y2="458"/>
+      <g class="thin"><line x1="180" y1="458" x2="172" y2="468"/><line x1="200" y1="458" x2="192" y2="468"/><line x1="220" y1="458" x2="212" y2="468"/><line x1="240" y1="458" x2="232" y2="468"/><line x1="260" y1="458" x2="252" y2="468"/><line x1="280" y1="458" x2="272" y2="468"/><line x1="300" y1="458" x2="292" y2="468"/><line x1="320" y1="458" x2="312" y2="468"/></g>
+
+      <!-- étiquettes à droite -->
+      <g class="thin">
+        <line x1="276" y1="38" x2="400" y2="38"/>
+        <line x1="257" y1="80" x2="400" y2="80"/>
+        <line x1="243" y1="128" x2="400" y2="132"/>
+        <line x1="302" y1="190" x2="400" y2="190"/>
+        <line x1="302" y1="244" x2="400" y2="244"/>
+        <line x1="266" y1="282" x2="400" y2="292"/>
+        <line x1="274" y1="345" x2="400" y2="350"/>
+        <line x1="257" y1="408" x2="400" y2="408"/>
+        <line x1="300" y1="452" x2="400" y2="452"/>
+      </g>
+      <text class="lbl" x="406" y="35"><tspan font-weight="600">S1 hanche roulis</tspan> · servo au bassin, axe avant-arrière</text>
+      <text class="lbls" x="406" y="50">porte S2 et toute la jambe</text>
+      <text class="lbl" x="406" y="77"><tspan font-weight="600">S2 hanche tangage</tspan> · axe H</text>
+      <text class="lbls" x="406" y="92">fait pivoter la cuisse ; roulement en face du servo</text>
+      <text class="lbl" x="406" y="129"><tspan font-weight="600">S3 genou</tspan> · fixé sur la cuisse, 40 mm sous H</text>
+      <text class="lbls" x="406" y="144">bras r1 = 22 mm → bielle B1 (≈ 132 mm) → levier r2 = 22 mm</text>
+      <text class="sprt" x="406" y="187">ressort de genou ≈ 3,5 N/mm sur came r = 15 mm</text>
+      <text class="lbls" x="406" y="202">engagé seulement au-delà de 40° de flexion</text>
+      <text class="lbl" x="406" y="241"><tspan font-weight="600">Genou</tspan> · pivot passif sur roulements, 0° à 130°</text>
+      <text class="lbls" x="406" y="256">levier r2 derrière le genou, solidaire du tibia</text>
+      <text class="lbl" x="406" y="289"><tspan font-weight="600">S4 cheville</tspan> · fixé en haut du tibia, 40 mm sous le genou</text>
+      <text class="lbls" x="406" y="304">bras 22 mm → bielle B2 (≈ 132 mm) → levier talon 22 mm</text>
+      <text class="sprt" x="406" y="347">option V1.5 : tibia télescopique + ressort + verrou</text>
+      <text class="lbls" x="406" y="362">B2 suit la course (bielle à ressort) ou cheville bloquée au saut</text>
+      <text class="lbl" x="406" y="405"><tspan font-weight="600">Cheville</tspan> · pivot passif, ±45°</text>
+      <text class="sprt" x="406" y="449">semelle TPU : amortit la réception</text>
+
+      <!-- cotes à gauche -->
+      <line class="dim" x1="150" y1="80" x2="150" y2="244" marker-start="url(#jd)" marker-end="url(#jd)"/>
+      <text class="dimt" x="142" y="166" text-anchor="end">cuisse 170</text>
+      <line class="dim" x1="150" y1="244" x2="150" y2="408" marker-start="url(#jd)" marker-end="url(#jd)"/>
+      <text class="dimt" x="142" y="330" text-anchor="end">tibia 170</text>
+      <line class="dim" x1="150" y1="408" x2="150" y2="456" marker-start="url(#jd)" marker-end="url(#jd)"/>
+      <text class="dimt" x="142" y="436" text-anchor="end">50</text>
+      <line class="dim" x1="208" y1="488" x2="300" y2="488" marker-start="url(#jd)" marker-end="url(#jd)"/>
+      <text class="dimt" x="254" y="504" text-anchor="middle">pied 92</text>
+      <g class="dim" stroke-dasharray="2 3"><line x1="144" y1="80" x2="240" y2="80"/><line x1="144" y1="244" x2="284" y2="244"/><line x1="144" y1="408" x2="240" y2="408"/></g>
+      <text class="ttl" x="254" y="530" text-anchor="middle">VUE DE CÔTÉ — AVANT À DROITE — GENOU FLÉCHI À 30°</text>
+    </svg>
+    </div>
+    <div class="legend">
+      <span><i class="sw servo"></i>sortie de servo (motorisée)</span>
+      <span><i class="sw pass"></i>pivot passif ou rotule</span>
+      <span><i class="sw servo" style="border-radius:2px;width:22px;height:6px;opacity:.8"></i>tube carbone</span>
+      <span><i class="sw spr"></i>élément élastique</span>
+      <span><i class="sw pass" style="border-radius:2px;border-style:dashed"></i>option V1.5</span>
+    </div>
+    <figcaption>Échelle des cotes en mm. Les deux bielles sont des parallélogrammes : rotules M3 de modélisme aux extrémités, tube carbone de 4 à 6 mm. Côté de passage des tiges à choisir dans la CAO pour qu'elles travaillent en traction sous le poids. Les pivots du genou et de la cheville tournent sur des roulements ; les servos ne portent pas la charge du robot sur leur axe.</figcaption>
+  </figure>
+  <div class="tw" style="margin-top:16px"><table>
+    <thead><tr><th>Liaison</th><th>Type</th><th>Entraînée par</th><th>Réalisation</th></tr></thead>
+    <tbody>
+      <tr><td>Bassin → étrier de hanche</td><td>pivot, axe x</td><td>S1 direct</td><td>servo au bassin + roulement opposé</td></tr>
+      <tr><td>Étrier → cuisse (H)</td><td>pivot, axe y</td><td>S2 direct</td><td>chape PETG, roulement 6800 ou 688 en face</td></tr>
+      <tr><td>Cuisse → tibia (genou)</td><td>pivot, axe y, 0–130°</td><td>S3 via bielle B1</td><td>axe M5 + 2 roulements, levier 22 mm</td></tr>
+      <tr><td>Tibia → pied (cheville)</td><td>pivot, axe y, ±45°</td><td>S4 via bielle B2</td><td>axe M4 + 2 roulements, levier talon 22 mm</td></tr>
+      <tr><td>Extrémités de bielles (×4)</td><td>rotules</td><td>—</td><td>chapes à boule M3 de modélisme</td></tr>
+      <tr><td>Ressort de genou</td><td>élastique, engagement retardé</td><td>passif</td><td>ressort de traction sur la cuisse + câble sur came de 15 mm</td></tr>
+      <tr><td>Tibia télescopique (V1.5)</td><td>glissière + ressort + verrou</td><td>passif, chargé par un servo</td><td>tube 10 mm dans 12 mm, 2 bagues PTFE, méplat anti-rotation</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note" style="margin-top:10px">Masse des 4 servos : ≈ 220 g par jambe, dont 3 à moins de 5 cm de l'axe de hanche et 1 juste sous le genou. Aucun moteur sous la mi-tibia : la jambe qui avance reste légère.</p>
 </section>
 
 <section>
