@@ -46,6 +46,8 @@ try:
 except ImportError:
     serial = None
 
+from behavior import Behavior
+from gestures import DemoPoseDetector, GestureRecognizer, KP_MIN
 from yolo_onnx import SimpleTracker
 
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -61,6 +63,8 @@ TARGET_Y_RATIO   = 0.12           # point visé : 12 % depuis le haut de la boî
 FILTER_ALPHA     = 0.6            # filtre alpha-bêta : poids de la mesure sur la position
 FILTER_BETA      = 0.15           #                     poids de la mesure sur la vitesse
 MAX_PREDICT_S    = 0.25           # extrapolation maximale de la position cible
+TORSO_M          = 0.50           # longueur épaules → hanches d'un adulte (estimation de distance)
+PERSON_M         = 1.70           # taille d'une personne debout (repli si pas de squelette)
 
 
 # ── Utilitaires ───────────────────────────────────────────────────────────────
@@ -270,24 +274,28 @@ class UltralyticsDetector:
     def detect(self, img, classes=None):
         r = self.model.predict(img, imgsz=self.imgsz, conf=self.conf, classes=classes,
                                device=self.device, verbose=False)[0]
+        kps = r.keypoints.data.cpu().numpy() if r.keypoints is not None else None
         out = []
-        for b in r.boxes:
+        for i, b in enumerate(r.boxes):
             x1, y1, x2, y2 = b.xyxy[0].tolist()
-            out.append((x1, y1, x2, y2, float(b.conf[0]), int(b.cls[0])))
+            d = (x1, y1, x2, y2, float(b.conf[0]), int(b.cls[0]))
+            out.append(d + (kps[i],) if kps is not None else d)
         return out
 
 
 def make_detector(model, conf, imgsz):
     if model == "demo":
         return DemoDetector()
+    if model == "demo-pose":
+        return DemoPoseDetector()
     if model == "none":
         return NullDetector()
     if model.endswith(".hef"):
-        from yolo_hailo import HailoDetector, find_hef
+        from yolo_hailo import find_hef, make_hailo_detector
         path = find_hef(model)
         if path is None:
             raise SystemExit(f"[YOLO] Modèle Hailo introuvable : {model} (voir ls /usr/share/hailo-models)")
-        return HailoDetector(path, conf=conf)
+        return make_hailo_detector(path, conf)
     path = model if os.path.isabs(model) else os.path.join(_SCRIPT_DIR, model)
     if path.endswith(".pt"):
         # nom nu si absent : ultralytics télécharge alors le modèle officiel
@@ -306,8 +314,12 @@ class TargetState:
         self.lock = threading.Condition()
         self.version = 0
         self.tracks = []          # [(id, x1, y1, x2, y2, conf)] normalisés
+        self.kpts = {}            # id → points du corps (17, 3) normalisés (modèles -pose)
+        self.gest = ({}, {})      # (id → (geste, progression), id → direction pointée)
+        self.t_cap = 0.0
         self.target_id = None
         self.auto_lock = auto_lock
+        self.paused = False       # REPOS : pas de verrouillage automatique
         self.drive = False
         self.t_seen = 0.0         # dernier instant (capture) où la cible a été vue
         self.pos = None           # [x, y] normalisé, filtré
@@ -318,10 +330,22 @@ class TargetState:
     def _reset_target(self):
         self.target_id, self.pos, self.vel, self.box_h = None, None, [0.0, 0.0], 0.0
 
-    def update(self, tracks, t_cap):
+    def lock_on(self, tid):
         with self.lock:
-            self.tracks = tracks
-            if self.target_id is None and self.auto_lock and tracks:
+            if tid != self.target_id:
+                self._reset_target()
+                self.target_id = tid
+                self.t_seen = time.monotonic()
+                print(f"[LOCK] Cible ID {tid}")
+
+    def release(self):
+        with self.lock:
+            self._reset_target()
+
+    def update(self, tracks, t_cap, kpts=None, gest=({}, {})):
+        with self.lock:
+            self.tracks, self.kpts, self.gest, self.t_cap = tracks, kpts or {}, gest, t_cap
+            if self.target_id is None and self.auto_lock and not self.paused and tracks:
                 best = min(tracks, key=lambda d: abs((d[1] + d[3]) / 2 - 0.5) + abs((d[2] + d[4]) / 2 - 0.5))
                 self.target_id = best[0]
                 print(f"[AUTO] Cible ID {self.target_id}")
@@ -381,8 +405,9 @@ class TargetState:
 
 # ── Thread inférence ──────────────────────────────────────────────────────────
 class InferenceWorker:
-    def __init__(self, slot, detector, state, stop, reduce, classes):
+    def __init__(self, slot, detector, state, stop, reduce, classes, gestures=None, behavior=None):
         self.slot, self.detector, self.state, self.stop = slot, detector, state, stop
+        self.gestures, self.behavior = gestures, behavior
         self.reduce, self.classes = reduce, classes
         self.tracker = SimpleTracker(iou_thresh=0.3, max_lost=30)
         self.rate = RateMeter()
@@ -415,12 +440,28 @@ class InferenceWorker:
                 img = fr.bgr
             t1 = time.monotonic()
             dets = self.detector.detect(img, classes=self.classes)
-            tracks = self.tracker.update(dets)
+            tracks = self.tracker.update([d[:6] for d in dets])
             t2 = time.monotonic()
             h, w = img.shape[:2]
             norm = [(int(tid), x1 / w, y1 / h, x2 / w, y2 / h, float(c))
                     for tid, x1, y1, x2, y2, c in tracks]
-            self.state.update(norm, fr.t_cap)
+            # Le tracker renvoie les boîtes détectées telles quelles : on y raccroche les squelettes
+            by_box = {tuple(np.round(d[:4], 2)): d[6] for d in dets if len(d) > 6}
+            kpts = {}
+            for tid, x1, y1, x2, y2, _ in tracks:
+                k = by_box.get(tuple(np.round((x1, y1, x2, y2), 2)))
+                if k is not None:
+                    k = np.array(k, np.float32)
+                    k[:, 0] /= w
+                    k[:, 1] /= h
+                    kpts[int(tid)] = k
+            events, gest = [], ({}, {})
+            if self.gestures is not None:
+                events = self.gestures.update(fr.t_cap, kpts, w / h)
+                gest = (self.gestures.current, self.gestures.pointing)
+            self.state.update(norm, fr.t_cap, kpts, gest)      # squelettes et gestes publiés ensemble
+            if self.behavior is not None:
+                self.behavior.on_events(events)
             self.decode_ms.add((t1 - t0) * 1000)
             self.infer_ms.add((t2 - t1) * 1000)
             self.age_ms.add((t2 - fr.t_cap) * 1000)
@@ -465,8 +506,8 @@ def _serial_reader(ser):
 class ControlLoop:
     """Envoie la consigne à fréquence fixe, indépendamment du rythme de YOLO."""
 
-    def __init__(self, ser, state, stop, rate_hz, predict, cam_latency):
-        self.ser, self.state, self.stop = ser, state, stop
+    def __init__(self, ser, state, stop, rate_hz, predict, cam_latency, behavior=None):
+        self.ser, self.state, self.stop, self.behavior = ser, state, stop, behavior
         self.period, self.predict, self.cam_latency = 1.0 / rate_hz, predict, cam_latency
         self.last_cmd = (0, 0, 0)
         threading.Thread(target=self._run, daemon=True, name="control").start()
@@ -474,8 +515,11 @@ class ControlLoop:
     def _run(self):
         t_next = time.monotonic()
         while not self.stop.is_set():
-            est = self.state.estimate(time.monotonic() + self.cam_latency, self.predict)
-            if est is None:
+            ov = self.behavior.override(time.monotonic()) if self.behavior else None
+            est = None if ov else self.state.estimate(time.monotonic() + self.cam_latency, self.predict)
+            if ov:
+                ex, ey, bh = ov            # animation ou arrêt imposés par le comportement
+            elif est is None:
                 ex = ey = bh = 0
             else:
                 x, y, box_h = est
@@ -512,21 +556,32 @@ body{background:#111;color:#eee;font-family:system-ui,sans-serif;margin:0;text-a
 #hud{font:13px monospace;margin:6px;white-space:pre-wrap}
 button{margin:4px;padding:10px 16px;font-size:1em;border:0;border-radius:8px;color:#fff;background:#444;cursor:pointer}
 button.on{background:#2a2}
+#aide{font-size:13px;color:#aaa;margin:6px 10px 14px}
 </style></head><body>
 <div id="wrap"><img id="v" alt=""><canvas id="o"></canvas></div>
 <div id="hud">connexion…</div>
 <button id="bd" onclick="key('d')">Drive</button>
 <button id="ba" onclick="key('a')">Auto</button>
 <button onclick="key('r')">Reset cible</button>
+<button onclick="key('p')">Reprendre</button>
 <button onclick="key('q')">Quitter</button>
+<div id="aide">✋ 1 main levée 1 s = « c'est moi, écoute » · puis dans les 3 s : 👉 bras tendu = regarde là ·
+🤏 avant-bras qui se replie = viens · 🦘 plier les genoux et se redresser = saute · ❌ bras croisés = repos<br>
+🙌 deux bras levés = STOP (tout le monde) · 👋 coucou (tout le monde)</div>
 <script>
 const v=document.getElementById('v'),o=document.getElementById('o'),c=o.getContext('2d');
+const SK=[[5,7],[7,9],[6,8],[8,10],[5,6],[5,11],[6,12],[11,12],[11,13],[13,15],[12,14],[14,16],[0,1],[0,2],[1,3],[2,4]];
+const COL={SUIVI:'#2a2',ATTENTE:'#666',ECOUTE:'#08f',ARRET:'#d22',REPOS:'#a6a'};
+const GN={STOP:'🙌 STOP',ECOUTE:'✋ écoute',POINTE:'👉 pointe',REPOS:'❌ repos'};
 let st=null;
 function post(p,b){fetch(p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});}
 function key(k){post('/key',{key:k});}
-document.addEventListener('keydown',e=>{if('rdaq'.includes(e.key))key(e.key);});
+document.addEventListener('keydown',e=>{if('rdaqp'.includes(e.key))key(e.key);});
 o.addEventListener('click',e=>{const r=o.getBoundingClientRect();
   post('/click',{x:(e.clientX-r.left)/r.width,y:(e.clientY-r.top)/r.height});});
+function label(x,y,txt,col,W){c.font='bold 15px system-ui';const w=c.measureText(txt).width+10;
+  x=Math.min(Math.max(x,0),W-w);c.fillStyle='rgba(0,0,0,.65)';c.fillRect(x,y-18,w,22);
+  c.fillStyle=col;c.fillText(txt,x+5,y-2);}
 function draw(){
   const d=window.devicePixelRatio||1,W=o.clientWidth,H=o.clientHeight;
   if(o.width!==W*d||o.height!==H*d){o.width=W*d;o.height=H*d;}
@@ -534,12 +589,35 @@ function draw(){
   c.strokeStyle='#f33';c.lineWidth=2;c.beginPath();
   c.moveTo(W/2-12,H/2);c.lineTo(W/2+12,H/2);c.moveTo(W/2,H/2-12);c.lineTo(W/2,H/2+12);c.stroke();
   if(!st)return;
-  c.font='13px monospace';
   for(const [id,x1,y1,x2,y2,cf] of st.tracks){
-    const t=id===st.target;c.strokeStyle=c.fillStyle=t?'#0f0':'#fa0';c.lineWidth=t?3:2;
-    c.strokeRect(x1*W,y1*H,(x2-x1)*W,(y2-y1)*H);c.fillText('ID '+id+' '+cf.toFixed(2),x1*W+3,y1*H-4);
+    const t=id===st.target,col=t?'#0f0':'#fa0',k=st.kp[id];
+    c.strokeStyle=col;c.lineWidth=t?3:1.5;c.setLineDash(k?[6,4]:[]);
+    c.strokeRect(x1*W,y1*H,(x2-x1)*W,(y2-y1)*H);c.setLineDash([]);
+    if(k){c.strokeStyle=t?'#0ff':'#fd6';c.lineWidth=3;c.beginPath();
+      for(const [a,b] of SK){if(k[a*3+2]>=0.4&&k[b*3+2]>=0.4){
+        c.moveTo(k[a*3]*W,k[a*3+1]*H);c.lineTo(k[b*3]*W,k[b*3+1]*H);}}
+      c.stroke();c.fillStyle='#fff';
+      for(let i=0;i<17;i++)if(k[i*3+2]>=0.4){c.beginPath();c.arc(k[i*3]*W,k[i*3+1]*H,3,0,7);c.fill();}
+      const p=st.pt[id];
+      if(p&&k[5*3+2]>=0.4){const sx=(k[15]+k[18])/2*W,sy=(k[16]+k[19])/2*H,L=H*0.35;
+        c.strokeStyle='#ff0';c.lineWidth=4;c.beginPath();c.moveTo(sx,sy);
+        c.lineTo(sx+p[0]*L,sy+p[1]*L);c.stroke();}}
+    let txt=(t?'★ ':'')+'#'+id;const g=st.g[id];
+    if(g)txt+='  '+(GN[g[0]]||g[0]);
+    label(x1*W,y1*H,txt,col,W);
+    if(g&&g[1]<1){c.fillStyle='#08f';c.fillRect(x1*W,y1*H+5,(x2-x1)*W*g[1],5);}
   }
   if(st.aim){c.fillStyle='#0f0';c.beginPath();c.arc(st.aim[0]*W,st.aim[1]*H,6,0,7);c.fill();}
+  const b=st.beh;if(!b)return;
+  let txt=b.etat+' – '+b.texte+(b.etat==='ECOUTE'?' ('+b.ecoute_restant+' s)':'')+(b.action?'  → '+b.action:'');
+  c.font='bold 18px system-ui';const w=c.measureText(txt).width+16;
+  c.fillStyle=COL[b.etat]||'#444';c.globalAlpha=.85;c.fillRect(8,8,w,30);c.globalAlpha=1;
+  c.fillStyle='#fff';c.fillText(txt,16,29);
+  let y=H-10;c.font='14px system-ui';
+  for(const e of b.evenements.slice().reverse()){const age=b.now-e.t;if(age>6)continue;
+    c.globalAlpha=Math.max(0,1-age/6);const w2=c.measureText(e.msg).width+10;
+    c.fillStyle='rgba(0,0,0,.7)';c.fillRect(8,y-17,w2,22);c.fillStyle='#fff';c.fillText(e.msg,13,y);y-=26;}
+  c.globalAlpha=1;
 }
 const es=new EventSource('/events');
 es.onmessage=e=>{st=JSON.parse(e.data);const m=st.m;
@@ -588,6 +666,14 @@ def make_handler(app):
                 self._stream()
             elif self.path == "/events":
                 self._events()
+            elif self.path in ("/perception", "/etat"):
+                data = app.perception() if self.path == "/perception" else app.behavior.etat()
+                body = json.dumps(data, ensure_ascii=False).encode()
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.send_header("Content-Length", str(len(body)))
+                self.end_headers()
+                self.wfile.write(body)
             else:
                 self.send_error(404)
 
@@ -603,6 +689,8 @@ def make_handler(app):
                 k = str(data.get("key", ""))
                 if k == "q":
                     app.stop.set()
+                elif k == "p":
+                    app.behavior.resume()
                 else:
                     app.state.key(k)
             self.send_response(204)
@@ -684,6 +772,9 @@ class App:
         self._jpeg_cache = (0, b"")
         self._jpeg_lock = threading.Lock()
         self.jpeg_quality = args.stream_quality
+        self.hfov = args.hfov
+        self.behavior = Behavior(self.state)
+        self.gestures = None if args.no_gestes else GestureRecognizer()
 
         w, h = (int(v) for v in args.size.lower().split("x"))
         backend = args.backend
@@ -697,9 +788,11 @@ class App:
         classes = None if args.classes == "all" else [int(c) for c in args.classes.split(",")]
         self.source = src_cls(args.source, (w, h), args.fps, self.slot, self.stop)
         self.infer = InferenceWorker(self.slot, detector, self.state, self.stop,
-                                     reduce=not args.no_reduce, classes=classes)
+                                     reduce=not args.no_reduce, classes=classes,
+                                     gestures=self.gestures, behavior=self.behavior)
         self.control = ControlLoop(open_serial(args.serial), self.state, self.stop,
-                                   args.cmd_rate, not args.no_predict, args.cam_latency / 1000)
+                                   args.cmd_rate, not args.no_predict, args.cam_latency / 1000,
+                                   behavior=self.behavior)
         srv = _Server(("0.0.0.0", args.port), make_handler(self))
         threading.Thread(target=srv.serve_forever, daemon=True, name="http").start()
         self.server = srv
@@ -728,16 +821,65 @@ class App:
     def snapshot(self):
         s = self.state
         est = s.estimate(time.monotonic(), predict=False)
+        beh = self.behavior.etat()
+        beh["now"] = time.time()
         with s.lock:
+            cur, pts = s.gest
             return {"tracks": [[t[0]] + [round(v, 4) for v in t[1:]] for t in s.tracks],
                     "target": s.target_id, "drive": s.drive, "auto": s.auto_lock,
                     "aim": [round(est[0], 4), round(est[1], 4)] if est else None,
-                    "cmd": list(self.control.last_cmd), "m": self.metrics()}
+                    "kp": {i: np.round(k, 3).reshape(-1).tolist() for i, k in s.kpts.items()},
+                    "g": {i: [n, round(p, 2)] for i, (n, p) in cur.items()},
+                    "pt": {i: [round(v[0], 3), round(v[1], 3)] for i, v in pts.items()},
+                    "beh": beh, "cmd": list(self.control.last_cmd), "m": self.metrics()}
+
+    def perception(self):
+        """Message de perception (contrat vision → comportement, voir PROJET.md).
+        Directions en degrés depuis l'axe de la caméra (az > 0 à droite, el > 0 en haut) ;
+        distances estimées d'après la taille du torse (ou de la boîte à défaut). À calibrer avec --hfov."""
+        fr = self.slot.get_newer(-1, 0)
+        aspect = fr.w / fr.h if fr and fr.h else 16 / 9
+        tan_h = math.tan(math.radians(self.hfov) / 2)
+        tan_v = tan_h / aspect
+        s = self.state
+        with s.lock:
+            tracks, kpts, t_cap, target = list(s.tracks), dict(s.kpts), s.t_cap, s.target_id
+            cur, pts = s.gest
+        personnes = []
+        for tid, x1, y1, x2, y2, conf in tracks:
+            cx, cy = (x1 + x2) / 2, (y1 + y2) / 2
+            dist, src = None, None
+            k = kpts.get(tid)
+            if k is not None and min(k[5, 2], k[6, 2], k[11, 2], k[12, 2]) >= KP_MIN:
+                sh, hip = (k[5, :2] + k[6, :2]) / 2, (k[11, :2] + k[12, :2]) / 2
+                cx, cy = (sh[0] + hip[0]) / 2, (sh[1] + hip[1]) / 2
+                torso = math.hypot((hip[0] - sh[0]) * aspect, hip[1] - sh[1])
+                dist, src = TORSO_M / (torso * 2 * tan_v), "torse"
+            elif y2 - y1 > 0.05 and y1 > 0.01 and y2 < 0.99:      # boîte entière dans l'image
+                dist, src = PERSON_M / ((y2 - y1) * 2 * tan_v), "boite"
+            geste, pointe = cur.get(tid), pts.get(tid)
+            personnes.append({
+                "id": tid, "conf": round(conf, 2), "boite": [round(v, 3) for v in (x1, y1, x2, y2)],
+                "az_deg": round(math.degrees(math.atan((cx - 0.5) * 2 * tan_h)), 1),
+                "el_deg": round(math.degrees(math.atan((0.5 - cy) * 2 * tan_v)), 1),
+                "dist_m": round(dist, 2) if dist else None, "dist_source": src,
+                "proprio": tid == target,
+                "geste": geste[0] if geste else None, "geste_prog": round(geste[1], 2) if geste else 0,
+                "pointe": {"vx": round(pointe[0], 3), "vy": round(pointe[1], 3)} if pointe else None,
+                "squelette": np.round(k, 3).tolist() if k is not None else None,
+            })
+        m = self.metrics()
+        return {"t": round(t_cap, 3), "latence_ms": m["age_ms"], "fps": m["det_fps"],
+                "hfov_deg": self.hfov, "comportement": self.behavior.etat(),
+                "cible": next((p for p in personnes if p["proprio"]), None),
+                "personnes": personnes,
+                "obstacles": [], "sol": None}      # capteur de profondeur à venir
 
     def run(self):
         t_log = time.monotonic()
         try:
             while not self.stop.wait(0.5):
+                self.behavior._changed()           # transitions sans geste (fin d'écoute, cible perdue…)
                 if time.monotonic() - t_log >= 5:
                     t_log = time.monotonic()
                     m = self.metrics()
@@ -766,7 +908,7 @@ def default_model():
     try:
         import hailo_platform  # noqa: F401  (Raspberry Pi 5 + AI HAT+)
         from yolo_hailo import default_hef
-        hef = default_hef()
+        hef = default_hef(pose=True) or default_hef()
         if hef:
             return hef
     except ImportError:
@@ -789,7 +931,8 @@ def main():
     p.add_argument("--backend", choices=("auto", "ffmpeg", "opencv"), default="auto")
     p.add_argument("--size", default="1920x1080", help="résolution demandée à la caméra")
     p.add_argument("--fps", type=int, default=30)
-    p.add_argument("--model", default=default_model(), help=".hef (Hailo), .onnx, .pt, 'demo' ou 'none'")
+    p.add_argument("--model", default=default_model(), help=".hef (Hailo, *_pose_* = gestes), .pt (yolov8n-pose.pt = gestes), .onnx, "
+                        "'demo', 'demo-pose' ou 'none'")
     p.add_argument("--imgsz", type=int, default=640)
     p.add_argument("--conf", type=float, default=0.4)
     p.add_argument("--classes", default="0", help="classes COCO, ex. '0' (personne) ou 'all'")
@@ -801,6 +944,9 @@ def main():
     p.add_argument("--no-predict", action="store_true", help="désactive l'extrapolation de la cible")
     p.add_argument("--cam-latency", type=float, default=0, help="latence caméra estimée (ms) à compenser")
     p.add_argument("--auto", action="store_true", help="verrouille automatiquement la cible la plus centrale")
+    p.add_argument("--hfov", type=float, default=90,
+                   help="champ de vision horizontal de la caméra (degrés) pour les directions et distances")
+    p.add_argument("--no-gestes", action="store_true", help="désactive la reconnaissance des gestes")
     p.add_argument("--port", type=int, default=8082)
     p.add_argument("--stream-quality", type=int, default=80, help="qualité JPEG du flux (backend opencv)")
     p.add_argument("--list-devices", action="store_true", help="liste les caméras DirectShow via ffmpeg")

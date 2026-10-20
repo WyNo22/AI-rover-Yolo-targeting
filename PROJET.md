@@ -37,7 +37,48 @@ Navigateur : vidéo + boîtes dessinées dans un <canvas>, clic pour choisir la 
   - avec une caméra à 30 FPS, la caméra limite le débit avant l'accélérateur ;
   - un Hailo-8 mesuré sur Pi 5 donne environ 144 FPS pour YOLOv8n, hors pré- et post-traitement ;
   - un Jetson Orin Nano sortait du budget (≥ 300 € d'occasion).
-- **À vérifier à réception :** carte Pi 5, `free -h` ≈ 4 Go, `hailortcli fw-control identify` → `HAILO8`.
+- **Vérifié à réception :** Pi 5 4 Go, Hailo-8 (26 TOPS) en PCIe Gen 3, aucun bridage.
+- **Mesuré en conditions réelles (DJI 1280×720 → Hailo → Arduino) :** caméra 30 FPS, YOLOv8s 30 FPS,
+  inférence 12 ms, **âge de l'image à la décision 18,5 ms** (PC : 12,7 FPS, 55,6 ms).
+  Marge : Hailo utilisé à ~15–20 %, environ 3 cœurs CPU libres.
+
+### Gestes (`gestures.py`, `behavior.py`)
+
+Modèle de pose (YOLOv8s-pose sur le Hailo, 17 points du corps) à la place de la détection seule.
+
+| Geste | Qui | Tourelle aujourd'hui | LEO-S demain |
+|---|---|---|---|
+| 🙌 deux bras levés (0,3 s) | tout le monde | STOP, se fige | arrêt, position stable |
+| ✋ une main levée (1 s) | tout le monde → devient propriétaire | hoche la tête, écoute 3 s | écoute |
+| 👉 bras tendu (1 s) | propriétaire en écoute | coup d'œil dans la direction | marche vers le point montré au sol |
+| 🤏 avant-bras qui se replie ×2 | propriétaire en écoute | rover : avance vers lui | suit (court si on s'éloigne vite) |
+| 🦘 genoux pliés puis redressés | propriétaire en écoute | petit bond de la tête | saute l'obstacle **si la perception valide** |
+| ❌ bras croisés (1 s) | propriétaire en écoute | lâche la cible, repos | s'assoit, coupe les servos lourds |
+| 👋 coucou | tout le monde | salut | salut |
+
+États : SUIVI / ATTENTE / ECOUTE / ARRET / REPOS. Ils s'affichent dans la vidéo et sur `/etat`.
+**Écran e-ink prévu** sur le robot pour afficher cet état (petit écran Waveshare en SPI) : rafraîchi
+seulement aux changements d'état (`Behavior.on_change`), car un e-ink met 0,3 à 2 s à se redessiner.
+
+### Contrat vision → comportement → Pico
+
+```
+Vision (Pi, Hailo) ──► Comportement (Pi) ──► Pico 2 (marche, équilibre, 200 Hz)
+ « ce que je vois »      « ce que je fais »     « comment je bouge »
+```
+
+- **Perception** (30 Hz, `GET /perception`, JSON) : horodatage et latence ; état du comportement ;
+  `personnes` (id, boîte, direction az/el en degrés, distance estimée par la taille du torse, propriétaire,
+  geste et progression, direction pointée, squelette) ; `cible` ; `obstacles` et `sol` (vides tant qu'il n'y
+  a pas de capteur de profondeur). Passage au repère du robot (x avant, y gauche, z haut, en mètres)
+  quand les angles de la tête seront connus.
+- **Obstacles et sauts :** YOLO ne suffit pas (pas de classe « mur », pas de mesure en cm). Prévu : caméra ToF
+  Arducam (~40 €) + VL53L1X. Par obstacle : distance, hauteur, largeur, épaisseur, type
+  (mur / marche / trou), atterrissage libre. Il faut voir l'obstacle ≥ 1,5 m avant à 1 m/s.
+- **Commande vers le Pico** (50 Hz, binaire + CRC) : mode (ARRÊT_URGENCE / REPOS / DEBOUT / MARCHE / SAUT),
+  vx, vy, rotation, tête, hauteur du corps ; pour SAUT : hauteur, distance du mur, distance d'appel.
+  Le Pico garde l'obstacle en mémoire (odométrie des jambes + IMU) quand il sort du champ de la caméra.
+  Sans message pendant 200 ms → position stable.
 
 ---
 
@@ -190,9 +231,11 @@ Si le Pi plante, le Pico garde le robot debout.
 ## 7. Prochaines étapes
 
 **Rover / vision :**
-1. Installer PyTorch avec CUDA sur le PC (12,7 → 30 FPS attendus).
-2. Ajouter l'estimation de pose et la reconnaissance de gestes : pointer, lever la main, stop.
-3. À réception du Pi 5 + Hailo : vérifications, puis portage du pipeline (modèle `.hef`).
+1. ✅ Pi 5 + Hailo vérifié, tourelle pilotée depuis le Pi (30 FPS, 18 ms).
+2. ✅ Pose + gestes + couche comportement (à valider en vrai sur le Pi).
+3. Récepteur FS-iA6B : arrêt d'urgence et MANUEL / AUTO.
+4. Caméra ToF : test obstacles sur le rover (« j'aurais sauté ici »).
+5. Écran e-ink d'état ; démarrage automatique (service systemd, à déboguer).
 
 **Bipède LEO-S :**
 1. **CAO + simulation** (gratuit) : jambe dans SolidWorks → URDF → MuJoCo, pour valider longueurs et couples.
@@ -219,4 +262,6 @@ Si le Pi plante, le Pico garde le robot debout.
 | `docs/ETUDE_CALCULATEUR_EMBARQUE.md` | étude comparative du calculateur embarqué |
 | `docs/leo_s.html` | avant-projet LEO-S (schémas, cinématique, saut, dimensionnement) |
 | `tracker_v2.py`, `yolo_test.py`, `lancer_*.bat` | pipeline vision et lanceurs Windows |
+| `yolo_hailo.py`, `gestures.py`, `behavior.py` | YOLO et pose sur Hailo, gestes, comportement |
+| `pi/` | bilan de santé, lanceur et démarrage automatique sur le Pi |
 | `turret_click/`, `turret_rover/`, `pan_test/`, `turret_test/` | programmes Arduino |
