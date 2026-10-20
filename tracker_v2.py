@@ -434,7 +434,8 @@ def open_serial(port):
         return None
     if port is None:
         cands = [p.device for p in serial.tools.list_ports.comports()
-                 if any(k in (p.description or "").lower() for k in ("arduino", "ch340", "ftdi", "acm", "usb serial"))]
+                 if any(k in (p.description or "").lower() for k in ("arduino", "ch340", "ftdi", "acm", "usb serial"))
+                 or "ttyACM" in p.device or "ttyUSB" in p.device]
         if not cands:
             print("[SERIAL] Aucun Arduino détecté – mode vision seule")
             return None
