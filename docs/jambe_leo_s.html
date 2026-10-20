@@ -99,20 +99,21 @@ svg text{font-family:var(--f-disp)}
 .glue{fill:url(#glue)}
 .wall{fill:var(--petg);stroke:var(--petg-line);stroke-width:.9}
 .bolt{fill:var(--axis);stroke:var(--ink);stroke-width:.5}
+.stud{stroke:var(--axis);stroke-width:1.4}
 </style>
 
 <div class="wrap">
 <header>
   <div>
-    <h1>Jambe LEO-S · Rév. E</h1>
+    <h1>Jambe LEO-S · Rév. F</h1>
     <p class="sub">Plan coté d'une jambe, servos déportés et bielles en parallélogramme. Coupes des tubes carbone,
-    fixation de chaque servo, correctifs des articulations à la limite. Rév. E : tibia en deux tubes et pied allégé,
-    repris de LEONARDO.</p>
+    fixation de chaque servo, correctifs des articulations à la limite. Rév. F : hanche à 450 mm (segments de 200 mm), tibia en deux tubes et pied
+    allégé repris de LEONARDO.</p>
   </div>
   <div class="cartouche" aria-label="Cartouche">
     <div>Projet</div><div>LEO-S bipède</div>
     <div>Pièce</div><div>Jambe ×1</div>
-    <div>Rév.</div><div>E · 20/10/2026</div>
+    <div>Rév.</div><div>F · 20/10/2026</div>
     <div>Unités</div><div>mm · kg·cm</div>
     <div>Servos</div><div>4 × STS3215 12 V</div>
   </div>
@@ -121,13 +122,13 @@ svg text{font-family:var(--f-disp)}
 <section>
   <h2>Plan</h2>
   <div class="sheet plan"><div class="plan-inner">
-    <svg viewBox="-122 -112 278 530" role="img" aria-label="Vue de côté cotée de la jambe : hanche, cuisse de 170 mm, genou, tibia de 170 mm, cheville à 50 mm du sol, pied de 85 mm, servos S3 et S4 déportés avec bielles B1 et B2.">
+    <svg viewBox="-122 -112 278 589" role="img" aria-label="Vue de côté cotée de la jambe : hanche, cuisse de 200 mm, genou, tibia de 200 mm, cheville à 50 mm du sol, pied de 85 mm, servos S3 et S4 déportés avec bielles B1 et B2.">
       <defs>
         <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path class="arrow" d="M0,1 L10,5 L0,9 Z"/></marker>
         <pattern id="hatch" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line class="hatchline" x1="0" y1="0" x2="0" y2="4"/></pattern>
       </defs>
-      <line class="ground" x1="-110" y1="381.94" x2="150" y2="381.94"/>
-<rect class="hatch" x="-110" y="381.94" width="260" height="6"/>
+      <line class="ground" x1="-110" y1="440.52" x2="150" y2="440.52"/>
+<rect class="hatch" x="-110" y="440.52" width="260" height="6"/>
 <rect class="plate" x="-48" y="-84" width="96" height="8" rx="1.5"/>
 <rect class="servo" x="-24" y="-76" width="35" height="25" rx="2"/>
 <line class="axis" x1="11" y1="-63.5" x2="26" y2="-63.5"/>
@@ -137,112 +138,114 @@ svg text{font-family:var(--f-disp)}
 <circle class="horn" cx="0" cy="0" r="6"/>
 <circle class="pin" cx="0" cy="0" r="1.6"/>
 <polygon class="fit" points="-15.94,-2.61 1.59,76.47 30.88,69.98 13.35,-9.1" />
-<polygon class="fit" points="19.67,144.16 27.03,177.35 50.46,172.16 43.1,138.97" />
+<polygon class="fit" points="26.16,173.45 33.52,206.64 56.95,201.45 49.59,168.25" />
 <polygon class="tube-in" points="6.05,54.99 10.38,74.52 22.09,71.92 17.76,52.4" />
-<polygon class="tube" points="10.38,74.52 25.53,142.86 37.24,140.26 22.09,71.92" />
-<polygon class="tube-in" points="25.53,142.86 29.85,162.39 41.57,159.79 37.24,140.26" />
+<polygon class="tube" points="10.38,74.52 32.02,172.15 43.73,169.55 22.09,71.92" />
+<polygon class="tube-in" points="32.02,172.15 36.35,191.68 48.06,189.08 43.73,169.55" />
 <polygon class="servo" points="-5.78,30.99 4,75.11 28.12,69.77 18.33,25.64" />
 <circle class="horn" cx="8.66" cy="39.05" r="6"/>
 <circle class="pin" cx="8.66" cy="39.05" r="1.6"/>
-<polygon class="fit" points="25.07,154.15 7.98,231.28 35.31,237.34 52.41,160.21" />
-<polygon class="tube-in" points="21.09,213.7 16.76,233.23 26.53,235.39 30.85,215.87" />
-<polygon class="tube" points="16.76,233.23 0.53,306.45 10.29,308.62 26.53,235.39" />
-<polygon class="tube-in" points="0.53,306.45 -3.8,325.98 5.96,328.14 10.29,308.62" />
-<text class="small" x="20.25" y="281.17" text-anchor="start">2 × Ø10</text>
-<polygon class="fit" points="-5.33,305.15 -12.47,337.37 9.01,342.13 16.15,309.91" />
-<polygon class="servo2" points="19.54,186.73 9.76,230.86 33.87,236.2 43.66,192.07" />
-<circle class="horn" cx="29.22" cy="200.14" r="6"/>
-<circle class="pin" cx="29.22" cy="200.14" r="1.6"/>
-<circle class="cam" cx="36.79" cy="165.97" r="20"/>
-<circle class="bearing" cx="36.79" cy="165.97" r="8"/>
-<circle class="pin" cx="36.79" cy="165.97" r="2.5"/>
+<polygon class="fit" points="31.57,183.44 14.47,260.57 41.81,266.63 58.9,189.5" />
+<polygon class="tube-in" points="27.58,242.99 23.26,262.52 33.02,264.68 37.35,245.16" />
+<polygon class="tube" points="23.26,262.52 0.53,365.03 10.29,367.19 33.02,264.68" />
+<polygon class="tube-in" points="0.53,365.03 -3.8,384.55 5.96,386.72 10.29,367.19" />
+<text class="small" x="21.99" y="331.94" text-anchor="start">2 × Ø10</text>
+<polygon class="fit" points="-5.33,363.73 -12.47,395.95 9.01,400.71 16.15,368.49" />
+<polygon class="servo2" points="26.04,216.02 16.25,260.15 40.37,265.49 50.15,221.36" />
+<circle class="horn" cx="35.71" cy="229.43" r="6"/>
+<circle class="pin" cx="35.71" cy="229.43" r="1.6"/>
+<circle class="cam" cx="43.29" cy="195.26" r="20"/>
+<circle class="bearing" cx="43.29" cy="195.26" r="8"/>
+<circle class="pin" cx="43.29" cy="195.26" r="2.5"/>
 <circle class="pin" cx="31.96" cy="74.86" r="1.8"/>
 <polyline class="spr" points="31.96,74.86 29.41,78.15 36.24,79.37 30.57,83.36 37.39,84.58 31.72,88.57 38.55,89.79 32.88,93.77 39.7,94.99 34.03,98.98 40.86,100.2 35.18,104.19 42.01,105.41 36.34,109.39 43.16,110.61 37.49,114.6 44.32,115.82 38.65,119.81 42.35,121.72"/>
-<line class="cable" x1="42.35" y1="121.72" x2="56.32" y2="161.64"/>
+<line class="cable" x1="42.35" y1="121.72" x2="62.81" y2="190.93"/>
 <line class="arm" x1="8.66" y1="39.05" x2="-7.56" y2="53.91"/>
-<line class="arm" x1="36.79" y1="165.97" x2="20.57" y2="180.83"/>
-<line class="arm" x1="29.22" y1="200.14" x2="7.22" y2="200.14"/>
-<polygon class="rod" points="-6.05,69.97 15.16,165.65 19.06,164.78 -2.15,69.1" />
-<polygon class="rod" points="1.8,215.33 -20.49,315.89 -16.58,316.75 5.71,216.19" />
+<line class="arm" x1="43.29" y1="195.26" x2="27.07" y2="210.12"/>
+<line class="arm" x1="35.71" y1="229.43" x2="13.71" y2="229.43"/>
+<line class="stud" x1="-7.56" y1="53.91" x2="27.07" y2="210.12"/>
+<line class="stud" x1="13.71" y1="229.43" x2="-22" y2="390.52"/>
+<polygon class="rod" points="-6.05,69.97 21.65,194.93 25.56,194.07 -2.15,69.1" />
+<polygon class="rod" points="8.3,244.62 -20.49,374.46 -16.58,375.33 12.2,245.48" />
 <circle class="rodend" cx="-7.56" cy="53.91" r="3.2"/>
-<circle class="rodend" cx="20.57" cy="180.83" r="3.2"/>
-<circle class="rodend" cx="7.22" cy="200.14" r="3.2"/>
-<circle class="rodend" cx="-22" cy="331.94" r="3.2"/>
-<polygon class="fit" points="-12,373.94 12,373.94 9,327.94 -9,327.94"/>
-<line class="arm" x1="0" y1="331.94" x2="-22" y2="331.94"/>
-<rect class="plate" x="-25" y="373.94" width="85" height="4" rx="1"/>
-<rect x="-20" y="374.84" width="12" height="2.2" rx="1" style="fill:var(--sheet)"/>
-<rect x="18" y="374.84" width="16" height="2.2" rx="1" style="fill:var(--sheet)"/>
-<rect x="38" y="374.84" width="16" height="2.2" rx="1" style="fill:var(--sheet)"/>
-<rect class="tpu" x="-25" y="377.94" width="85" height="4" rx="1.5"/>
-<circle class="bearing" cx="0" cy="331.94" r="7"/>
-<circle class="pin" cx="0" cy="331.94" r="2.5"/>
+<circle class="rodend" cx="27.07" cy="210.12" r="3.2"/>
+<circle class="rodend" cx="13.71" cy="229.43" r="3.2"/>
+<circle class="rodend" cx="-22" cy="390.52" r="3.2"/>
+<polygon class="fit" points="-12,432.52 12,432.52 9,386.52 -9,386.52"/>
+<line class="arm" x1="0" y1="390.52" x2="-22" y2="390.52"/>
+<rect class="plate" x="-25" y="432.52" width="85" height="4" rx="1"/>
+<rect x="-20" y="433.42" width="12" height="2.2" rx="1" style="fill:var(--sheet)"/>
+<rect x="18" y="433.42" width="16" height="2.2" rx="1" style="fill:var(--sheet)"/>
+<rect x="38" y="433.42" width="16" height="2.2" rx="1" style="fill:var(--sheet)"/>
+<rect class="tpu" x="-25" y="436.52" width="85" height="4" rx="1.5"/>
+<circle class="bearing" cx="0" cy="390.52" r="7"/>
+<circle class="pin" cx="0" cy="390.52" r="2.5"/>
 <circle class="horn" cx="0" cy="0" r="6"/>
 <circle class="pin" cx="0" cy="0" r="1.6"/>
 <line class="axis" x1="-10" y1="0" x2="10" y2="0"/>
 <line class="axis" x1="0" y1="-10" x2="0" y2="10"/>
-<line class="axis" x1="26.79" y1="165.97" x2="46.79" y2="165.97"/>
-<line class="axis" x1="36.79" y1="155.97" x2="36.79" y2="175.97"/>
-<line class="axis" x1="-10" y1="331.94" x2="10" y2="331.94"/>
-<line class="axis" x1="0" y1="321.94" x2="0" y2="341.94"/>
+<line class="axis" x1="33.29" y1="195.26" x2="53.29" y2="195.26"/>
+<line class="axis" x1="43.29" y1="185.26" x2="43.29" y2="205.26"/>
+<line class="axis" x1="-10" y1="390.52" x2="10" y2="390.52"/>
+<line class="axis" x1="0" y1="380.52" x2="0" y2="400.52"/>
 <line class="ext" x1="1.95" y1="-0.43" x2="36.12" y2="-8.01"/>
-<line class="ext" x1="38.75" y1="165.54" x2="72.92" y2="157.96"/>
-<line class="dim" x1="33.19" y1="-7.36" x2="69.99" y2="158.61" marker-start="url(#ar)" marker-end="url(#ar)"/>
-<text class="dimt" x="53.35" y="75.24" text-anchor="middle" transform="rotate(77.5 53.35 75.24)">170</text>
-<line class="ext" x1="38.75" y1="166.4" x2="72.92" y2="173.98"/>
-<line class="ext" x1="1.95" y1="332.37" x2="36.12" y2="339.95"/>
-<line class="dim" x1="69.99" y1="173.33" x2="33.19" y2="339.3" marker-start="url(#ar)" marker-end="url(#ar)"/>
-<text class="dimt" x="49.83" y="255.92" text-anchor="middle" transform="rotate(-77.5 49.83 255.92)">170</text>
+<line class="ext" x1="45.24" y1="194.83" x2="79.41" y2="187.25"/>
+<line class="dim" x1="33.19" y1="-7.36" x2="76.48" y2="187.9" marker-start="url(#ar)" marker-end="url(#ar)"/>
+<text class="dimt" x="57.57" y="89.66" text-anchor="middle" transform="rotate(77.5 57.57 89.66)">200</text>
+<line class="ext" x1="45.24" y1="195.69" x2="79.41" y2="203.27"/>
+<line class="ext" x1="1.95" y1="390.95" x2="36.12" y2="398.53"/>
+<line class="dim" x1="76.48" y1="202.62" x2="33.19" y2="397.88" marker-start="url(#ar)" marker-end="url(#ar)"/>
+<text class="dimt" x="52.1" y="299.64" text-anchor="middle" transform="rotate(-77.5 52.1 299.64)">200</text>
 <line class="ext" x1="1.95" y1="-0.43" x2="24.41" y2="-5.41"/>
 <line class="ext" x1="10.61" y1="38.62" x2="33.06" y2="33.64"/>
 <line class="dim" x1="21.48" y1="-4.76" x2="30.14" y2="34.29" marker-start="url(#ar)" marker-end="url(#ar)"/>
-<text class="dimt" x="27.56" y="14.37" text-anchor="middle" transform="rotate(77.5 27.56 14.37)">40</text>
-<line class="ext" x1="38.75" y1="166.4" x2="63.15" y2="171.81"/>
-<line class="ext" x1="31.17" y1="200.57" x2="55.58" y2="205.98"/>
-<line class="dim" x1="60.23" y1="171.16" x2="52.65" y2="205.34" marker-start="url(#ar)" marker-end="url(#ar)"/>
-<text class="dimt" x="54.68" y="187.86" text-anchor="middle" transform="rotate(-77.5 54.68 187.86)">35</text>
+<text class="dimt" x="28.54" y="14.16" text-anchor="middle" transform="rotate(77.5 28.54 14.16)">40</text>
+<line class="ext" x1="45.24" y1="195.69" x2="69.65" y2="201.1"/>
+<line class="ext" x1="37.67" y1="229.86" x2="62.07" y2="235.27"/>
+<line class="dim" x1="66.72" y1="200.45" x2="59.14" y2="234.62" marker-start="url(#ar)" marker-end="url(#ar)"/>
+<text class="dimt" x="60.2" y="216.93" text-anchor="middle" transform="rotate(-77.5 60.2 216.93)">35</text>
 <line class="ext" x1="-97" y1="0" x2="-98" y2="0"/>
-<line class="ext" x1="-97" y1="381.94" x2="-98" y2="381.94"/>
-<line class="dim" x1="-95" y1="0" x2="-95" y2="381.94" marker-start="url(#ar)" marker-end="url(#ar)"/>
-<text class="dimt" x="-93.2" y="190.97" text-anchor="middle" transform="rotate(90 -93.2 190.97)">382 (genou à 25°)</text>
+<line class="ext" x1="-97" y1="440.52" x2="-98" y2="440.52"/>
+<line class="dim" x1="-95" y1="0" x2="-95" y2="440.52" marker-start="url(#ar)" marker-end="url(#ar)"/>
+<text class="dimt" x="-92.2" y="220.26" text-anchor="middle" transform="rotate(90 -92.2 220.26)">441 (genou à 25°)</text>
 <line class="ext" x1="-40" y1="0" x2="-98" y2="0"/>
-<line class="ext" x1="80" y1="331.94" x2="81" y2="331.94"/>
-<line class="ext" x1="80" y1="381.94" x2="81" y2="381.94"/>
-<line class="dim" x1="78" y1="331.94" x2="78" y2="381.94" marker-start="url(#ar)" marker-end="url(#ar)"/>
-<text class="dimt" x="79.8" y="356.94" text-anchor="middle" transform="rotate(90 79.8 356.94)">50</text>
-<line class="ext" x1="10" y1="331.94" x2="81" y2="331.94"/>
-<line class="ext" x1="-25" y1="393.94" x2="-25" y2="392.94"/>
-<line class="ext" x1="0" y1="393.94" x2="0" y2="392.94"/>
-<line class="dim" x1="-25" y1="395.94" x2="0" y2="395.94" marker-start="url(#ar)" marker-end="url(#ar)"/>
-<text class="dimt" x="-12.5" y="394.14" text-anchor="middle" transform="rotate(0 -12.5 394.14)">25</text>
-<line class="ext" x1="0" y1="393.94" x2="0" y2="392.94"/>
-<line class="ext" x1="60" y1="393.94" x2="60" y2="392.94"/>
-<line class="dim" x1="0" y1="395.94" x2="60" y2="395.94" marker-start="url(#ar)" marker-end="url(#ar)"/>
-<text class="dimt" x="30" y="394.14" text-anchor="middle" transform="rotate(0 30 394.14)">60</text>
-<line class="ext" x1="-25" y1="389.94" x2="-25" y2="398.94"/>
-<line class="ext" x1="60" y1="389.94" x2="60" y2="398.94"/>
-<line class="ext" x1="0" y1="341.94" x2="0" y2="398.94"/>
-<text class="dimt" x="-1.3" y="119.11" text-anchor="middle" transform="rotate(77.5 -1.3 119.11)">B1 entraxe 130</text>
-<text class="dimt" x="-15.39" y="266.04" text-anchor="middle" transform="rotate(-77.5 -15.39 266.04)">B2 entraxe 135</text>
+<line class="ext" x1="80" y1="390.52" x2="81" y2="390.52"/>
+<line class="ext" x1="80" y1="440.52" x2="81" y2="440.52"/>
+<line class="dim" x1="78" y1="390.52" x2="78" y2="440.52" marker-start="url(#ar)" marker-end="url(#ar)"/>
+<text class="dimt" x="80.8" y="415.52" text-anchor="middle" transform="rotate(90 80.8 415.52)">50</text>
+<line class="ext" x1="10" y1="390.52" x2="81" y2="390.52"/>
+<line class="ext" x1="-25" y1="452.52" x2="-25" y2="451.52"/>
+<line class="ext" x1="0" y1="452.52" x2="0" y2="451.52"/>
+<line class="dim" x1="-25" y1="454.52" x2="0" y2="454.52" marker-start="url(#ar)" marker-end="url(#ar)"/>
+<text class="dimt" x="-12.5" y="451.72" text-anchor="middle" transform="rotate(0 -12.5 451.72)">25</text>
+<line class="ext" x1="0" y1="452.52" x2="0" y2="451.52"/>
+<line class="ext" x1="60" y1="452.52" x2="60" y2="451.52"/>
+<line class="dim" x1="0" y1="454.52" x2="60" y2="454.52" marker-start="url(#ar)" marker-end="url(#ar)"/>
+<text class="dimt" x="30" y="451.72" text-anchor="middle" transform="rotate(0 30 451.72)">60</text>
+<line class="ext" x1="-25" y1="448.52" x2="-25" y2="457.52"/>
+<line class="ext" x1="60" y1="448.52" x2="60" y2="457.52"/>
+<line class="ext" x1="0" y1="400.52" x2="0" y2="457.52"/>
+<text class="dimt" x="1.94" y="133.75" text-anchor="middle" transform="rotate(77.5 1.94 133.75)">B1 entraxe 160</text>
+<text class="dimt" x="-12.14" y="309.97" text-anchor="middle" transform="rotate(-77.5 -12.14 309.97)">B2 entraxe 165</text>
 <text class="small" x="-11.45" y="43.48" text-anchor="start">r 22</text>
-<text class="small" x="32.68" y="183.4" text-anchor="start">r 22</text>
-<text class="small" x="5.22" y="196.14" text-anchor="middle">r 22</text>
-<text class="small" x="-22" y="326.94" text-anchor="middle">r 22</text>
-<text class="small" x="59.79" y="149.97" text-anchor="start">came r 20</text>
+<text class="small" x="39.18" y="212.69" text-anchor="start">r 22</text>
+<text class="small" x="11.71" y="225.43" text-anchor="middle">r 22</text>
+<text class="small" x="-22" y="385.52" text-anchor="middle">r 22</text>
+<text class="small" x="66.29" y="179.26" text-anchor="start">came r 20</text>
 <line class="lead" x1="-80" y1="-100" x2="-30" y2="-80"/><circle class="bal" cx="-80" cy="-100" r="6.2"/><text class="baln" x="-80" y="-97.6" text-anchor="middle">1</text>
 <line class="lead" x1="-80" y1="-68" x2="-15" y2="-63"/><circle class="bal" cx="-80" cy="-68" r="6.2"/><text class="baln" x="-80" y="-65.6" text-anchor="middle">2</text>
 <line class="lead" x1="-80" y1="-30" x2="-30" y2="-4"/><circle class="bal" cx="-80" cy="-30" r="6.2"/><text class="baln" x="-80" y="-27.6" text-anchor="middle">3</text>
 <line class="lead" x1="110" y1="-10" x2="23.25" y2="50.77"/><circle class="bal" cx="110" cy="-10" r="6.2"/><text class="baln" x="110" y="-7.6" text-anchor="middle">4</text>
-<line class="lead" x1="120" y1="75" x2="28.81" y2="107.39"/><circle class="bal" cx="120" cy="75" r="6.2"/><text class="baln" x="120" y="77.4" text-anchor="middle">5</text>
-<line class="lead" x1="120" y1="125" x2="50.79" y2="171.97"/><circle class="bal" cx="120" cy="125" r="6.2"/><text class="baln" x="120" y="127.4" text-anchor="middle">6</text>
-<line class="lead" x1="-80" y1="105" x2="6.51" y2="117.37"/><circle class="bal" cx="-80" cy="105" r="6.2"/><text class="baln" x="-80" y="107.4" text-anchor="middle">7</text>
-<line class="lead" x1="120" y1="165" x2="37.15" y2="98.29"/><circle class="bal" cx="120" cy="165" r="6.2"/><text class="baln" x="120" y="167.4" text-anchor="middle">8</text>
-<line class="lead" x1="120" y1="215" x2="39.22" y2="208.14"/><circle class="bal" cx="120" cy="215" r="6.2"/><text class="baln" x="120" y="217.4" text-anchor="middle">9</text>
-<line class="lead" x1="120" y1="268" x2="15.82" y2="283.13"/><circle class="bal" cx="120" cy="268" r="6.2"/><text class="baln" x="120" y="270.4" text-anchor="middle">10</text>
-<line class="lead" x1="-80" y1="268" x2="-7.39" y2="266.04"/><circle class="bal" cx="-80" cy="268" r="6.2"/><text class="baln" x="-80" y="270.4" text-anchor="middle">11</text>
-<line class="lead" x1="120" y1="330" x2="8" y2="335.94"/><circle class="bal" cx="120" cy="330" r="6.2"/><text class="baln" x="120" y="332.4" text-anchor="middle">12</text>
-<line class="lead" x1="-80" y1="360" x2="-20" y2="379.94"/><circle class="bal" cx="-80" cy="360" r="6.2"/><text class="baln" x="-80" y="362.4" text-anchor="middle">13</text>
-<text class="cap" x="-110" y="411.94" text-anchor="start">VUE DE CÔTÉ · cotes en mm · genou fléchi de 25°</text>
+<line class="lead" x1="120" y1="131.8" x2="34.22" y2="131.8"/><circle class="bal" cx="120" cy="131.8" r="6.2"/><text class="baln" x="120" y="134.2" text-anchor="middle">5</text>
+<line class="lead" x1="120" y1="201.26" x2="57.29" y2="201.26"/><circle class="bal" cx="120" cy="201.26" r="6.2"/><text class="baln" x="120" y="203.66" text-anchor="middle">6</text>
+<line class="lead" x1="-80" y1="132.02" x2="9.75" y2="132.02"/><circle class="bal" cx="-80" cy="132.02" r="6.2"/><text class="baln" x="-80" y="134.42" text-anchor="middle">7</text>
+<line class="lead" x1="120" y1="73.29" x2="37.15" y2="98.29"/><circle class="bal" cx="120" cy="73.29" r="6.2"/><text class="baln" x="120" y="75.69" text-anchor="middle">8</text>
+<line class="lead" x1="120" y1="237.43" x2="45.71" y2="237.43"/><circle class="bal" cx="120" cy="237.43" r="6.2"/><text class="baln" x="120" y="239.83" text-anchor="middle">9</text>
+<line class="lead" x1="120" y1="341.7" x2="15.82" y2="341.7"/><circle class="bal" cx="120" cy="341.7" r="6.2"/><text class="baln" x="120" y="344.1" text-anchor="middle">10</text>
+<line class="lead" x1="-80" y1="309.97" x2="-4.14" y2="309.97"/><circle class="bal" cx="-80" cy="309.97" r="6.2"/><text class="baln" x="-80" y="312.37" text-anchor="middle">11</text>
+<line class="lead" x1="120" y1="394.52" x2="8" y2="394.52"/><circle class="bal" cx="120" cy="394.52" r="6.2"/><text class="baln" x="120" y="396.92" text-anchor="middle">12</text>
+<line class="lead" x1="-80" y1="428.52" x2="-20" y2="438.52"/><circle class="bal" cx="-80" cy="428.52" r="6.2"/><text class="baln" x="-80" y="430.92" text-anchor="middle">13</text>
+<text class="cap" x="-110" y="470.52" text-anchor="start">VUE DE CÔTÉ · cotes en mm · genou fléchi de 25°</text>
     </svg>
     <svg viewBox="-80 -112 160 252" role="img" aria-label="Vue de face du bassin : deux servos de roulis S1, étriers, servos de tangage S2, 90 mm entre les axes de hanche.">
       <defs><marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path class="arrow" d="M0,1 L10,5 L0,9 Z"/></marker></defs>
@@ -264,7 +267,7 @@ svg text{font-family:var(--f-disp)}
 <line class="ext" x1="-45" y1="102" x2="-45" y2="111"/>
 <line class="ext" x1="45" y1="102" x2="45" y2="111"/>
 <line class="dim" x1="-45" y1="108" x2="45" y2="108" marker-start="url(#ar2)" marker-end="url(#ar2)"/>
-<text class="dimt" x="0" y="106.2" text-anchor="middle" transform="rotate(0 0 106.2)">90 entre axes de hanche</text>
+<text class="dimt" x="0" y="105.2" text-anchor="middle" transform="rotate(0 0 105.2)">90 entre axes de hanche</text>
 <text class="cap" x="-60" y="-100" text-anchor="start">VUE DE FACE · bassin</text>
 <text class="small" x="-60" y="128" text-anchor="start">S1 roulis : axe vers l'avant, au centre de chaque étrier</text>
     </svg>
@@ -278,7 +281,7 @@ svg text{font-family:var(--f-disp)}
     <span><i class="sw spr"></i>ressort et câble</span>
     <span><i class="sw dim"></i>cote</span>
   </div>
-  <p class="note">Jambe dessinée genou fléchi de 25°, la position de marche. Jambe tendue, la hanche est à 390 mm du sol.
+  <p class="note">Jambe dessinée genou fléchi de 25°, la position de marche. Jambe tendue, la hanche est à <b>450 mm</b> du sol (robot d'environ 0,8 m).
   Les bielles B1 et B2 sont des parallélogrammes : bras du servo = levier de l'articulation = 22 mm, le genou
   reproduit l'angle du servo avec le même couple. B1 passe côté extérieur de la jambe ; B2 et
   le bras de S4 sont dans le plan médian du tibia, entre ses deux tubes, et le boîtier de S4 côté intérieur.</p>
@@ -289,17 +292,19 @@ svg text{font-family:var(--f-disp)}
   <div class="tw"><table>
     <thead><tr><th>Rep.</th><th>Pièce</th><th>Matière</th><th class="n">Entraxe</th><th class="n">Visible</th><th class="n">Longueur de coupe</th></tr></thead>
     <tbody>
-      <tr><td><span class="rep">5</span></td><td>Tube de cuisse</td><td>carbone Ø12 × 10</td><td class="n">170</td><td class="n">70</td><td class="n cut">110</td></tr>
-      <tr><td><span class="rep">10</span></td><td>Tubes de tibia, côte à côte à 20 mm d'entraxe</td><td>2 × carbone Ø10 × 8</td><td class="n">170</td><td class="n">75</td><td class="n cut">2 × 115</td></tr>
-      <tr><td><span class="rep">7</span></td><td>Bielle de genou B1</td><td>carbone Ø4 × 2 + 2 goujons M3</td><td class="n">130</td><td class="n">—</td><td class="n cut">98</td></tr>
-      <tr><td><span class="rep">11</span></td><td>Bielle de cheville B2</td><td>carbone Ø4 × 2 + 2 goujons M3</td><td class="n">135</td><td class="n">—</td><td class="n cut">103</td></tr>
+      <tr><td><span class="rep">5</span></td><td>Tube de cuisse</td><td>carbone Ø12 × 10</td><td class="n">200</td><td class="n">100</td><td class="n cut">140</td></tr>
+      <tr><td><span class="rep">10</span></td><td>Tubes de tibia, côte à côte à 20 mm d'entraxe</td><td>2 × carbone Ø10 × 8</td><td class="n">200</td><td class="n">105</td><td class="n cut">2 × 145</td></tr>
+      <tr><td><span class="rep">7</span></td><td>Bielle de genou B1</td><td>carbone Ø4 × 2 + 2 goujons M3</td><td class="n">160</td><td class="n">—</td><td class="n cut">128</td></tr>
+      <tr><td><span class="rep">11</span></td><td>Bielle de cheville B2</td><td>carbone Ø4 × 2 + 2 goujons M3</td><td class="n">165</td><td class="n">—</td><td class="n cut">133</td></tr>
     </tbody>
   </table></div>
   <p>Tubes : chaque bout entre de <b>20 mm</b> dans sa pièce imprimée (d'où coupe = visible + 40). Le tibia passe de
   1 tube Ø12 à <b>2 tubes Ø10 × 8</b> : deux Ø8 auraient été deux fois plus souples d'avant en arrière qu'un Ø12 ; deux Ø10
   gardent la même raideur dans ce sens, sont nettement plus raides en torsion et sur le côté, pour environ 4 g de plus. Bielles : coupe =
   entraxe − 2 × 16 mm, pour des rotules M3 dont le centre de la boule est à 16 mm du bout du tube une fois vissée.
-  Mesure tes rotules avant de couper, et garde 2 à 3 mm de filetage libre pour régler la longueur exacte.</p>
+  Mesure tes rotules avant de couper, et garde 2 à 3 mm de filetage libre pour régler la longueur exacte.
+  Avec des bielles de 128 et 133 mm, le tube Ø4 × 2 suffit, mais sa marge au flambage baisse d'environ 40 % par rapport
+  aux segments de 170 : un tube Ø5 × 3 est plus confortable si tu en trouves.</p>
 </section>
 
 <section>
@@ -395,7 +400,7 @@ svg text{font-family:var(--f-disp)}
     </div>
     <div class="sheet det">
       <h3>D · Bielle</h3>
-      <svg viewBox="0 0 170 92" role="img" aria-label="Bielle : rotule M3 vissée sur un goujon collé dans un tube carbone de 4 mm, avec un contre-écrou ; entraxe 130, coupe 98.">
+      <svg viewBox="0 0 170 92" role="img" aria-label="Bielle : rotule M3 vissée sur un goujon collé dans un tube carbone de 4 mm, avec un contre-écrou ; entraxe 160, coupe 128.">
         <defs><pattern id="glue" width="3" height="3" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line class="hatchline" x1="0" y1="0" x2="0" y2="3"/></pattern></defs>
         <circle class="rodend" cx="14" cy="44" r="7"/><circle class="pin" cx="14" cy="44" r="1.8"/>
         <rect class="rod" x="21" y="42" width="9" height="4" style="fill:var(--axis);stroke:var(--axis)"/>
@@ -407,10 +412,10 @@ svg text{font-family:var(--f-disp)}
         <circle class="rodend" cx="156" cy="44" r="7"/><circle class="pin" cx="156" cy="44" r="1.8"/>
         <line class="dim" x1="14" y1="20" x2="156" y2="20" marker-start="url(#ar)" marker-end="url(#ar)"/>
         <line class="ext" x1="14" y1="17" x2="14" y2="36"/><line class="ext" x1="156" y1="17" x2="156" y2="36"/>
-        <text class="dimt" x="85" y="16" text-anchor="middle">entraxe 130 (B1)</text>
+        <text class="dimt" x="85" y="16" text-anchor="middle">entraxe 160 (B1)</text>
         <line class="dim" x1="30" y1="62" x2="140" y2="62" marker-start="url(#ar)" marker-end="url(#ar)"/>
         <line class="ext" x1="30" y1="50" x2="30" y2="65"/><line class="ext" x1="140" y1="50" x2="140" y2="65"/>
-        <text class="dimt" x="85" y="72" text-anchor="middle">coupe 98</text>
+        <text class="dimt" x="85" y="72" text-anchor="middle">coupe 128</text>
         <line class="dim" x1="14" y1="62" x2="30" y2="62"/>
         <text class="dimt" x="22" y="72" text-anchor="middle">16</text>
         <text class="small" x="30" y="86">goujon M3 collé 12 mm à l'époxy · contre-écrou · rotule métal</text>
@@ -442,18 +447,18 @@ svg text{font-family:var(--f-disp)}
     <div class="sheet det">
       <h3>F · Bilan de masse d'une jambe</h3>
       <table>
-        <thead><tr><th>Sous la hanche</th><th class="n">Rév. D</th><th class="n">Rév. E</th></tr></thead>
+        <thead><tr><th>Sous la hanche</th><th class="n">Rév. E, 170</th><th class="n">Rév. F, 200</th></tr></thead>
         <tbody>
           <tr><td>Servos S3 + S4</td><td class="n">110 g</td><td class="n">110 g</td></tr>
           <tr><td>Raccords, chapes, roulements</td><td class="n">78 g</td><td class="n">78 g</td></tr>
-          <tr><td>Tubes, bielles, ressort</td><td class="n">32 g</td><td class="n">36 g</td></tr>
-          <tr><td>Pied + semelle</td><td class="n">45 g</td><td class="n">25 g</td></tr>
-          <tr><td><b>Total</b></td><td class="n"><b>265 g</b></td><td class="n"><b>249 g</b></td></tr>
-          <tr><td>Inertie autour de la hanche</td><td class="n">11,4 g·m²</td><td class="n ok">9,0 g·m²</td></tr>
+          <tr><td>Tubes, bielles, ressort</td><td class="n">36 g</td><td class="n">42 g</td></tr>
+          <tr><td>Pied + semelle</td><td class="n">25 g</td><td class="n">25 g</td></tr>
+          <tr><td><b>Total</b></td><td class="n"><b>249 g</b></td><td class="n"><b>255 g</b></td></tr>
+          <tr><td>Inertie autour de la hanche</td><td class="n">9,0 g·m²</td><td class="n warn">12,5 g·m²</td></tr>
         </tbody>
       </table>
-      <p>Estimations. Le pied pèse peu mais il est au bout : les 20 g gagnés au pied font l'essentiel des −20 % d'inertie,
-      donc des pas plus rapides pour le même servo de hanche.</p>
+      <p>Estimations. Des segments plus longs ne pèsent presque rien de plus (+6 g), mais éloignent le pied et S4 de la
+      hanche : inertie ×1,4. Le balancement est plus lent, le pas 18 % plus long, la vitesse de marche reste proche.</p>
     </div>
   </div>
 </section>
@@ -463,18 +468,19 @@ svg text{font-family:var(--f-disp)}
   <div class="tw"><table>
     <thead><tr><th>Point limite</th><th class="n">Avant</th><th>Correctif</th><th class="n">Après</th></tr></thead>
     <tbody>
-      <tr><td>Genou en marche, flexion 30°</td><td class="n warn">11,5</td><td>Ressort de genou engagé dès 10° au lieu de 40° (≈ 1,2 N·m/rad) et marche à 20–25° de flexion</td><td class="n ok">≈ 6</td></tr>
-      <tr><td>Genou à 40° et plus</td><td class="n bad">15</td><td>Hors de la plage de marche ; le ressort porte l'accroupi</td><td class="n ok">évité</td></tr>
-      <tr><td>Genou accroupi à 90° (2 jambes)</td><td class="n warn">12</td><td>Le ressort donne ≈ 17 kg·cm à 90°</td><td class="n ok">≈ 0</td></tr>
-      <tr><td>Genou, impulsion de saut</td><td class="n bad">30</td><td>Ressort 17 + servo en pointe (bref) + poussée 1,3 × poids</td><td class="n ok">couvert</td></tr>
-      <tr><td>Genou en l'air (jambe qui avance, 45°)</td><td class="n">≈ 2</td><td>Coût du ressort : le servo plie la jambe contre lui</td><td class="n warn">≈ 7,5</td></tr>
+      <tr><td>Genou en marche, flexion 25–30°</td><td class="n warn">11,3–13,5</td><td>Ressort de genou engagé dès 10° (≈ 1,4 N·m/rad) et marche à 20–25° de flexion</td><td class="n ok">7,6–8,5</td></tr>
+      <tr><td>Genou à 40° et plus</td><td class="n bad">17,8</td><td>Hors de la plage de marche ; le ressort porte l'accroupi</td><td class="n ok">évité</td></tr>
+      <tr><td>Genou accroupi à 90° (2 jambes)</td><td class="n warn">14</td><td>Le ressort donne ≈ 20 kg·cm à 90°</td><td class="n ok">≈ 0</td></tr>
+      <tr><td>Genou, impulsion de saut</td><td class="n bad">35</td><td>Ressort 20 + servo en pointe (bref) + poussée 1,3 × poids</td><td class="n ok">couvert</td></tr>
+      <tr><td>Genou en l'air (jambe qui avance, 45°)</td><td class="n">≈ 2</td><td>Coût du ressort : le servo plie la jambe contre lui</td><td class="n warn">≈ 8,7</td></tr>
       <tr><td>Hanche roulis, transfert de poids</td><td class="n warn">12</td><td>Hanches à 90 mm et buste décalé au-dessus du pied d'appui avant de lever l'autre</td><td class="n ok">4–6, pic 9</td></tr>
       <tr><td>Cheville, poussée sur la pointe</td><td class="n warn">10</td><td>Pas de poussée de pointe : centre de pression gardé à ±30 mm de l'axe</td><td class="n ok">≈ 6</td></tr>
     </tbody>
   </table></div>
   <p>Valeurs en kg·cm, robot de 2,0 kg sur une jambe, chocs ×1,3. Repère STS3215 : 30 kg·cm en blocage, environ 10 en
-  continu. Ressort de genou : 2 ressorts de traction de 1,5 N/mm en parallèle sur la came de rayon 20, course utile 35 mm,
-  force maxi environ 52 N chacun.</p>
+  continu. Ressort de genou : 2 ressorts de traction de 1,75 N/mm en parallèle sur la came de rayon 20, course utile 35 mm,
+  force maxi environ 61 N chacun. Si le genou chauffe malgré tout en marche, la solution de repli est un STS3250 aux deux
+  genoux seulement.</p>
   <p class="note">Changement par rapport à ma proposition précédente : la bielle « 20/26 » qui donnait ×1,3 au genou ne
   tient pas sur toute la course. Le calcul de la bielle montre qu'aucune géométrie à 4 barres ne donne plus de ×1,1 tout en
   couvrant 0–110° avec un angle de transmission correct. On garde donc le parallélogramme 22/22 (angle de transmission
