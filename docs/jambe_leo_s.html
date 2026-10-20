@@ -1,4 +1,4 @@
-<title>Jambe LEO-S Rév. D</title>
+<title>Jambe LEO-S</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -104,14 +104,15 @@ svg text{font-family:var(--f-disp)}
 <div class="wrap">
 <header>
   <div>
-    <h1>Jambe LEO-S · Rév. D</h1>
+    <h1>Jambe LEO-S · Rév. E</h1>
     <p class="sub">Plan coté d'une jambe, servos déportés et bielles en parallélogramme. Coupes des tubes carbone,
-    fixation de chaque servo, correctifs des articulations à la limite.</p>
+    fixation de chaque servo, correctifs des articulations à la limite. Rév. E : tibia en deux tubes et pied allégé,
+    repris de LEONARDO.</p>
   </div>
   <div class="cartouche" aria-label="Cartouche">
     <div>Projet</div><div>LEO-S bipède</div>
     <div>Pièce</div><div>Jambe ×1</div>
-    <div>Rév.</div><div>D · 20/10/2026</div>
+    <div>Rév.</div><div>E · 20/10/2026</div>
     <div>Unités</div><div>mm · kg·cm</div>
     <div>Servos</div><div>4 × STS3215 12 V</div>
   </div>
@@ -144,9 +145,10 @@ svg text{font-family:var(--f-disp)}
 <circle class="horn" cx="8.66" cy="39.05" r="6"/>
 <circle class="pin" cx="8.66" cy="39.05" r="1.6"/>
 <polygon class="fit" points="25.07,154.15 7.98,231.28 35.31,237.34 52.41,160.21" />
-<polygon class="tube-in" points="20.11,213.49 15.79,233.01 27.5,235.61 31.83,216.08" />
-<polygon class="tube" points="15.79,233.01 -0.45,306.23 11.27,308.83 27.5,235.61" />
-<polygon class="tube-in" points="-0.45,306.23 -4.78,325.76 6.94,328.36 11.27,308.83" />
+<polygon class="tube-in" points="21.09,213.7 16.76,233.23 26.53,235.39 30.85,215.87" />
+<polygon class="tube" points="16.76,233.23 0.53,306.45 10.29,308.62 26.53,235.39" />
+<polygon class="tube-in" points="0.53,306.45 -3.8,325.98 5.96,328.14 10.29,308.62" />
+<text class="small" x="20.25" y="281.17" text-anchor="start">2 × Ø10</text>
 <polygon class="fit" points="-5.33,305.15 -12.47,337.37 9.01,342.13 16.15,309.91" />
 <polygon class="servo2" points="19.54,186.73 9.76,230.86 33.87,236.2 43.66,192.07" />
 <circle class="horn" cx="29.22" cy="200.14" r="6"/>
@@ -169,6 +171,9 @@ svg text{font-family:var(--f-disp)}
 <polygon class="fit" points="-12,373.94 12,373.94 9,327.94 -9,327.94"/>
 <line class="arm" x1="0" y1="331.94" x2="-22" y2="331.94"/>
 <rect class="plate" x="-25" y="373.94" width="85" height="4" rx="1"/>
+<rect x="-20" y="374.84" width="12" height="2.2" rx="1" style="fill:var(--sheet)"/>
+<rect x="18" y="374.84" width="16" height="2.2" rx="1" style="fill:var(--sheet)"/>
+<rect x="38" y="374.84" width="16" height="2.2" rx="1" style="fill:var(--sheet)"/>
 <rect class="tpu" x="-25" y="377.94" width="85" height="4" rx="1.5"/>
 <circle class="bearing" cx="0" cy="331.94" r="7"/>
 <circle class="pin" cx="0" cy="331.94" r="2.5"/>
@@ -266,7 +271,7 @@ svg text{font-family:var(--f-disp)}
   </div></div>
   <div class="legend">
     <span><i class="sw servo"></i>servo STS3215 (S1, S2, S3)</span>
-    <span><i class="sw servo2"></i>S4, côté intérieur du tibia</span>
+    <span><i class="sw servo2"></i>S4, bras dans le plan médian du tibia</span>
     <span><i class="sw tube"></i>tube carbone (pointillé : partie emmanchée)</span>
     <span><i class="sw petg"></i>pièce imprimée PETG</span>
     <span><i class="sw rod"></i>levier et bielle</span>
@@ -275,8 +280,8 @@ svg text{font-family:var(--f-disp)}
   </div>
   <p class="note">Jambe dessinée genou fléchi de 25°, la position de marche. Jambe tendue, la hanche est à 390 mm du sol.
   Les bielles B1 et B2 sont des parallélogrammes : bras du servo = levier de l'articulation = 22 mm, le genou
-  reproduit l'angle du servo avec le même couple. B1 passe côté extérieur de la jambe, S4 et B2 côté intérieur, pour
-  que la bielle du genou ne frotte jamais sur le servo de cheville.</p>
+  reproduit l'angle du servo avec le même couple. B1 passe côté extérieur de la jambe ; B2 et
+  le bras de S4 sont dans le plan médian du tibia, entre ses deux tubes, et le boîtier de S4 côté intérieur.</p>
 </section>
 
 <section>
@@ -285,12 +290,14 @@ svg text{font-family:var(--f-disp)}
     <thead><tr><th>Rep.</th><th>Pièce</th><th>Matière</th><th class="n">Entraxe</th><th class="n">Visible</th><th class="n">Longueur de coupe</th></tr></thead>
     <tbody>
       <tr><td><span class="rep">5</span></td><td>Tube de cuisse</td><td>carbone Ø12 × 10</td><td class="n">170</td><td class="n">70</td><td class="n cut">110</td></tr>
-      <tr><td><span class="rep">10</span></td><td>Tube de tibia</td><td>carbone Ø12 × 10</td><td class="n">170</td><td class="n">75</td><td class="n cut">115</td></tr>
+      <tr><td><span class="rep">10</span></td><td>Tubes de tibia, côte à côte à 20 mm d'entraxe</td><td>2 × carbone Ø10 × 8</td><td class="n">170</td><td class="n">75</td><td class="n cut">2 × 115</td></tr>
       <tr><td><span class="rep">7</span></td><td>Bielle de genou B1</td><td>carbone Ø4 × 2 + 2 goujons M3</td><td class="n">130</td><td class="n">—</td><td class="n cut">98</td></tr>
       <tr><td><span class="rep">11</span></td><td>Bielle de cheville B2</td><td>carbone Ø4 × 2 + 2 goujons M3</td><td class="n">135</td><td class="n">—</td><td class="n cut">103</td></tr>
     </tbody>
   </table></div>
-  <p>Tubes : chaque bout entre de <b>20 mm</b> dans sa pièce imprimée (d'où coupe = visible + 40). Bielles : coupe =
+  <p>Tubes : chaque bout entre de <b>20 mm</b> dans sa pièce imprimée (d'où coupe = visible + 40). Le tibia passe de
+  1 tube Ø12 à <b>2 tubes Ø10 × 8</b> : deux Ø8 auraient été deux fois plus souples d'avant en arrière qu'un Ø12 ; deux Ø10
+  gardent la même raideur dans ce sens, sont nettement plus raides en torsion et sur le côté, pour environ 4 g de plus. Bielles : coupe =
   entraxe − 2 × 16 mm, pour des rotules M3 dont le centre de la boule est à 16 mm du bout du tube une fois vissée.
   Mesure tes rotules avant de couper, et garde 2 à 3 mm de filetage libre pour régler la longueur exacte.</p>
 </section>
@@ -309,10 +316,10 @@ svg text{font-family:var(--f-disp)}
       <tr><td><span class="rep">7</span></td><td>Bielle B1, côté extérieur</td><td>Rotule M3 métal vissée sur le bras de S3 (22 mm) et sur le levier du tibia (22 mm).</td></tr>
       <tr><td><span class="rep">8</span></td><td>Ressort de genou, 2 × traction</td><td>Le long de l'avant de la cuisse (comme un quadriceps), câble Dyneema sur l'avant de la came. Mou jusqu'à 10° de flexion, puis il porte une partie du poids.</td></tr>
       <tr><td><span class="rep">9</span></td><td>S4, cheville, dans le raccord haut de tibia</td><td>Berceau côté intérieur, 4 vis boîtier, arbre à 35 mm sous le genou. Ce raccord porte aussi le levier de genou.</td></tr>
-      <tr><td><span class="rep">10</span></td><td>Tube de tibia</td><td>Même montage que la cuisse : 20 mm emmanchés de chaque côté, collier M3, époxy.</td></tr>
-      <tr><td><span class="rep">11</span></td><td>Bielle B2, côté intérieur</td><td>Du bras de S4 (22 mm) au levier de talon (22 mm, à l'arrière de la cheville).</td></tr>
-      <tr><td><span class="rep">12</span></td><td>Chape de cheville + pied</td><td>Deux joues montées sur le pied, 2 × 625ZZ, vis épaulée M5. Pied de 85 mm : 25 derrière l'axe, 60 devant.</td></tr>
-      <tr><td><span class="rep">13</span></td><td>Semelle TPU 4 mm</td><td>Collée ou vissée sous le pied. Place pour 4 capteurs de force plus tard.</td></tr>
+      <tr><td><span class="rep">10</span></td><td>2 tubes de tibia Ø10</td><td>Côte à côte, 20 mm d'entraxe (vue E). Chaque tube entre de 20 mm dans le raccord haut et dans la chape de cheville, collier M3, époxy.</td></tr>
+      <tr><td><span class="rep">11</span></td><td>Bielle B2, plan médian du tibia</td><td>Du bras de S4 (22 mm) au levier de talon (22 mm, à l'arrière de la cheville). Vue de face, elle passe entre les deux tubes, qui la protègent des chocs latéraux.</td></tr>
+      <tr><td><span class="rep">12</span></td><td>Chape de cheville + pied évidé</td><td>Deux joues sur le pied, 2 × 625ZZ, vis épaulée M5. Pied de 85 × 45 mm (25 derrière l'axe, 60 devant), PETG évidé en treillis, ≈ 15 g.</td></tr>
+      <tr><td><span class="rep">13</span></td><td>Semelle TPU 3–4 mm</td><td>Collée sous le pied, ≈ 10 g. Place pour 4 capteurs de force ; leurs fils remontent en boucle souple autour de la cheville.</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -410,6 +417,43 @@ svg text{font-family:var(--f-disp)}
       </svg>
       <p>Un tube carbone Ø4 × 2, un goujon M3 collé dans chaque bout, une rotule métal vissée et bloquée par un contre-écrou.
       Effort maxi environ 70 N au genou : prends des rotules métal, le plastique prend du jeu.</p>
+    </div>
+    <div class="sheet det">
+      <h3>E · Coupe du tibia (Rév. E)</h3>
+      <svg viewBox="0 0 170 92" role="img" aria-label="Coupe du tibia : deux tubes carbone Ø10 côte à côte à 20 mm d'entraxe, bielle B2 dans le plan médian, 22 mm derrière l'axe.">
+        <rect class="fit" x="40" y="14" width="56" height="26" rx="4" style="fill:none;stroke-dasharray:3 2"/>
+        <circle class="tube" cx="58" cy="27" r="5"/><circle cx="58" cy="27" r="4" style="fill:var(--sheet)"/>
+        <circle class="tube" cx="78" cy="27" r="5"/><circle cx="78" cy="27" r="4" style="fill:var(--sheet)"/>
+        <circle class="rod" cx="68" cy="49" r="2"/>
+        <line class="axis" x1="68" y1="8" x2="68" y2="66"/>
+        <line class="dim" x1="58" y1="10" x2="78" y2="10" marker-start="url(#ar)" marker-end="url(#ar)"/>
+        <text class="dimt" x="68" y="7.5" text-anchor="middle">20</text>
+        <line class="dim" x1="102" y1="27" x2="102" y2="49" marker-start="url(#ar)" marker-end="url(#ar)"/>
+        <line class="ext" x1="82" y1="27" x2="105" y2="27"/><line class="ext" x1="70" y1="49" x2="105" y2="49"/>
+        <text class="dimt" x="107" y="40">22</text>
+        <text class="small" x="8" y="30">2 × Ø10 × 8</text>
+        <text class="small" x="74" y="60">B2 (plan médian)</text>
+        <text class="small" x="8" y="80">vers l'extérieur ←</text><text class="small" x="112" y="80">→ vers l'intérieur</text>
+        <text class="small" x="8" y="88">avant en haut, arrière en bas</text>
+      </svg>
+      <p>Les deux tubes sont tenus en haut par le raccord du genou et en bas par la chape de cheville ; ces deux pièces
+      font le cadre qui donne la raideur en torsion. B2 travaille 22 mm derrière, dans le plan médian, entre les tubes vus de face.</p>
+    </div>
+    <div class="sheet det">
+      <h3>F · Bilan de masse d'une jambe</h3>
+      <table>
+        <thead><tr><th>Sous la hanche</th><th class="n">Rév. D</th><th class="n">Rév. E</th></tr></thead>
+        <tbody>
+          <tr><td>Servos S3 + S4</td><td class="n">110 g</td><td class="n">110 g</td></tr>
+          <tr><td>Raccords, chapes, roulements</td><td class="n">78 g</td><td class="n">78 g</td></tr>
+          <tr><td>Tubes, bielles, ressort</td><td class="n">32 g</td><td class="n">36 g</td></tr>
+          <tr><td>Pied + semelle</td><td class="n">45 g</td><td class="n">25 g</td></tr>
+          <tr><td><b>Total</b></td><td class="n"><b>265 g</b></td><td class="n"><b>249 g</b></td></tr>
+          <tr><td>Inertie autour de la hanche</td><td class="n">11,4 g·m²</td><td class="n ok">9,0 g·m²</td></tr>
+        </tbody>
+      </table>
+      <p>Estimations. Le pied pèse peu mais il est au bout : les 20 g gagnés au pied font l'essentiel des −20 % d'inertie,
+      donc des pas plus rapides pour le même servo de hanche.</p>
     </div>
   </div>
 </section>
