@@ -124,7 +124,7 @@ if [ "$QUICK" -eq 0 ] && have hailortcli && [ -n "$ARCH" ]; then
   title "6. Benchmark du NPU (débit brut de la puce)"
   SUFFIX=$( [ "$ARCH" = "HAILO8L" ] && echo h8l || echo h8 )
   mapfile -t HEFS < <(find /usr/share/hailo-models "$HOME" -maxdepth 3 -name "*.hef" 2>/dev/null \
-                      | grep -iE "yolov8|yolov6|yolov5|yolox" | grep -i "$SUFFIX" | head -3)
+                      | grep -iE "yolov8|yolov6|yolov5|yolox" | grep -iE "_${SUFFIX}(_|\.)" | head -3)
   [ ${#HEFS[@]} -eq 0 ] && mapfile -t HEFS < <(find /usr/share/hailo-models "$HOME" -maxdepth 3 -name "*.hef" 2>/dev/null | head -3)
   if [ ${#HEFS[@]} -eq 0 ]; then
     warn "Aucun modèle .hef trouvé (installés par 'hailo-all' dans /usr/share/hailo-models)"
