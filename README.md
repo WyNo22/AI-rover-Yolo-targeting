@@ -249,6 +249,10 @@ Puis ouvrir `http://<ip-du-pi>:8082` sur le téléphone. Le modèle est choisi a
 `/usr/share/hailo-models` (`yolov8s_h8.hef` en priorité) ; pour en forcer un : `--model yolov8m_h8.hef`.
 Options utiles : `--size 1920x1080`, `--auto`, `--serial none` (vision seule). `CAM=/dev/videoN` force la caméra.
 
+**Démarrage automatique** (plus besoin de SSH) : `bash pi/installer_demarrage_auto.sh` une fois.
+La tourelle se lance à chaque allumage et attend la DJI si elle n'est pas encore branchée.
+Messages : `journalctl -u tourelle -f`. Arrêt : `sudo systemctl stop tourelle`. Options : `pi/tourelle.conf`.
+
 ## ⚙️ Serial Protocol (Python → Arduino)
 
 ```

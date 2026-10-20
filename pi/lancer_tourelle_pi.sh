@@ -21,6 +21,7 @@ if [ ${#missing[@]} -gt 0 ]; then
 fi
 python3 -c "import hailo_platform" 2>/dev/null \
   || { echo "hailo_platform absent : sudo apt install hailo-all, puis redémarrer"; exit 1; }
+[ "${1:-}" = "--deps-only" ] && { echo "Dépendances OK"; exit 0; }
 
 # Caméra USB : premier /dev/videoN d'un périphérique USB qui sait sortir du MJPEG.
 # (sur Pi 5, les /dev/video0..7 sont souvent ceux du processeur d'image interne, pas la DJI)
