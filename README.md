@@ -235,6 +235,20 @@ python tracker_v2.py --source 0 --backend opencv          # sans ffmpeg (le flux
 
 ---
 
+## 🍓 Tourelle sur Raspberry Pi 5 + AI HAT+ (Hailo)
+
+DJI (mode webcam) et Arduino branchés en USB sur le Pi, YOLO tourne sur le Hailo (`yolo_hailo.py`).
+
+```bash
+git clone -b claude/sleepy-fermi-a1a0sa https://github.com/WyNo22/AI-rover-Yolo-targeting.git
+cd AI-rover-Yolo-targeting
+bash pi/lancer_tourelle_pi.sh            # trouve la caméra USB, installe ce qui manque, lance
+```
+
+Puis ouvrir `http://<ip-du-pi>:8082` sur le téléphone. Le modèle est choisi automatiquement dans
+`/usr/share/hailo-models` (`yolov8s_h8.hef` en priorité) ; pour en forcer un : `--model yolov8m_h8.hef`.
+Options utiles : `--size 1920x1080`, `--auto`, `--serial none` (vision seule). `CAM=/dev/videoN` force la caméra.
+
 ## ⚙️ Serial Protocol (Python → Arduino)
 
 ```

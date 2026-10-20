@@ -19,6 +19,7 @@ Exemples :
   python tracker_v2.py --source "dshow:OsmoAction4" --size 1920x1080   # Windows + ffmpeg
   python tracker_v2.py --source 0 --backend opencv           # sans ffmpeg
   python tracker_v2.py --list-devices                        # noms DirectShow (Windows)
+  python3 tracker_v2.py --source 0 --model yolov8s_h8.hef    # Raspberry Pi 5 + AI HAT+ (Hailo)
 Puis ouvrir http://<ip>:8082
 """
 
@@ -281,6 +282,12 @@ def make_detector(model, conf, imgsz):
         return DemoDetector()
     if model == "none":
         return NullDetector()
+    if model.endswith(".hef"):
+        from yolo_hailo import HailoDetector, find_hef
+        path = find_hef(model)
+        if path is None:
+            raise SystemExit(f"[YOLO] Modèle Hailo introuvable : {model} (voir ls /usr/share/hailo-models)")
+        return HailoDetector(path, conf=conf)
     path = model if os.path.isabs(model) else os.path.join(_SCRIPT_DIR, model)
     if path.endswith(".pt"):
         # nom nu si absent : ultralytics télécharge alors le modèle officiel
@@ -720,6 +727,14 @@ def local_ip():
 
 def default_model():
     try:
+        import hailo_platform  # noqa: F401  (Raspberry Pi 5 + AI HAT+)
+        from yolo_hailo import default_hef
+        hef = default_hef()
+        if hef:
+            return hef
+    except ImportError:
+        pass
+    try:
         import ultralytics  # noqa: F401
         return "yolov8n.pt"
     except ImportError:
@@ -737,7 +752,7 @@ def main():
     p.add_argument("--backend", choices=("auto", "ffmpeg", "opencv"), default="auto")
     p.add_argument("--size", default="1920x1080", help="résolution demandée à la caméra")
     p.add_argument("--fps", type=int, default=30)
-    p.add_argument("--model", default=default_model(), help=".onnx, .pt, 'demo' ou 'none'")
+    p.add_argument("--model", default=default_model(), help=".hef (Hailo), .onnx, .pt, 'demo' ou 'none'")
     p.add_argument("--imgsz", type=int, default=640)
     p.add_argument("--conf", type=float, default=0.4)
     p.add_argument("--classes", default="0", help="classes COCO, ex. '0' (personne) ou 'all'")
