@@ -507,13 +507,13 @@ _HTML = """<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8">
 <style>
 body{background:#111;color:#eee;font-family:system-ui,sans-serif;margin:0;text-align:center}
 #wrap{position:relative;display:inline-block;max-width:100%}
-#v{display:block;max-width:100%;max-height:80vh}
+#v{display:block;max-width:100%;max-height:80vh;min-width:320px;min-height:180px;background:#000}
 #o{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair}
 #hud{font:13px monospace;margin:6px;white-space:pre-wrap}
 button{margin:4px;padding:10px 16px;font-size:1em;border:0;border-radius:8px;color:#fff;background:#444;cursor:pointer}
 button.on{background:#2a2}
 </style></head><body>
-<div id="wrap"><img id="v" src="/stream"><canvas id="o"></canvas></div>
+<div id="wrap"><img id="v" alt=""><canvas id="o"></canvas></div>
 <div id="hud">connexion…</div>
 <button id="bd" onclick="key('d')">Drive</button>
 <button id="ba" onclick="key('a')">Auto</button>
@@ -551,6 +551,14 @@ es.onmessage=e=>{st=JSON.parse(e.data);const m=st.m;
    `âge à la décision ${m.age_ms} ms | images sautées ${m.dropped}`;
   draw();};
 es.onerror=()=>{document.getElementById('hud').textContent='connexion perdue…';};
+// Vidéo : la page demande la dernière image, l'affiche, puis redemande. Le débit s'adapte
+// tout seul au Wi-Fi : pas de file d'images en retard, contrairement à un flux MJPEG poussé.
+(async()=>{let seq=0,url=null;
+  for(;;){try{const r=await fetch('/frame.jpg?after='+seq,{cache:'no-store'});
+      if(r.status!==200){await new Promise(z=>setTimeout(z,200));continue;}
+      seq=+r.headers.get('X-Seq')||0;const u=URL.createObjectURL(await r.blob());
+      v.src=u;await v.decode().catch(()=>{});if(url)URL.revokeObjectURL(url);url=u;draw();
+    }catch(e){await new Promise(z=>setTimeout(z,500));}}})();
 window.addEventListener('resize',draw);
 </script></body></html>"""
 
@@ -567,12 +575,15 @@ def make_handler(app):
 
         def do_GET(self):
             if self.path == "/":
+                print(f"[WEB] Page ouverte par {self.client_address[0]}")
                 body = _HTML.encode()
                 self.send_response(200)
                 self.send_header("Content-Type", "text/html; charset=utf-8")
                 self.send_header("Content-Length", str(len(body)))
                 self.end_headers()
                 self.wfile.write(body)
+            elif self.path.startswith("/frame.jpg"):
+                self._frame()
             elif self.path == "/stream":
                 self._stream()
             elif self.path == "/events":
@@ -596,6 +607,30 @@ def make_handler(app):
                     app.state.key(k)
             self.send_response(204)
             self.end_headers()
+
+        def _frame(self):
+            try:
+                after = int(self.path.split("after=")[1]) if "after=" in self.path else 0
+            except ValueError:
+                after = 0
+            fr = app.slot.get_newer(after, 1.0)
+            if fr is None:
+                self.send_response(204)
+                self.end_headers()
+                return
+            jpeg = app.jpeg_for(fr)
+            self.send_response(200)
+            self.send_header("Content-Type", "image/jpeg")
+            self.send_header("Content-Length", str(len(jpeg)))
+            self.send_header("Cache-Control", "no-store")
+            self.send_header("X-Seq", str(fr.seq))
+            self.end_headers()
+            try:
+                self.wfile.write(jpeg)
+            except (BrokenPipeError, ConnectionResetError, OSError):
+                return
+            app.stream_rate.tick()
+            app.last_pull = time.monotonic()
 
         def _stream(self):
             self.send_response(200)
@@ -644,6 +679,7 @@ class App:
         self.slot = LatestSlot()
         self.state = TargetState(auto_lock=args.auto)
         self.clients = 0
+        self.last_pull = 0.0
         self.stream_rate = RateMeter()
         self._jpeg_cache = (0, b"")
         self._jpeg_lock = threading.Lock()
@@ -686,7 +722,7 @@ class App:
             "cam_fps": r(self.source.rate.hz), "det_fps": r(self.infer.rate.hz),
             "dec_ms": r(self.infer.decode_ms.v), "inf_ms": r(self.infer.infer_ms.v),
             "age_ms": r(self.infer.age_ms.v), "dropped": self.infer.dropped,
-            "stream_fps": r(self.stream_rate.hz), "clients": self.clients,
+            "stream_fps": r(self.stream_rate.hz), "clients": self.clients + (time.monotonic() - self.last_pull < 2),
         }
 
     def snapshot(self):
@@ -707,7 +743,7 @@ class App:
                     m = self.metrics()
                     print(f"[PERF] {m['size']} caméra {m['cam_fps']} fps | YOLO {m['det_fps']} fps "
                           f"(déc {m['dec_ms']} ms, inf {m['inf_ms']} ms) "
-                          f"| âge {m['age_ms']} ms | sautées {m['dropped']} | clients {m['clients']}")
+                          f"| âge {m['age_ms']} ms | sautées {m['dropped']} | vidéo {m['stream_fps']} fps, clients {m['clients']}")
         except KeyboardInterrupt:
             self.stop.set()
         time.sleep(0.3)
