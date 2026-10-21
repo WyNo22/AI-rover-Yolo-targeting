@@ -1,4 +1,4 @@
-# CAO LEO-S (Rév. G)
+# CAO LEO-S (Rév. H)
 
 Pièces imprimées d'une jambe, générées par `jambe_cad.py` (CadQuery). Les cotes viennent du plan `docs/jambe_leo_s.html`.
 
@@ -9,12 +9,12 @@ Pièces imprimées d'une jambe, générées par `jambe_cad.py` (CadQuery). Les c
 | `03_etrier_roulis_berceau_S2` | étrier de roulis + berceau de S2 | 2 (miroir) |
 | `04_chape_cuisse_berceau_S3` | chape en U de cuisse + berceau de S3 + ancrage des ressorts | 2 (miroir) |
 | `05_languette_genou` | bas de cuisse, tube Ø12 | 2 |
-| `06_raccord_tibia_berceau_S4` | joues-cames du genou + levier B1 + berceau de S4 + 2 tubes Ø10 | 2 (miroir) |
+| `06_raccord_tibia_berceau_S4` | joues-cames du genou + levier B1 en cadre fermé (pont, arc, colonne) + berceau de S4 + 2 tubes Ø10 | 2 (miroir) |
 | `07_tibia_bas` | languette de cheville, 2 tubes Ø10 | 2 |
-| `08_pied` | pied 100 × 65 évidé + joues de cheville + levier de talon | 2 (miroir) |
+| `08_pied` | pied 100 × 65, dessous plein (collage), poches par le dessus, joues en A + levier de talon intégré | 2 (miroir) |
 | `09_bras_servo_22` | bras de 22 mm (S3, S4) | 4 |
 | `10_entretoise_S3_12_4` / `11_entretoise_S4_4_4` | entretoises palonnier → bras de 6 mm (S3 / S4) | 2 / 2 |
-| `16_semelle_TPU` | semelle TPU 95A, 4 mm, 4 poches FSR 402, rainures, 4 vis M3 fraisées | 2 (miroir) |
+| `16_semelle_TPU` | semelle TPU 95A, 4 mm, 4 poches FSR 402, rainures, **collée** sous le pied | 2 (miroir) |
 
 - `step/` : une pièce par fichier, les tubes à couper (`12` à `15`), et trois assemblages :
   - **`assemblage_robot_complet.step`** : les deux jambes + bassin + **buste estimé** (batteries, Pi, contrôleur de vol,
@@ -23,7 +23,7 @@ Pièces imprimées d'une jambe, générées par `jambe_cad.py` (CadQuery). Les c
   - **`assemblage_deux_jambes.step`** : plaque de bassin + les deux jambes (gauche et droite symétriques), tous composants :
     servos (maquettes), pièces imprimées, tubes carbone, bielles avec rotules, bras, entretoises, roulements 625ZZ,
     vis épaulées M5, ressorts de genou, semelles, **toute la visserie** (vis de palonnier, vis de boîtier M2, rotules,
-    colliers, goupilles des tubes, axe des ressorts, tendeurs, vis de semelle, vis du berceau de S1).
+    colliers, goupilles des tubes, axe des ressorts, tendeurs, vis du berceau de S1).
 - `stl/` : mêmes pièces, prêtes à trancher.
 - Repère : x avant, y extérieur, z haut, origine sur l'axe de tangage de hanche. **Jambe gauche : symétrie par rapport au plan xz** (dans Fusion : Miroir).
 - Tubes carbone : cuisse Ø12 × 10 coupé à **130 mm**, tibia 2 × Ø10 × 8 coupés à **135 mm**, bielles Ø4 × 2
@@ -40,6 +40,20 @@ Contrôles faits : aucune collision entre tous les composants jambe tendue, ni s
 3. Imprimer un test d'emmanchement (Ø16,15 pour les 625ZZ, Ø12,2 / Ø10,2 pour les tubes) et ajuster `JEU`, `BRG_D`, `T12`, `T10`.
 
 Régénérer : `pip install cadquery` puis `python jambe_cad.py`.
+
+## Rév. H — corrections
+
+- **Pied refait** : les 4 bossages de vis de semelle flottaient dans les évidements (corps séparés dans le STEP) et le
+  levier de talon ne tenait que par une arête. Maintenant : plaque 6 mm avec dessous plein (surface de collage) et
+  poches par le dessus (peau 2,5 mm), joues en A tangentes au moyeu de cheville, levier de talon collé sur toute la face
+  extérieure de la joue, lamage pour l'écrou M5. +11 g par pied.
+- **Semelle TPU collée** (plus de vis) : colle souple pour TPU/PETG (cyanoacrylate souple + primaire, ou colle néoprène),
+  FSR posés dans leurs poches avant collage, queues des FSR par les encoches latérales.
+- **Levier B1 du genou** : l'ancienne lame de 6 mm en biais remplacée par un arc de 8 mm autour de l'axe (la vis M5
+  et la clé passent) + une colonne Ø13 qui ramène le moyeu sur la joue → cadre fermé joue / pont / arc / colonne.
+- Berceaux de S3 et S4 : arêtes extérieures arrondies (r 3).
+- Vérifié : chaque pièce = 1 seul corps, aucune collision statique, ni sur les débattements (roulis, hanche, genou
+  0–110°, cheville ±40° avec bielles et bras).
 
 ## Rév. G — ce qui a changé
 

@@ -5,11 +5,11 @@ Pièces imprimées : PETG à 60 % de densité effective (4 parois, gyroïde 40 %
 | Ensemble | Masse |
 |---|---|
 | bassin | 56 g |
-| jambes (×2) | 1196 g |
+| jambes (×2) | 1216 g |
 | buste (estimé) | 1124 g |
-| **Total** | **2377 g** |
+| **Total** | **2397 g** |
 
-Centre de gravité : **467 mm au-dessus du sol** (+17 mm par rapport à l'axe de hanche), -3.3 mm en x.
+Centre de gravité : **464 mm au-dessus du sol** (+14 mm par rapport à l'axe de hanche), -3.3 mm en x.
 
 | Ensemble | Composant | Masse |
 |---|---|---|
@@ -21,17 +21,17 @@ Centre de gravité : **467 mm au-dessus du sol** (+17 mm par rapport à l'axe de
 | jambes (×2) | S2 | 110.0 g |
 | jambes (×2) | S3 | 110.0 g |
 | jambes (×2) | S4 | 110.0 g |
-| jambes (×2) | raccord_tibia_berceau_S4 | 94.1 g |
+| jambes (×2) | raccord_tibia_berceau_S4 | 98.5 g |
 | buste (estimé) | Pi5_AI_HAT_ventilo | 90.0 g |
+| jambes (×2) | pied | 80.4 g |
 | buste (estimé) | Pico2_regulateur_capteurs | 80.0 g |
-| jambes (×2) | chape_cuisse_berceau_S3 | 76.1 g |
+| jambes (×2) | chape_cuisse_berceau_S3 | 75.8 g |
 | jambes (×2) | etrier_roulis_berceau_S2 | 74.1 g |
 | buste (estimé) | bras_propulseurs_carbone | 73.5 g |
 | buste (estimé) | cablage | 70.0 g |
 | buste (estimé) | cadre_buste | 67.4 g |
-| jambes (×2) | pied | 58.8 g |
 | bassin | plaque de bassin | 56.0 g |
-| jambes (×2) | semelle_TPU | 50.1 g |
+| jambes (×2) | semelle_TPU | 50.6 g |
 | buste (estimé) | FC_F405_ESC_4en1_RX | 36.0 g |
 | jambes (×2) | tibia_bas | 33.3 g |
 | jambes (×2) | berceau_S1 | 26.3 g |
@@ -62,7 +62,6 @@ Centre de gravité : **467 mm au-dessus du sol** (+17 mm par rapport à l'axe de
 | buste (estimé) | cou_servo_pan | 9.0 g |
 | buste (estimé) | tete_servo_tilt | 9.0 g |
 | jambes (×2) | ecrou_M5 | 8.2 g |
-| jambes (×2) | vis_semelle | 6.1 g |
 | jambes (×2) | entretoise_S3 | 5.1 g |
 | jambes (×2) | vis_rotules_B1 | 4.8 g |
 | jambes (×2) | vis_rotules_B2 | 4.8 g |
