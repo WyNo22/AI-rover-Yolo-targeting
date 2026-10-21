@@ -314,7 +314,8 @@ def pied():
     p = p.cut(cyl_y(0, AZ, M5 / 2, -30, 30))
     return p.cut(cyl_y(-ARM, AZ, INS / 2, 18, B2_Y + 3))
 
-FSR = ((-24, 0), (8, 0), (52, 17), (52, -17))           # 4 capteurs de force FSR 402 (Ø18 actif)
+FSR = ((-24, 0), (8, 0), (52, 17), (52, -17))           # 4 FSR 402 (disque Ø18,3 × 0,45, zone active Ø12,7, queue standard 56 mm)
+FSR_QUEUE = 8.0                                          # largeur de la rainure de la queue
 
 def semelle_tpu():
     """Semelle TPU 95A, 4 mm, collée sous le pied : poches pour 4 FSR sur le dessus, rainures sous la semelle."""
@@ -322,8 +323,9 @@ def semelle_tpu():
     s_ = box(-talon, pointe, -larg / 2, larg / 2, GZ, GZ + 4).edges("|Z").fillet(8)
     s_ = s_.edges(">Z or <Z").chamfer(0.6)
     for (fx, fy) in FSR:
-        s_ = s_.cut(cyl_z(fx, fy, 9.6, GZ + 3.2, GZ + 4.1))                 # poche FSR, 0,8 mm
-        s_ = s_.cut(box(fx - 1, fx + 1, fy, larg / 2 + 1, GZ + 3.2, GZ + 4.1) if fy >= 0 else box(fx - 1, fx + 1, -larg / 2 - 1, fy, GZ + 3.2, GZ + 4.1))  # passage de la queue
+        s_ = s_.cut(cyl_z(fx, fy, 9.6, GZ + 3.2, GZ + 4.1))                 # poche FSR, 0,8 mm (FSR 0,45 + pastille Ø10 × 0,4)
+        q = FSR_QUEUE / 2
+        s_ = s_.cut(box(fx - q, fx + q, fy, larg / 2 + 1, GZ + 3.2, GZ + 4.1) if fy >= 0 else box(fx - q, fx + q, -larg / 2 - 1, fy, GZ + 3.2, GZ + 4.1))  # passage de la queue
     for i in range(-4, 13):                                              # rainures 1 mm sous la semelle
         x = i * 7.5
         if -talon + 4 < x < pointe - 4:

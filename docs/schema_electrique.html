@@ -266,7 +266,7 @@ td code, .mono { font: 12.5px var(--mono); }
       <tr><td>Pico ↔ 2 ToF bas</td><td><span class="pill pi2c">I²C</span></td><td>sol et obstacles bas devant les pieds, réflexe d'arrêt</td></tr>
       <tr><td>LiDAR LD19 → Pi</td><td><span class="pill puart">UART</span></td><td>scan 360° à 10 tours/s, carte autour du robot</td></tr>
       <tr><td>Pico ↔ BNO085, ADS1115 ×2</td><td><span class="pill pi2c">I²C</span></td><td>inclinaison, appuis des pieds</td></tr>
-      <tr><td>FSR 402 → ADS1115</td><td><span class="pill pana">Analog.</span></td><td>4 par pied, pont diviseur 10 kΩ</td></tr>
+      <tr><td>FSR 402 → ADS1115</td><td><span class="pill pana">Analog.</span></td><td>4 par pied, pont diviseur 4,7 kΩ ; contact et répartition de l'appui</td></tr>
       <tr><td>Pi ↔ INA226</td><td><span class="pill pi2c">I²C</span></td><td>tension et courant de la 3S</td></tr>
       <tr><td>Pi → caméra Module 3</td><td><span class="pill pcsi">CSI</span></td><td>vision, gestes (YOLO sur Hailo)</td></tr>
       <tr><td>Pi → e-ink 2,13″</td><td><span class="pill pspi">SPI</span></td><td>affiche l'état (SUIVI, ÉCOUTE, ARRÊT…)</td></tr>

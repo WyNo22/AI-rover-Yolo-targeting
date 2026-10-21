@@ -35,7 +35,7 @@ Une seule commande, envoi express vers Munich ; prévoir la TVA d'import (19 %).
 | 1 kit | **Inserts M3 à chaud** (kit 220 pcs M2–M6) | quelques $ | 16 inserts M3 utilisés ; trou Ø4,0 |
 | 1 | **ESC 4-en-1 45–50 A**, 4S, DShot, 30,5 × 30,5 | ≈ 15–25 $ | piloté par le Pico ; un stack F405 + ESC (≈ 24 $, HAKRC) convient aussi, le FC reste en réserve |
 | 2 | **ADS1115** (module) | < 2 $ | 1 par pied |
-| 8 | **FSR 402** | ≈ 1 $ | 4 par pied, version queue courte |
+| 8 | **FSR 402**, queue **standard 56 mm** (pas la « short ») | ≈ 1 $ | 4 par pied ; + 8 résistances 4,7 kΩ (pont diviseur) |
 | 2 | **MG90S** | ≈ 2 $ | cou |
 | 1 lot | Boîtiers **Molex 5264, 3 broches, pas 2,50 mm** + contacts 5263 | quelques $ | attention : pas 2,50, pas 2,54 |
 

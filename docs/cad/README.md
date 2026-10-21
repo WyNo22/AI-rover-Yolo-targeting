@@ -14,7 +14,7 @@ Pièces imprimées d'une jambe, générées par `jambe_cad.py` (CadQuery). Les c
 | `08_pied` | pied 100 × 65, dessous plein (collage), poches par le dessus, joues en A + levier de talon intégré | 2 (miroir) |
 | `09_bras_servo_22` | bras de 22 mm (S3, S4) | 4 |
 | `10_entretoise_S3_11_8` / `11_entretoise_S4_3_8` | entretoises palonnier → bras de 6 mm (S3 / S4), alésées pour la vis centrale du palonnier | 2 / 2 |
-| `16_semelle_TPU` | semelle TPU 95A, 4 mm, 4 poches FSR 402, rainures, **collée** sous le pied | 2 (miroir) |
+| `16_semelle_TPU` | semelle TPU 95A, 4 mm, 4 poches FSR 402 (Ø19,2 × 0,8, rainure de queue 8 mm), rainures, **collée** sous le pied ; sur chaque FSR, une pastille PETG Ø10 × 0,4 collée sur la zone active | 2 (miroir) |
 | `17_support_ToF_bas` | support d'un ToF VL53L8CX sous l'avant du bassin : plongée 37°, ouvert de 20° vers l'extérieur, 2 inserts M3 | 2 (miroir) |
 
 - `step/` : une pièce par fichier, les tubes à couper (`12` à `15`), et trois assemblages :

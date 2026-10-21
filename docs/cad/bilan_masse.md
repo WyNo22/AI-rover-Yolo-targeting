@@ -7,7 +7,7 @@ Pièces imprimées : PETG à 60 % de densité effective (4 parois, gyroïde 40 %
 | bassin | 55 g |
 | jambes (×2) | 1215 g |
 | buste (estimé) | 1153 g |
-| **Total** | **2424 g** |
+| **Total** | **2423 g** |
 
 Centre de gravité : **467 mm au-dessus du sol** (+17 mm par rapport à l'axe de hanche), -3.0 mm en x.
 
@@ -31,7 +31,7 @@ Centre de gravité : **467 mm au-dessus du sol** (+17 mm par rapport à l'axe de
 | buste (estimé) | cablage | 70.0 g |
 | buste (estimé) | cadre_buste | 67.4 g |
 | bassin | plaque de bassin | 55.3 g |
-| jambes (×2) | semelle_TPU | 50.6 g |
+| jambes (×2) | semelle_TPU | 50.0 g |
 | buste (estimé) | lidar_LD19 | 47.0 g |
 | jambes (×2) | tibia_bas | 33.3 g |
 | jambes (×2) | berceau_S1 | 24.9 g |
