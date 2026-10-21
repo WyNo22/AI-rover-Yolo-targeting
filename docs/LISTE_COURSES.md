@@ -1,6 +1,6 @@
 # Liste de courses LEO-S
 
-Quantités tirées de la CAO Rév. I (`docs/cad`). ✅ = déjà possédé (voir PROJET.md §6), à vérifier avant de racheter.
+Quantités tirées de la CAO Rév. I (`docs/cad`). Câblage : `docs/schema_electrique.html`. ✅ = déjà possédé (voir PROJET.md §6), à vérifier avant de racheter.
 
 ## 1. Première jambe (de quoi la monter et la faire bouger au banc)
 
@@ -80,6 +80,7 @@ Total robot : **8 servos (+1 ou 2)**, 8 roulements 625ZZ, 8 rotules, 4 ressorts 
 | ✅ | Raspberry Pi 5 4 Go + AI HAT+ 26 TOPS | cerveau, vision |
 | 1 | **Raspberry Pi Pico 2** (RP2350) | boucle d'équilibre, capteurs (la PicoBoard ✅ peut dépanner) |
 | 1 | **UBEC / abaisseur 5,1 V 5 A** | alimente le Pi depuis la 3S |
+| 1 | **BEC 5 V 3 A** | servos du cou, séparés du 5 V du Pi |
 | 1 | Interrupteur de puissance (ou anti-étincelle XT60) | coupure générale servos |
 | 1 | Carte ou bornier de distribution (12 V vers les 2 jambes) | le courant des servos ne passe pas par l'URT-2 |
 | 1 lot | Câble silicone 14 AWG et 22 AWG, gaine thermo, gaine tressée, colliers | |
