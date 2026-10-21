@@ -31,15 +31,16 @@ Sous-total 135,03 € HT port compris ; prévoir la **TVA d'import (19 %, ≈ 26
 | 2 | **ADS1115** (module) | indispensable pour lire les 8 RFP602 : le Pico n'a que 3 entrées analogiques |
 | 2 | **MG90S** | servos du cou (vague 3, mais quasi gratuit ici) |
 
-## 3. Reste à acheter en Europe — vague 1 (monter les jambes)
+## 3. AliExpress — vague 1 (monter les jambes)
 
 | Qté | Article | Remarque |
 |---|---|---|
 | 0,5 m | Tube carbone **Ø12 × 10** | cuisses, 2 × 130 mm |
 | 1 m | Tube carbone **Ø10 × 8** | tibias, 4 × 135 mm |
 | 1 m | Tube carbone **Ø5 × 3** | bielles : 2 × 130 mm (B1) + 2 × 135 mm (B2) |
-| 4 | **Ressorts de traction 65Mn, fil 1,4 × Ø10 × 60 mm** (AliExpress, magasin Jindong) | genoux, ≈ 1,8–1,9 N/mm ; crochets ouverts à refermer à la pince |
-| 8 | Résistances 10 kΩ | pont diviseur des RFP602 |
+| 4 | **Ressorts de traction 65Mn, fil 1,4 × Ø10 × 60 mm** (magasin Jindong) | genoux, ≈ 1,8–1,9 N/mm ; crochets ouverts à refermer à la pince |
+| 8 | Résistances 10 kΩ (ou 5 modules de conversion de plus) | un RFP602 n'est qu'une résistance qui varie : sans résistance fixe en série, l'ADS1115 ne lit rien |
+| 8 | Roulements **683ZZ** (3 × 7 × 3), optionnel | dans les embouts de bielle imprimés : pivot sans jeu ; à prendre chez le vendeur des 625ZZ |
 
 **Bielles** (B1 genou, B2 cheville, 2 par jambe) : tube carbone Ø5 × 3 + un embout imprimé collé à l'époxy à chaque
 bout, pivot sur vis M3. Entraxes : **B1 = 161,9 mm**, **B2 = 166,9 mm** (axe à axe).
