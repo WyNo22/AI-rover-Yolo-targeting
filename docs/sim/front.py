@@ -91,6 +91,13 @@ for sgn in (-1, 1):
         o.append(line(P(cx - 34, y), P(cx + 34, y), "axis"))
     o.append(line(P(cx, -70), P(cx, GY + 4), "axis"))
 
+# ── débattement du roulis de hanche (jambe de droite du dessin) ──
+import math as _m
+r_ = 150; c_ = (HIP, -63.5)
+pa = (c_[0] + r_ * _m.sin(_m.radians(-20)), c_[1] + r_ * _m.cos(_m.radians(-20)))
+pb = (c_[0] + r_ * _m.sin(_m.radians(30)), c_[1] + r_ * _m.cos(_m.radians(30)))
+o.append(f'<path class="arc" d="M{f(pa[0])},{f(pa[1])} A{r_},{r_} 0 0 0 {f(pb[0])},{f(pb[1])}" marker-start="url(#arw)" marker-end="url(#arw)"/>')
+o.append(text(P(HIP + 52, 96), "roulis −20° / +30°", "arct"))
 # ── cotes (jambe de droite sur le dessin : extérieur vers +x) ──
 o.append(dim(P(-HIP, -96), P(HIP, -96), 0, "90 entre axes de hanche", side=-1))
 o.append(line(P(-HIP, -88), P(-HIP, -99), "ext")); o.append(line(P(HIP, -88), P(HIP, -99), "ext"))

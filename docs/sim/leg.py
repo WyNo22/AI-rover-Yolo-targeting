@@ -139,6 +139,20 @@ for x0, w0 in ((-30, 16), (18, 18), (40, 18)):     # évidements du pied
 s.append(f'<rect class="tpu" x="-35" y="{f(foot_top+4)}" width="100" height="4" rx="1.5"/>')
 s.append(circle(A, 7, "bearing")); s.append(circle(A, 2.5, "pin"))
 s.append(circle(H, 6, "horn")); s.append(circle(H, 1.6, "pin"))
+# débattements des articulations
+def arc_deg(c, r, a0, a1, label, lp):
+    """Arc de débattement : angles depuis la verticale basse, positifs vers l'avant (+x)."""
+    pa = c + r * P(math.sin(math.radians(a0)), math.cos(math.radians(a0)))
+    pb = c + r * P(math.sin(math.radians(a1)), math.cos(math.radians(a1)))
+    big = 1 if abs(a1 - a0) > 180 else 0
+    sweep = 0 if a1 > a0 else 1
+    s.append(f'<path class="arc" d="M{pt(pa)} A{r},{r} 0 {big} {sweep} {pt(pb)}" marker-start="url(#arw)" marker-end="url(#arw)"/>')
+    s.append(text(lp, label, "arct"))
+th = math.degrees(T)
+arc_deg(H, 62, -30, 90, "hanche −30° / +90°", H + P(48, -8))
+arc_deg(K, 46, th, th - 110, "genou 0–110°", P(-112, 222))
+arc_deg(A, 34, 90 - 45, 90 + 45, "cheville ±45°", A + P(24, -26))
+s.append(text(K + P(14, -40), "flexion dessinée : 25°", "small"))
 # axes (repères)
 for c in (H, K, A):
     s.append(line(c + P(-10, 0), c + P(10, 0), "axis")); s.append(line(c + P(0, -10), c + P(0, 10), "axis"))

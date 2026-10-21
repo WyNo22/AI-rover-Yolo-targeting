@@ -5,6 +5,7 @@ sys.path.insert(0, '.')
 import leg
 import front
 import top
+import hip
 D = leg.DIMS
 G = leg.GROUND
 
@@ -109,6 +110,16 @@ svg text{font-family:var(--f-disp)}
 .ext{stroke:var(--dim);stroke-width:.35}
 .arrow{fill:var(--dim)}
 .glue{fill:url(#glue)}
+.arc{fill:none;stroke:var(--spring);stroke-width:.8;stroke-dasharray:3 1.6}
+.arcarrow{fill:var(--spring)}
+.arct{font-size:6.2px;fill:var(--spring);font-family:var(--f-disp)}
+.fitE{fill:var(--petg);fill-opacity:.7;stroke:var(--servo);stroke-width:.9}
+.hole{fill:var(--sheet);stroke:var(--servo);stroke-width:.6}
+.mini .dimt{font-size:3.4px}.mini .small{font-size:3.4px}.mini .cap{font-size:3.2px;letter-spacing:.06em}
+.mini .arct{font-size:3.6px}.mini .dim{stroke-width:.3}.mini .ext{stroke-width:.25}
+.mini .servo,.mini .fitE{stroke-width:.6}.mini .fit,.mini .plate,.mini .fitT{stroke-width:.5}.mini .horn{stroke-width:.6}
+.hipviews{display:grid;grid-template-columns:1.1fr 1fr;gap:12px}
+@media (max-width:760px){.hipviews{grid-template-columns:1fr}}
 .tag{fill:var(--sheet);stroke:var(--rod);stroke-width:.7}
 .tagt{font-size:5.4px;fill:var(--rod);font-family:var(--f-mono)!important;font-weight:500}
 .det.wide{grid-column:1/-1}
@@ -152,6 +163,7 @@ svg text{font-family:var(--f-disp)}
       <defs>
         <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path class="arrow" d="M0,1 L10,5 L0,9 Z"/></marker>
         <pattern id="hatch" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line class="hatchline" x1="0" y1="0" x2="0" y2="4"/></pattern>
+        <marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="4.5" markerHeight="4.5" orient="auto-start-reverse"><path class="arcarrow" d="M0,1 L10,5 L0,9 Z"/></marker>
       </defs>
       __SIDE__
     </svg>
@@ -204,8 +216,8 @@ svg text{font-family:var(--f-disp)}
     <thead><tr><th>Rep.</th><th>Élément</th><th>Comment il est fixé</th></tr></thead>
     <tbody>
       <tr><td><span class="rep">1</span></td><td>Plaque de bassin, PETG 8 mm</td><td>Porte les deux S1 et le buste. 90 mm entre les axes de hanche.</td></tr>
-      <tr><td><span class="rep">2</span></td><td>S1, hanche roulis</td><td>Vissé sous la plaque, arbre vers l'avant. Le palonnier tient l'avant de l'étrier ; l'arrière de l'étrier tourne sur un 625ZZ + vis épaulée M5 (palier opposé).</td></tr>
-      <tr><td><span class="rep">3</span></td><td>S2, hanche tangage, dans l'étrier</td><td>Tenu par 4 vis dans les trous du boîtier. Palonnier vissé sur le flasque du raccord de cuisse (4) ; de l'autre côté, vis épaulée M5 dans un 625ZZ de l'étrier.</td></tr>
+      <tr><td><span class="rep">2</span></td><td>S1, hanche roulis</td><td>Dans un berceau vissé sous la plaque, arbre vers l'avant, tenu par les 2 trous de coin du bout opposé à l'arbre sur chaque face. Le palonnier tient la plaque avant de l'étrier ; la plaque arrière tourne sur le <b>moyeu arrière</b> du servo (vis M3 + rondelle). Détail I.</td></tr>
+      <tr><td><span class="rep">3</span></td><td>S2, hanche tangage</td><td>Sous le plancher de l'étrier, dans un berceau qui ne tient que sa moitié arrière (4 vis M2 dans les trous de coin du bout opposé à l'arbre). La chape en U de la cuisse prend le palonnier côté extérieur et le <b>moyeu arrière</b> côté intérieur. Détail I.</td></tr>
       <tr><td><span class="rep">4</span></td><td>Raccord haut de cuisse + berceau de S3</td><td>Pièce unique en PETG. S3 centré <b>derrière le tube</b>, 4 vis boîtier, arbre à 40 mm sous la hanche et 25 mm en arrière. Palonnier côté extérieur + entretoise de 11,5 mm jusqu'au plan de B1.</td></tr>
       <tr><td><span class="rep">5</span></td><td>Tube de cuisse</td><td>Emmanché 20 mm en haut (4) et en bas (6), collier fendu + vis M3 de serrage, puis époxy une fois réglé.</td></tr>
       <tr><td><span class="rep">6</span></td><td>Chape de genou + came r 20</td><td>Deux joues sur la cuisse, un 625ZZ dans chaque, vis épaulée M5 + écrou frein. La came est solidaire du tibia.</td></tr>
@@ -221,11 +233,47 @@ svg text{font-family:var(--f-disp)}
 </section>
 
 <section>
+  <h2>Interface du STS3215</h2>
+  <div class="sheet det">
+    <svg class="mini" style="max-width:640px" viewBox="__SVB__" role="img" aria-label="Face arbre du STS3215 : 45,2 × 24,7 mm, arbre à 10,2 mm du bout, 4 trous de coin en rectangle 24,5 × 20,5, 4 petits trous en carré de 9,9 autour de l'arbre ; vue de côté : 35 mm, arbre 25 dents, moyeu arrière Ø6 avec trou M3.">
+      __SERVO__
+    </svg>
+    <p>Cotes relevées sur le modèle 3D du servo publié par le projet SO-ARM100 (précision ±0,2 mm) : <b>mesure ton
+    servo au pied à coulisse avant d'imprimer les poches</b>. Les 4 trous de coin Ø1,5 traversent tout le boîtier : ce sont
+    ceux des vis de boîtier. Vérifie si elles ressortent sur la face qui te sert ; si oui, on les remplace par des vis M2 plus
+    longues qui traversent aussi le berceau. Les 4 petits trous Ø2,5 autour de l'arbre ne font que 2,5 mm de profondeur :
+    ne compte pas dessus pour porter la jambe.</p>
+    <p><b>Règle de fixation, pour les 4 servos :</b> le berceau tient le servo par la <b>moitié opposée à l'arbre</b>, avec les
+    2 trous de coin de ce bout, sur les deux faces (4 vis). La moitié côté arbre reste libre : le palonnier et le bras
+    tournent sans rien toucher. En face du palonnier, la pièce entraînée s'appuie sur le <b>moyeu arrière</b> Ø6 du servo
+    (vis M3 + rondelle) : l'effort passe par les deux côtés du boîtier.</p>
+  </div>
+</section>
+
+<section>
   <h2>Fixation des servos</h2>
   <p>Deux règles pour tous les servos. Le boîtier est tenu dans une poche imprimée par ses propres trous de fixation,
   jamais par des colliers ou de la colle. Et chaque articulation porte la charge sur des roulements : l'arbre du servo
   ne fait que tourner, il ne soutient pas le robot.</p>
   <div class="details">
+    <div class="sheet det wide">
+      <h3>I · Hanche : S1, étrier de roulis, S2</h3>
+      <div class="hipviews">
+        <svg class="mini" viewBox="__HSVB__" role="img" aria-label="Hanche vue de côté : plaque de bassin, berceau de S1, S1 arbre vers l'avant, étrier avec plaque avant sur le palonnier et plaque arrière sur le moyeu arrière, plancher, berceau de S2, S2 dont l'axe est 63,5 mm sous celui de S1.">
+          __HSIDE__
+        </svg>
+        <svg class="mini" viewBox="__HFVB__" role="img" aria-label="Hanche vue de face : S1 avec arbre à 10,2 mm de son bout intérieur, berceau de S1 côté extérieur, étrier en col autour de l'axe de roulis, S2 et chape en U de la cuisse de 49 mm, roulis de −20° à +30°.">
+          __HFRONT__
+        </svg>
+      </div>
+      <p><b>Fixe :</b> la plaque de bassin porte le <b>berceau de S1</b> (4 vis M3 dans des inserts). Il tient S1 par son bout
+      extérieur, arbre vers l'avant. <b>Mobile en roulis :</b> l'<b>étrier</b> est une pièce en U. Sa plaque avant est vissée
+      sur le palonnier de S1 ; sa plaque arrière tourne sur le moyeu arrière de S1 (vis M3 + rondelle). En haut, les deux
+      plaques se réduisent à un moyeu de rayon 11 autour de l'axe de roulis, pour ne pas toucher le berceau de S1 en
+      tournant de −20° à +30°. En bas, un plancher relie les deux plaques et porte le <b>berceau de S2</b>, qui tient S2 par sa
+      moitié arrière. <b>Mobile en tangage :</b> la chape en U de la cuisse (49 mm de large) prend le palonnier de S2 côté
+      extérieur et son moyeu arrière côté intérieur. Axe de roulis 63,5 mm au-dessus de l'axe de tangage.</p>
+    </div>
     <div class="sheet det">
       <h3>A · Berceau sur le tube</h3>
       <svg viewBox="0 0 170 92" role="img" aria-label="Coupe : tube carbone dans un collier fendu serré par une vis M3, berceau qui entoure le servo, vissé dans le boîtier.">
@@ -263,10 +311,11 @@ svg text{font-family:var(--f-disp)}
         <text class="small" x="18" y="22">servo dans l'étrier</text>
         <text class="small" x="60" y="72">pièce entraînée, vissée au palonnier</text>
         <text class="small" x="60" y="79">(4 vis sur le pourtour + vis centrale)</text>
-        <text class="small" x="112" y="22">625ZZ + vis épaulée M5</text>
+        <text class="small" x="104" y="22">moyeu arrière + vis M3</text>
       </svg>
-      <p>Le palonnier aluminium du STS3215 se visse sur un flasque de la pièce entraînée. En face, une vis épaulée M5
-      tourne dans un roulement 625ZZ : l'effort de la jambe passe par les deux côtés de l'étrier, pas par l'arbre seul.</p>
+      <p>Le palonnier aluminium du STS3215 se visse sur un flasque de la pièce entraînée. En face, la pièce tourne sur le
+      moyeu arrière Ø6 du servo, tenue par une vis M3 et une rondelle : l'effort passe par les deux côtés du boîtier, pas par
+      l'arbre seul (dessiné ici avec une paroi pour la lisibilité).</p>
     </div>
     <div class="sheet det">
       <h3>C · Articulation passive (genou, cheville)</h3>
@@ -523,6 +572,49 @@ svg text{font-family:var(--f-disp)}
 </section>
 
 <section>
+  <h2>Cotes d'interface et impression</h2>
+  <div class="tw"><table>
+    <thead><tr><th>Interface</th><th class="n">Cote nominale</th><th class="n">À dessiner (PETG, FDM)</th></tr></thead>
+    <tbody>
+      <tr><td>Logement roulement 625ZZ</td><td class="n">Ø16 × 5</td><td class="n">Ø16,15 × 5, épaulement Ø13</td></tr>
+      <tr><td>Vis épaulée M5 dans la pièce fixe</td><td class="n">Ø5</td><td class="n">Ø5,2 (passage)</td></tr>
+      <tr><td>Emmanchement tube Ø12 · Ø10</td><td class="n">20 mm</td><td class="n">Ø12,2 · Ø10,2 × 20, fente 1,5 + collier M3</td></tr>
+      <tr><td>Poche de servo</td><td class="n">45,2 × 24,7 × 35</td><td class="n">+0,2 par côté</td></tr>
+      <tr><td>Insert laiton M3</td><td class="n">—</td><td class="n">Ø4,0 × 5,7 (selon l'insert)</td></tr>
+      <tr><td>Passage vis M3 · M2</td><td class="n">—</td><td class="n">Ø3,3 · Ø2,3</td></tr>
+      <tr><td>Moyeu arrière du servo</td><td class="n">Ø6</td><td class="n">alésage Ø6,2, appui sur rondelle M3</td></tr>
+      <tr><td>Axe de rotule (bras, levier)</td><td class="n">M3</td><td class="n">insert M3, ou écrou frein derrière</td></tr>
+    </tbody>
+  </table></div>
+  <p><b>Impression :</b> PETG, 4 parois, 5 couches dessus et dessous, remplissage gyroïde 40 % (60 % pour les raccords
+  du genou et la chape en U). Imprime les pièces qui portent un roulement avec l'axe vertical, pour que les logements
+  sortent ronds. Fais un test d'emmanchement (un anneau Ø16,15 et un manchon Ø12,2) avant les grosses pièces : chaque
+  imprimante a son propre jeu.</p>
+</section>
+
+<section>
+  <h2>Visserie d'une jambe</h2>
+  <div class="tw"><table>
+    <thead><tr><th>Pièce</th><th class="n">Qté</th><th>Où</th></tr></thead>
+    <tbody>
+      <tr><td>Vis M2 (longueur selon ton servo) </td><td class="n">16</td><td>berceaux des 4 servos</td></tr>
+      <tr><td>Vis de palonnier (fournies) + vis du palonnier vers la pièce</td><td class="n">4 + 16</td><td>S1 à S4</td></tr>
+      <tr><td>Vis M3 × 8 + rondelle M3</td><td class="n">2</td><td>moyeux arrière de S1 et S2</td></tr>
+      <tr><td>Roulement 625ZZ</td><td class="n">4</td><td>genou, cheville</td></tr>
+      <tr><td>Vis épaulée M5 + écrou frein + 2 rondelles</td><td class="n">2</td><td>genou, cheville</td></tr>
+      <tr><td>Rotule à œil M3 métal + goujon M3 collé + contre-écrou</td><td class="n">4</td><td>bielles B1 et B2</td></tr>
+      <tr><td>Vis M3 × 16 / × 25 + 2 rondelles</td><td class="n">3 + 1</td><td>attaches b, c, d / a</td></tr>
+      <tr><td>Vis M3 × 12 + écrou (colliers de tubes)</td><td class="n">6</td><td>cuisse ×2, tibia ×4</td></tr>
+      <tr><td>Axe M3 × 45 + écrou frein · tendeur M3 × 8</td><td class="n">1 · 2</td><td>ressorts de genou</td></tr>
+      <tr><td>Vis M3 × 10 + insert laiton</td><td class="n">4</td><td>berceau de S1 sur la plaque de bassin</td></tr>
+      <tr><td>Inserts laiton M3</td><td class="n">≈ 12</td><td>leviers, berceaux, plaque</td></tr>
+    </tbody>
+  </table></div>
+  <p>Avec le moyeu arrière des servos, la hanche n'a plus besoin de roulement ni de vis épaulée : 4 roulements par
+  jambe au lieu de 6 (environ −9 g).</p>
+</section>
+
+<section>
   <h2>À vérifier avant d'imprimer</h2>
   <p>Le boîtier du STS3215 est dessiné à 45,2 × 24,7 mm avec l'arbre à 11 mm d'un bout : mesure ton servo et ajuste
   les poches. Vérifie aussi le diamètre des trous taraudés du boîtier et des vis du palonnier, la longueur réelle de tes
@@ -530,7 +622,10 @@ svg text{font-family:var(--f-disp)}
 </section>
 </div>
 '''
-html = (html.replace("__TOP__", top.top_svg).replace("__TOPVB__", top.VB)
+html = (html.replace("__SERVO__", hip.servo_svg).replace("__SVB__", hip.SERVO_VB)
+        .replace("__HSIDE__", hip.hip_side_svg).replace("__HSVB__", hip.HIP_SIDE_VB)
+        .replace("__HFRONT__", hip.hip_front_svg).replace("__HFVB__", hip.HIP_FRONT_VB)
+        .replace("__TOP__", top.top_svg).replace("__TOPVB__", top.VB)
         .replace("__SIDE__", leg.side_svg).replace("__FRONT__", front.front_svg.replace("url(#ar)", "url(#ar2)"))
         .replace("__FRONTH__", str(front.GY + 168))
         .replace("__SIDEH__", str(round(G + 36 + 112)))
