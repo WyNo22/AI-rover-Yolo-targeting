@@ -48,6 +48,24 @@ Sous-total 135,03 € HT port compris ; prévoir la **TVA d'import (19 %, ≈ 26
 (tige filetée) collé à l'époxy sur 10 mm + contre-écrou M3 + rotule M3 femelle vissée dessus. Entraxes à régler :
 **B1 = 161,9 mm**, **B2 = 166,9 mm** (centre de rotule à centre de rotule).
 
+## Visserie à sortir de ta boîte (déjà possédée)
+
+| Qté | Vis | Où |
+|---|---|---|
+| 32 | M2 × 12 | boîtiers des servos |
+| 36 | M3 × 12 | palonniers S1/S2 + berceaux S1 |
+| 8 | M3 × 14 | bras de S4 |
+| 8 | M3 × 16 | rotules |
+| 8 | M3 × 22 (à défaut × 20) | bras de S3 |
+| 4 | M3 × 8 | tendeurs des ressorts |
+| 4 | M3 × 25 | colliers |
+| 4 | M3 × 40 | goupilles des tibias |
+| 2 | M3 × 45 | axes des ressorts |
+| 4 | M3 × 12 | supports des ToF bas |
+| 10 + 24 | Écrous M3 Nylstop + rondelles M3 | |
+| 2 + 2 | M5 × 40 et M5 × 55, tige lisse | genoux, chevilles |
+| 4 + 8 | Écrous M5 Nylstop + rondelles M5 | |
+
 ## 4. Plus tard
 
 | Vague | Quand | À acheter |
@@ -58,7 +76,7 @@ Sous-total 135,03 € HT port compris ; prévoir la **TVA d'import (19 %, ≈ 26
 
 ## Déjà possédé
 
-✅ inserts M3 · ✅ visserie complète (tableau dans l'historique du dépôt) · ✅ tige filetée M3 · ✅ câbles servo et connecteurs (bricolés)
+✅ inserts M3 · ✅ visserie complète (voir le tableau) · ✅ tige filetée M3 · ✅ câbles servo et connecteurs (bricolés)
 · ✅ PETG + TPU · ✅ colles (cyanoacrylate souple + primaire, époxy, frein-filet) · ✅ panne à inserts, pince à sertir, clé de 8
 · ✅ Raspberry Pi 5 + AI HAT+ · ✅ LiPo 3S 2200 (servos) · ✅ LiPo 4S 1400 (propulseurs) · ✅ moteurs 2206 (vérifier qu'il y en a 4)
 · ✅ radio FlySky + FS-iA6B · ✅ chargeur LiPo (à vérifier) · ✅ imprimante Bambu P1S · ✅ PicoBoard (banc de poussée)
