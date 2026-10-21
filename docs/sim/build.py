@@ -201,7 +201,9 @@ svg text{font-family:var(--f-disp)}
       <tr><td><span class="rep">11</span></td><td>Bielle de cheville B2</td><td>carbone Ø4 × 2 + 2 goujons M3</td><td class="n">__B2__</td><td class="n">—</td><td class="n cut">__B2C__</td></tr>
     </tbody>
   </table></div>
-  <p>Tubes : chaque bout entre de <b>20 mm</b> dans sa pièce imprimée (d'où coupe = visible + 40). Le tibia passe de
+  <p>Tubes : chaque bout entre de <b>20 mm</b> dans sa pièce imprimée (d'où coupe = visible + 40). Les languettes du genou
+  et de la cheville font 35 mm de l'axe au bout : c'est ce qu'il faut pour loger 20 mm de tube et garder de la matière
+  autour de la vis M5 (vérifié dans la CAO, dossier docs/cad). Le tibia passe de
   1 tube Ø12 à <b>2 tubes Ø10 × 8</b> : deux Ø8 auraient été deux fois plus souples d'avant en arrière qu'un Ø12 ; deux Ø10
   gardent la même raideur dans ce sens, sont nettement plus raides en torsion et sur le côté, pour environ 4 g de plus. Bielles : coupe =
   entraxe − 2 × 16 mm, pour des rotules M3 dont le centre de la boule est à 16 mm du bout du tube une fois vissée.

@@ -29,10 +29,10 @@ for sgn in (-1, 1):
     # — tibia : 2 tubes Ø10 —
     for tx in (-10, 10):
         o.append(R(cx, sgn, tx - 5, tx + 5, KY + 50, KY + 70, "tube-in"))
-        o.append(R(cx, sgn, tx - 5, tx + 5, KY + 70, AY - 25, "tube"))
-        o.append(R(cx, sgn, tx - 5, tx + 5, AY - 25, AY - 5, "tube-in"))
+        o.append(R(cx, sgn, tx - 5, tx + 5, KY + 70, AY - 35, "tube"))
+        o.append(R(cx, sgn, tx - 5, tx + 5, AY - 35, AY - 15, "tube-in"))
     o.append(R(cx, sgn, -20, 20, KY - 10, KY + 70, "fitT", 3))                # raccord haut de tibia (transparent)
-    o.append(R(cx, sgn, -17, 17, AY - 45, AY + 8, "fitT", 3))                 # bas de tibia (languette)
+    o.append(R(cx, sgn, -17, 17, AY - 35, AY + 8, "fitT", 3))                 # bas de tibia (languette)
     # — pied, chape de cheville —
     for c0, c1 in ((-25, -19), (19, 25)):
         o.append(R(cx, sgn, c0, c1, AY - 8, GY - 8, "fit"))
@@ -50,10 +50,10 @@ for sgn in (-1, 1):
     o.append(R(cx, sgn, 17.5, 21.5, 34, 46, "horn"))
     o.append(R(cx, sgn, 21.5, B1X + 2, 38, 42, "arm2"))
     o.append(R(cx, sgn, -6, 6, 55, 75, "tube-in"))
-    o.append(R(cx, sgn, -6, 6, 75, KY - 25, "tube"))
-    o.append(R(cx, sgn, -6, 6, KY - 25, KY - 5, "tube-in"))
+    o.append(R(cx, sgn, -6, 6, 75, KY - 35, "tube"))
+    o.append(R(cx, sgn, -6, 6, KY - 35, KY - 15, "tube-in"))
     o.append(R(cx, sgn, -20, 20, 25, 78, "fitT", 3))                          # raccord haut de cuisse (transparent)
-    o.append(R(cx, sgn, -10, 10, KY - 25, KY + 8, "fit", 3))                  # languette du genou
+    o.append(R(cx, sgn, -10, 10, KY - 35, KY + 8, "fit", 3))                  # languette du genou
     # genou : joues du tibia, roulements, vis, levier vers B1
     for c0, c1 in ((-18, -11), (11, 18)):
         o.append(R(cx, sgn, c0, c1, KY - 10, KY + 30, "fit"))

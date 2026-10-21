@@ -22,8 +22,8 @@ S4 = K + 35 * u2 + 25 * nb2                # S4 derrière les deux tubes, centr�
 P3 = S4 + P(-22, 0); P4 = A + P(-22, 0)
 RE = 16                                    # centre rotule → bout du tube
 B1 = np.linalg.norm(P2 - P1); B2 = np.linalg.norm(P4 - P3)
-TOP1, CLV, INS = 75, 25, 20                # raccord haut cuisse, chape genou, emmanchement
-TOP2, CLV2 = 70, 25
+TOP1, CLV, INS = 75, 35, 20                # raccord haut de cuisse, chape genou (axe → bout), emmanchement
+TOP2, CLV2 = 70, 35
 thigh_vis = SEG - TOP1 - CLV; thigh_cut = thigh_vis + 2 * INS
 shank_vis = SEG - TOP2 - CLV2; shank_cut = shank_vis + 2 * INS
 B1_cut = round(B1) - 2 * RE; B2_cut = round(B2) - 2 * RE
