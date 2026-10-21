@@ -140,7 +140,6 @@ td code, .mono { font: 12.5px var(--mono); }
 <path d="M820,570 L868,570" class="w wana"/>
 <path d="M450,586 L450,636" class="w wuart"/>
 <path d="M650,622 L585,622 L585,562 L560,562" class="w wpwm"/>
-<path d="M650,640 L590,640 L590,660 L560,660" class="w wuart"/>
 <path d="M730,57 L745,57" class="w w12"/>
 <path d="M730,63 L745,63" class="w wbus"/>
 <path d="M825,57 L840,57" class="w w12"/>
@@ -166,7 +165,7 @@ td code, .mono { font: 12.5px var(--mono); }
 <g class="box cpu"><rect x="340" y="36" width="220" height="64" rx="4"/><text x="350" y="55" class="bt">FE-URT-2</text><text x="350" y="70" class="bs">USB ↔ bus TTL 1 Mbit/s</text></g>
 <g class="box cpu"><rect x="340" y="176" width="220" height="214" rx="4"/><text x="350" y="195" class="bt">Raspberry Pi 5</text><text x="350" y="210" class="bs">+ AI HAT+ (Hailo-8, 26 TOPS)</text></g>
 <g class="box cpu"><rect x="340" y="446" width="220" height="140" rx="4"/><text x="350" y="465" class="bt">Pico 2</text><text x="350" y="480" class="bs">équilibre, capteurs, poussée</text></g>
-<g class="box cpu"><rect x="340" y="636" width="220" height="74" rx="4"/><text x="350" y="655" class="bt">FC F405 + ESC 4-en-1</text><text x="350" y="670" class="bs">45 A · stabilise les moteurs</text></g>
+<g class="box cpu"><rect x="340" y="636" width="220" height="74" rx="4"/><text x="350" y="655" class="bt">ESC 4-en-1 45 A</text><text x="350" y="670" class="bs">4S · DShot · 30,5 × 30,5 mm</text></g>
 <g class="box sens"><rect x="650" y="196" width="170" height="42" rx="4"/><text x="660" y="215" class="bt">Caméra Pi Module 3</text><text x="660" y="230" class="bs">tête · vision</text></g>
 <g class="box sens"><rect x="650" y="248" width="170" height="42" rx="4"/><text x="660" y="267" class="bt">ToF VL53L5CX</text><text x="660" y="282" class="bs">8 × 8 zones · obstacles</text></g>
 <g class="box act"><rect x="650" y="300" width="170" height="42" rx="4"/><text x="660" y="319" class="bt">E-ink 2,13″</text><text x="660" y="334" class="bs">état du robot</text></g>
@@ -193,14 +192,14 @@ td code, .mono { font: 12.5px var(--mono); }
 <text x="350" y="264" class="pin">PWM · GPIO 12/13</text>
 <text x="350" y="282" class="pin">5 V · broches 2/4</text>
 <text x="350" y="494" class="pin">I²C0 · GP4/GP5</text>
-<text x="350" y="512" class="pin">UART0 · GP0/GP1</text>
+<text x="350" y="512" class="pin">DShot · GP6–GP9</text>
 <text x="350" y="530" class="pin">PWM in · GP16/GP17</text>
 <text x="450" y="13" text-anchor="middle" class="wl w12t">12 V vers les jambes · 14 AWG</text>
 <text x="590" y="77" text-anchor="middle" class="wl wbust">bus G</text>
 <text x="584" y="108" text-anchor="middle" class="wl wbust">bus D</text>
 <text x="226" y="392" text-anchor="start" class="wl w5t">5 V</text>
 <text x="252" y="424" text-anchor="start" class="wl w5t">5 V</text>
-<text x="277" y="664" text-anchor="middle" class="wl w4t">XT60 · 4S</text>
+<text x="277" y="664" text-anchor="middle" class="wl w4t">XT60 + coupure · 4S</text>
 <text x="598" y="740" text-anchor="middle" class="wl w4t">3 phases × 4</text>
 <text x="456" y="142" text-anchor="start" class="wl wusbt">USB</text>
 <text x="406" y="412" text-anchor="start" class="wl wusbt">USB (données + 5 V)</text>
@@ -213,9 +212,8 @@ td code, .mono { font: 12.5px var(--mono); }
 <text x="630" y="460" text-anchor="middle" class="wl wi2ct">0x4A</text>
 <text x="630" y="512" text-anchor="middle" class="wl wi2ct">0x48</text>
 <text x="630" y="564" text-anchor="middle" class="wl wi2ct">0x49</text>
-<text x="456" y="614" text-anchor="start" class="wl wuartt">UART · MSP</text>
+<text x="456" y="614" text-anchor="start" class="wl wuartt">DShot × 4</text>
 <text x="591" y="600" text-anchor="start" class="wl wpwmt">PWM CH5–6</text>
-<text x="596" y="654" text-anchor="start" class="wl wuartt">iBUS</text>
 </svg>
 </div>
 
@@ -232,7 +230,7 @@ td code, .mono { font: 12.5px var(--mono); }
     <li class="wspi"><i></i>SPI</li>
     <li class="wcsi"><i></i>CSI caméra</li>
     <li class="wpwm"><i></i>PWM</li>
-    <li class="wuart"><i></i>Série (UART, iBUS)</li>
+    <li class="wuart"><i></i>DShot (consigne moteurs)</li>
     <li class="wana"><i></i>Analogique</li>
   </ul>
   <p class="note" style="margin-top:14px">Un point = connexion. Un petit pont = deux fils qui se croisent sans se toucher.</p>
@@ -243,10 +241,10 @@ td code, .mono { font: 12.5px var(--mono); }
   <h2>Règles de câblage</h2>
   <ol class="regles">
     <li><span><strong>Jamais la 4S sur les servos.</strong> Deux réseaux séparés : la 3S (12 V) pour les servos et l'électronique, la 4S uniquement pour l'ESC des moteurs. 16,8 V grillent les STS3215.</span></li>
-    <li><span><strong>Masse commune.</strong> Le − de la 3S, le − de la 4S, le Pi, le Pico et la FC sont reliés. Sans ça, les liaisons série (MSP, iBUS, bus servo) ne fonctionnent pas.</span></li>
+    <li><span><strong>Masse commune.</strong> Le − de la 3S, le − de la 4S, le Pi, le Pico et l'ESC sont reliés. Sans ça, le DShot, le bus servo et la radio ne fonctionnent pas.</span></li>
     <li><span><strong>Le 12 V des servos ne traverse pas l'URT-2.</strong> L'adaptateur ne passe que les données et la masse ; le 12 V est injecté juste après, sur chaque départ de jambe (câble en Y).</span></li>
     <li><span><strong>Fusible 20 A juste après l'interrupteur,</strong> puis câble 14 AWG jusqu'aux départs de jambe. Les 8 servos peuvent tirer 10 à 20 A ensemble.</span></li>
-    <li><span><strong>Arrêt d'urgence par la radio.</strong> L'interrupteur CH5 arrive au Pico, qui coupe le couple des servos et demande à la FC de désarmer. La FC reçoit aussi la radio en direct : on peut toujours couper les moteurs.</span></li>
+    <li><span><strong>Arrêt d'urgence par la radio.</strong> L'interrupteur CH5 arrive au Pico, qui coupe le couple des servos et envoie 0 aux 4 moteurs. En plus, un interrupteur de coupure sur la 4S arrête physiquement les moteurs.</span></li>
     <li><span><strong>Pi alimenté par les broches 5 V</strong> (UBEC réglé à 5,1 V) : garder <code class="mono">usb_max_current_enable=1</code> dans <code class="mono">config.txt</code>, déjà en place.</span></li>
   </ol>
 </section>
@@ -258,8 +256,7 @@ td code, .mono { font: 12.5px var(--mono); }
     <tbody>
       <tr><td>Pi 5 → FE-URT-2 → S1…S4 ×2</td><td><span class="pill pbus">Bus TTL</span></td><td>consignes et retours des 8 servos (IDs 1–8)</td></tr>
       <tr><td>Pi 5 ↔ Pico 2</td><td><span class="pill pusb">USB</span></td><td>ordres de marche ↓, état d'équilibre ↑ ; alimente le Pico</td></tr>
-      <tr><td>Pico 2 → FC F405</td><td><span class="pill puart">UART</span></td><td>consignes de poussée (protocole MSP)</td></tr>
-      <tr><td>FS-iA6B → FC</td><td><span class="pill puart">iBUS</span></td><td>pilotage manuel, armement des moteurs</td></tr>
+      <tr><td>Pico 2 → ESC 4-en-1</td><td><span class="pill puart">DShot</span></td><td>poussée de chaque moteur, calculée par la boucle d'équilibre</td></tr>
       <tr><td>FS-iA6B → Pico</td><td><span class="pill ppwm">PWM</span></td><td>CH5 arrêt d'urgence, CH6 MANUEL / AUTO</td></tr>
       <tr><td>Pico ↔ BNO085, ADS1115 ×2</td><td><span class="pill pi2c">I²C</span></td><td>inclinaison, appuis des pieds</td></tr>
       <tr><td>FSR 402 → ADS1115</td><td><span class="pill pana">Analog.</span></td><td>4 par pied, pont diviseur 10 kΩ</td></tr>
@@ -293,7 +290,8 @@ td code, .mono { font: 12.5px var(--mono); }
     <thead><tr><th>Fonction</th><th>Broches</th><th>Branché sur</th></tr></thead>
     <tbody>
       <tr><td>I²C0</td><td class="mono">SDA GP4 · SCL GP5</td><td>BNO085 0x4A, ADS1115 0x48 (pied G) / 0x49 (pied D)</td></tr>
-      <tr><td>UART0</td><td class="mono">TX GP0 · RX GP1</td><td>FC F405, un UART libre (MSP)</td></tr>
+      <tr><td>DShot (PIO)</td><td class="mono">GP6 · GP7 · GP8 · GP9</td><td>ESC 4-en-1, moteurs 1 à 4</td></tr>
+      <tr><td>Récepteur</td><td class="mono">VBUS (5 V) · GND</td><td>alimentation du FS-iA6B</td></tr>
       <tr><td>Entrées PWM</td><td class="mono">GP16 · GP17</td><td>FS-iA6B CH5, CH6 (pont 10 k / 20 k si 5 V)</td></tr>
       <tr><td>USB</td><td class="mono">micro-USB / USB-C</td><td>Pi 5 (données + alimentation)</td></tr>
     </tbody>

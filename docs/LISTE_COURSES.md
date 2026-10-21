@@ -4,6 +4,18 @@ Sans pièces de rechange, sauf quand elles coûtent presque rien. Quantités tir
 câblage dans `docs/schema_electrique.html`. Prix relevés sur les annonces (à revérifier, ils changent souvent).
 ✅ = déjà possédé.
 
+## Ordre de commande
+
+| Vague | Pour faire quoi | À commander |
+|---|---|---|
+| **1. Maintenant** | monter les 2 jambes et les faire bouger au banc | 8 STS3215 C018 + câbles 300 mm · adaptateur de bus (Waveshare chez Eckstein ou FE-URT2) · 625ZZ · rotules M3 · tubes carbone · ressorts · tige filetée M3 · câble acier · inserts · visserie · Molex 5264 · PETG + TPU · fusible, XT60, câble 14 AWG, alarme LiPo · colles, panne à inserts, pince à sertir |
+| **2. Quand une jambe bouge** | tenir debout et s'équilibrer | Pico 2 · BNO085 · 2 ADS1115 · 8 FSR 402 · INA226 · UBEC 5,1 V 5 A (Pi embarqué) |
+| **3. Quand il tient debout** | tête, perception, interaction | caméra Pi Module 3 + nappe · VL53L5CX · écran e-ink 2,13″ · 2 MG90S · BEC 5 V 3 A |
+| **4. Quand il marche** | sauts et vol assistés | ESC 4-en-1 (ou stack) · 2 jeux d'hélices 5″ · interrupteur de coupure 4S |
+
+Astuce : les composants Alibaba de la vague 2 et 3 sont légers et bon marché ; si tu passes de toute façon une
+commande Alibaba en vague 1, tu peux les ajouter pour ne payer le port qu'une fois.
+
 ## A. Commande Feetech sur Alibaba (boutique officielle « Shenzhen Feite Model »)
 
 Une seule commande, envoi express vers Munich ; prévoir la TVA d'import (19 %).
@@ -21,7 +33,7 @@ Une seule commande, envoi express vers Munich ; prévoir la TVA d'import (19 %).
 | 10 | Roulements **625ZZ** (5 × 16 × 5) | ≈ 0,83 $ (NMB, min. 10) | 8 utilisés |
 | 8 | Rotules **M3 à œil, filetage femelle, pas à droite** | ≈ 0,21–0,26 $ (min. 100) | le lot de 100 coûte ≈ 25 $ ; sinon AliExpress par 10 |
 | 1 kit | **Inserts M3 à chaud** (kit 220 pcs M2–M6) | quelques $ | 16 inserts M3 utilisés ; trou Ø4,0 |
-| 1 | **Contrôleur de vol F405 + ESC 4-en-1 45–50 A**, 30,5 × 30,5 | ≈ 24 $ (HAKRC F405 V3) | ou SpeedyBee F405 V3 50 A, plus suivi |
+| 1 | **ESC 4-en-1 45–50 A**, 4S, DShot, 30,5 × 30,5 | ≈ 15–25 $ | piloté par le Pico ; un stack F405 + ESC (≈ 24 $, HAKRC) convient aussi, le FC reste en réserve |
 | 1 | **VL53L5CX** (ToF 8 × 8) | ≈ 10–11 $ | |
 | 2 | **ADS1115** (module) | < 2 $ | 1 par pied |
 | 8 | **FSR 402** | ≈ 1 $ | 4 par pied, version queue courte |
