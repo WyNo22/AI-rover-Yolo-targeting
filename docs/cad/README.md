@@ -15,12 +15,18 @@ Pièces imprimées d'une jambe, générées par `jambe_cad.py` (CadQuery). Les c
 | `09_bras_servo_22` | bras de 22 mm (S3, S4) | 4 |
 | `10_entretoise_11_5` / `11_entretoise_3_5` | entretoises palonnier → bras (S3 / S4) | 2 / 2 |
 
-- `step/` : une pièce par fichier + `assemblage_jambe.step` (jambe droite tendue, avec maquettes des servos et des tubes).
+- `step/` : une pièce par fichier, les tubes à couper (`12` à `15`), et deux assemblages :
+  - `assemblage_jambe.step` : une jambe tendue avec tous ses composants ;
+  - **`assemblage_deux_jambes.step`** : plaque de bassin + les deux jambes (gauche et droite symétriques), tous composants :
+    servos (maquettes), pièces imprimées, tubes carbone, bielles avec rotules, bras, entretoises, roulements 625ZZ,
+    vis épaulées M5, ressorts de genou.
 - `stl/` : mêmes pièces, prêtes à trancher.
 - Repère : x avant, y extérieur, z haut, origine sur l'axe de tangage de hanche. **Jambe gauche : symétrie par rapport au plan xz** (dans Fusion : Miroir).
-- Tubes carbone : cuisse Ø12 × 10 coupé à **130 mm**, tibia 2 × Ø10 × 8 coupés à **135 mm**.
+- Tubes carbone : cuisse Ø12 × 10 coupé à **130 mm**, tibia 2 × Ø10 × 8 coupés à **135 mm**, bielles Ø4 × 2
+  coupées à **130 mm** (B1, entraxe 162) et **135 mm** (B2, entraxe 167).
+- Les rotules se montent à côté du bras ou du levier (rondelle) : bielles à 40 mm (B1) et 32 mm (B2) de l'axe de jambe.
 
-Contrôles faits : aucune collision entre pièces et servos jambe tendue, ni sur les débattements
+Contrôles faits : aucune collision entre tous les composants jambe tendue, ni sur les débattements
 (roulis −20/+30°, hanche −30/+90°, genou 0–110°).
 
 **À faire avant d'imprimer :**

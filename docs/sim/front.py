@@ -110,7 +110,7 @@ o.append(dim(P(-HIP + 32.5, GY + 14), P(HIP - 32.5, GY + 14), 0, "25", side=-1))
 o.append(dim(P(HIP - 32.5, GY + 14), P(HIP + 32.5, GY + 14), 0, "65", side=-1))
 for x in (-HIP - 32.5, -HIP + 32.5, HIP - 32.5, HIP + 32.5):
     o.append(line(P(x, GY + 2), P(x, GY + 17), "ext"))
-o.append(dim(P(-HIP - B1X, GY + 32), P(HIP + B1X, GY + 32), 0, f"{2 * (HIP + B1X)} hors tout aux bielles", side=-1))
+o.append(dim(P(-HIP - B1X, GY + 32), P(HIP + B1X, GY + 32), 0, f"{2 * (HIP + B1X)} aux bras · ≈ 175 aux rotules", side=-1))
 for x in (-HIP - B1X, HIP + B1X):
     o.append(line(P(x, KY + 22), P(x, GY + 35), "ext"))
 VX = 118

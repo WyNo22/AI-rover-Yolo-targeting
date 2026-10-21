@@ -161,8 +161,8 @@ def raccord_tibia():
     import math
     b0 = math.radians(55)                                    # jambe tendue : bras à 55° vers le bas/arrière
     lx, lz = -ARM * math.cos(b0), KZ - ARM * math.sin(b0)
-    pont = box(-6, 6, 18, B1_Y + 2, KZ - 8, KZ + 2)
-    plaque = (cq.Workplane("XZ").polyline([(-6, KZ - 8), (6, KZ - 8), (lx + 5, lz - 3), (lx - 5, lz + 3)]).close()
+    pont = box(-6, 6, 18, B1_Y + 2, KZ + 7, KZ + 15)         # au-dessus de l'écrou de la vis M5
+    plaque = (cq.Workplane("XZ").polyline([(-6, KZ + 7), (6, KZ + 7), (lx + 5, lz - 3), (lx - 5, lz + 3)]).close()
               .extrude(-6).translate((0, B1_Y - 4, 0)))
     moyeu = cyl_y(lx, lz, 5, B1_Y - 4, B1_Y + 2)
     s4z = KZ - 35.0
@@ -177,6 +177,10 @@ def raccord_tibia():
         r = r.cut(cyl_y(0, KZ, BRG_D / 2, ys * 10.5 if ys > 0 else -10.5 - BRG_W, (10.5 + BRG_W) if ys > 0 else -10.5))
     r = r.cut(cyl_y(0, KZ, M5 / 2, -25, 25))
     r = r.cut(cyl_y(lx, lz, INS / 2, B1_Y - 4.5, B1_Y + 2.5))  # insert M3 du levier
+    for (g0, g1) in ((13.5, 15.0), (-15.0, -13.5)):            # gorge du câble Dyneema sur la came (r 20 → 18,5)
+        r = r.cut(cyl_y(0, KZ, 21, g0, g1).cut(cyl_y(0, KZ, 18.5, g0 - 1, g1 + 1)))
+    for yc in (14.25, -14.25):                                 # trou du câble + insert du tendeur M3
+        r = r.cut(cyl_x(yc, KZ - 12, 1.0, 8, 22)).cut(cyl_y(15, KZ - 12, INS / 2, yc - 3.5, yc + 3.5))
     for ty in (-10, 10):                                       # emmanchements des 2 tubes Ø10
         r = r.cut(cyl_z(0, ty, T10 / 2, KZ - TOP2 - 0.1, KZ - TOP2 + SOCK))
     r = r.cut(cyl_y(-OFF + 0, s4z, 6.2 / 2 + 3, -50, -SH / 2 - 0.5) if False else cyl_y(-OFF, s4z, 3.3, -SH / 2 - 6, -SH / 2 + 0.5))
@@ -225,6 +229,48 @@ def entretoise(h):
         e = e.cut(cq.Workplane("XZ").center(HORN_PCD / 2 * math.cos(a), HORN_PCD / 2 * math.sin(a)).circle(HORN_HOLE / 2).extrude(-h - 1))
     return e
 
+# ── Tubes carbone (à couper) et pièces du commerce simplifiées ────────────────
+import math
+L_CUISSE = SEG - TOP1 - CLV + 2 * SOCK      # 130
+L_TIBIA = SEG - TOP2 - CLV + 2 * SOCK       # 135
+RE = 16.0                                   # centre de rotule → bout du tube de bielle
+ROD_D, ROD_DI = 4.0, 2.0                    # tube de bielle (Ø5 × 3 conseillé si disponible)
+B1_ROD, B2_ROD = B1_Y + 2 + 3, B2_Y + 2 + 3   # plan des rotules : contre la face extérieure du bras/levier + rondelle
+
+def tube(d_ext, d_int, L):
+    return cyl_z(0, 0, d_ext / 2, -L, 0).cut(cyl_z(0, 0, d_int / 2, -L - 1, 1))
+
+def roulement_625():
+    return cyl_y(0, 0, 8, -2.5, 2.5).cut(cyl_y(0, 0, 2.5, -3, 3))
+
+def vis_epaulee_m5(L):
+    return cyl_y(0, 0, 2.5, -L / 2, L / 2).union(cyl_y(0, 0, 4, -L / 2 - 3, -L / 2))
+
+def rotule_m3():
+    """Rotule à œil M3 simplifiée : œil Ø9 × 5 (axe y) + corps vers +x."""
+    return cyl_y(0, 0, 4.5, -2.5, 2.5).cut(cyl_y(0, 0, 1.5, -3, 3)).union(cyl_x(0, 0, 2.5, 3.5, RE - 1))
+
+def bielle(p_a, p_b, y):
+    dx, dz = p_b[0] - p_a[0], p_b[1] - p_a[1]
+    L = math.hypot(dx, dz)
+    ang = math.degrees(math.atan2(-dz, dx))
+    t = cyl_x(0, 0, ROD_D / 2, RE, L - RE).cut(cyl_x(0, 0, ROD_DI / 2, RE - 1, L - RE + 1))
+    b = t.union(rotule_m3()).union(rotule_m3().rotate((0, 0, 0), (0, 0, 1), 180).translate((L, 0, 0)))
+    return b.rotate((0, 0, 0), (0, 1, 0), ang).translate((p_a[0], y, p_a[1])), L
+
+def ressort(L=58.0, d=10.5):
+    return cyl_z(0, 0, d / 2, -L, 0).cut(cyl_z(0, 0, d / 2 - 1.4, -L - 1, 1))
+
+def place_bras(centre, cible, y_face):
+    ang = math.degrees(math.atan2(-(cible[1] - centre[1]), cible[0] - centre[0]))
+    b = bras_servo()
+    b = b.translate((0, y_face - b.val().BoundingBox().ymin, 0))
+    return b.rotate((0, 0, 0), (0, 1, 0), ang).translate((centre[0], 0, centre[1]))
+
+def place_entretoise(h, centre, y_face):
+    e = entretoise(h)
+    return e.translate((centre[0], y_face - e.val().BoundingBox().ymin, centre[1]))
+
 # ── Maquettes (non imprimées) pour l'assemblage ───────────────────────────────
 def servo_maquette(axis, center, shaft_end_dir, body_dir):
     """Boîtier STS3215 simplifié. axis : 'x' ou 'y' (axe de l'arbre)."""
@@ -235,6 +281,41 @@ def servo_maquette(axis, center, shaft_end_dir, body_dir):
         return box(cx - SW / 2, cx + SW / 2, cy - SH / 2, cy + SH / 2, cz - (SL - S_END), cz + S_END)
     if axis == "x":
         return box(cx - SH / 2, cx + SH / 2, cy - S_END, cy + SL - S_END, cz - SW / 2, cz + SW / 2)
+
+def composants_jambe():
+    """Tous les composants d'une jambe droite (repère de jambe), hors plaque de bassin : {nom: (forme, couleur)}."""
+    pla, srv, carb = cq.Color(0.85, 0.88, 0.86), cq.Color(0.2, 0.37, 0.55), cq.Color(0.15, 0.15, 0.15)
+    acier, orange, vert = cq.Color(0.62, 0.62, 0.65), cq.Color(0.72, 0.42, 0.06), cq.Color(0.17, 0.53, 0.34)
+    c = {}
+    for n, fn in PIECES.items():
+        if n[:2] in ("01", "09", "10", "11"):
+            continue
+        c[n[3:]] = (fn(), pla)
+    c["S1"] = (servo_maquette("x", (0, 0, S1_Z), None, None), srv)
+    c["S2"] = (servo_maquette("y", (0, 0, 0), None, "-x"), srv)
+    c["S3"] = (servo_maquette("y", (-OFF, 0, -40), None, "-z"), srv)
+    c["S4"] = (servo_maquette("y", (-OFF, 0, KZ - 35), None, "-z"), srv)
+    c["tube_cuisse"] = (tube(12, 10, L_CUISSE).translate((0, 0, -TOP1 + SOCK)), carb)
+    for ty in (-10, 10):
+        c[f"tube_tibia_{'int' if ty < 0 else 'ext'}"] = (tube(10, 8, L_TIBIA).translate((0, ty, KZ - TOP2 + SOCK)), carb)
+    b0 = math.radians(55)
+    pin_s3 = (-OFF - ARM * math.cos(b0), -40 - ARM * math.sin(b0))
+    pin_genou = (-ARM * math.cos(b0), KZ - ARM * math.sin(b0))
+    pin_s4, pin_talon = (-OFF - ARM, KZ - 35), (-ARM, AZ)
+    c["bielle_B1"] = (bielle(pin_s3, pin_genou, B1_ROD)[0], orange)
+    c["bielle_B2"] = (bielle(pin_s4, pin_talon, B2_ROD)[0], orange)
+    c["entretoise_S3"] = (place_entretoise(11.5, (-OFF, -40), SH / 2 + HORN_T), pla)
+    c["bras_S3"] = (place_bras((-OFF, -40), pin_s3, SH / 2 + HORN_T + 11.5), pla)
+    c["entretoise_S4"] = (place_entretoise(3.5, (-OFF, KZ - 35), SH / 2 + HORN_T), pla)
+    c["bras_S4"] = (place_bras((-OFF, KZ - 35), pin_s4, SH / 2 + HORN_T + 3.5), pla)
+    for n, (y, z) in {"625_genou_ext": (13.0, KZ), "625_genou_int": (-13.0, KZ),
+                      "625_cheville_ext": (21.5, AZ), "625_cheville_int": (-21.5, AZ)}.items():
+        c[n] = (roulement_625().translate((0, y, z)), acier)
+    c["vis_M5_genou"] = (vis_epaulee_m5(40).translate((0, 0, KZ)), acier)
+    c["vis_M5_cheville"] = (vis_epaulee_m5(56).translate((0, 0, AZ)), acier)
+    for ys in (14.5, -14.5):
+        c[f"ressort_{'ext' if ys > 0 else 'int'}"] = (ressort().translate((12, ys, -TOP1 - 1)), vert)
+    return c, (pin_s3, pin_genou, pin_s4, pin_talon)
 
 PIECES = {
     "01_plaque_bassin": plaque_bassin,
@@ -262,23 +343,29 @@ if __name__ == "__main__":
         cq.exporters.export(shape, os.path.join(here, "stl", name + ".stl"), tolerance=0.05, angularTolerance=0.1)
         bb = shape.val().BoundingBox()
         print(f"{name:32s} {bb.xlen:6.1f} × {bb.ylen:6.1f} × {bb.zlen:6.1f} mm   volume {shape.val().Volume()/1000:6.1f} cm³")
-    # assemblage (pièces de la jambe droite + maquettes)
+    comp, pins = composants_jambe()
+    L1 = math.hypot(pins[1][0] - pins[0][0], pins[1][1] - pins[0][1])
+    L2 = math.hypot(pins[3][0] - pins[2][0], pins[3][1] - pins[2][1])
+    a_couper = {f"12_tube_cuisse_12x10_L{L_CUISSE:.0f}": tube(12, 10, L_CUISSE),
+                f"13_tube_tibia_10x8_L{L_TIBIA:.0f}_x2": tube(10, 8, L_TIBIA),
+                f"14_tube_bielle_B1_{ROD_D:.0f}x{ROD_DI:.0f}_L{L1 - 2 * RE:.0f}": tube(ROD_D, ROD_DI, L1 - 2 * RE),
+                f"15_tube_bielle_B2_{ROD_D:.0f}x{ROD_DI:.0f}_L{L2 - 2 * RE:.0f}": tube(ROD_D, ROD_DI, L2 - 2 * RE)}
+    for name, shape in a_couper.items():
+        cq.exporters.export(shape, os.path.join(here, "step", name + ".step"))
+        print(f"{name:32s} (tube à couper)")
+    print(f"Bielles : B1 entraxe {L1:.1f}, B2 entraxe {L2:.1f}")
+    pla = cq.Color(0.85, 0.88, 0.86)
     asm = cq.Assembly(name="jambe_droite_tendue")
-    for name, shape in built.items():
-        if name.startswith(("09", "10", "11")):
-            continue
-        if name.startswith("01"):
-            asm.add(shape.translate((0, -45, 0)), name=name, color=cq.Color(0.85, 0.88, 0.86))
-        else:
-            asm.add(shape, name=name, color=cq.Color(0.85, 0.88, 0.86))
-    serv = cq.Color(0.2, 0.37, 0.55)
-    asm.add(servo_maquette("x", (0, 0, S1_Z), None, None), name="S1", color=serv)
-    asm.add(servo_maquette("y", (0, 0, 0), None, "-x"), name="S2", color=serv)
-    asm.add(servo_maquette("y", (-OFF, 0, -40), None, "-z"), name="S3", color=serv)
-    asm.add(servo_maquette("y", (-OFF, 0, KZ - 35), None, "-z"), name="S4", color=serv)
-    carb = cq.Color(0.15, 0.15, 0.15)
-    asm.add(cyl_z(0, 0, 6, -TOP1 + SOCK, KZ + CLV - SOCK), name="tube_cuisse", color=carb)
-    for ty in (-10, 10):
-        asm.add(cyl_z(0, ty, 5, KZ - TOP2 + SOCK, AZ + CLV - SOCK), name=f"tube_tibia_{'int' if ty < 0 else 'ext'}", color=carb)
+    asm.add(built["01_plaque_bassin"].translate((0, -45, 0)), name="plaque_bassin", color=pla)
+    for n, (sh, col) in comp.items():
+        asm.add(sh, name=n, color=col)
     asm.save(os.path.join(here, "step", "assemblage_jambe.step"))
-    print("Assemblage : step/assemblage_jambe.step")
+    # deux jambes : y robot vers la gauche ; jambe gauche = repère de jambe décalé de +45,
+    # jambe droite = symétrie par rapport au plan xz puis décalage de -45
+    asm2 = cq.Assembly(name="LEO-S_jambes")
+    asm2.add(built["01_plaque_bassin"], name="plaque_bassin", color=pla)
+    for n, (sh, col) in comp.items():
+        asm2.add(sh.translate((0, 45, 0)), name="G_" + n, color=col)
+        asm2.add(sh.mirror("XZ").translate((0, -45, 0)), name="D_" + n, color=col)
+    asm2.save(os.path.join(here, "step", "assemblage_deux_jambes.step"))
+    print("Assemblages : step/assemblage_jambe.step, step/assemblage_deux_jambes.step")
