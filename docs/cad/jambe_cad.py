@@ -13,10 +13,10 @@ import cadquery as cq
 
 # ── Paramètres ────────────────────────────────────────────────────────────────
 SEG = 200.0                 # cuisse = tibia (entraxes)
-SL, SW, SH = 45.2, 24.7, 35.0   # STS3215 : longueur, largeur, épaisseur (le long de l'arbre)
-S_END = 10.2                # arbre → bout du boîtier
-S_HOLE_X, S_HOLE_Y = 2.4, 10.25  # trous de coin : 2,4 du bout opposé à l'arbre, ±10,25 de l'axe
-HORN_T = 4.0                # épaisseur palonnier
+SL, SW, SH = 45.22, 24.72, 35.0  # STS3215 (plan Feetech) : longueur, largeur, épaisseur du boîtier
+S_END = 10.11               # arbre → bout du boîtier
+S_HOLE_X, S_HOLE_Y = 2.36, 10.25  # vis de boîtier : 2,36 du bout opposé à l'arbre (18,41 + 24,45 côté arbre), ±10,25
+HORN_T = 4.0                # plan d'appui des pièces sur palonnier : SH/2 + HORN_T = 21,5 de l'axe du servo
 JEU = 0.2                   # jeu d'impression par côté
 BRG_D, BRG_W = 16.15, 5.0   # logement 625ZZ
 M5, M3, M2, INS = 5.2, 3.3, 2.3, 4.0   # passages et insert M3
@@ -29,7 +29,10 @@ FOOT = (35.0, 65.0, 65.0)   # talon, pointe, largeur
 KZ, AZ, GZ = -SEG, -2 * SEG, -2 * SEG - 50.0
 TOP1, CLV, TOP2 = 75.0, 35.0, 70.0   # raccord haut de cuisse, languettes (axe → bout), raccord haut de tibia
 # palonnier : motif de trous à mesurer sur ton palonnier aluminium (valeurs provisoires)
-HORN_PCD, HORN_N, HORN_HOLE = 14.0, 4, 2.3
+HORN_PCD, HORN_N, HORN_HOLE = 14.0, 4, 3.3   # palonnier alu Ø19,2 : 4 trous en croix sur Ø14 (filetage à vérifier : M3 ou M2,5)
+HORN_A0 = 0.0                # trous en croix (0°, 90°, 180°, 270°)
+HORN_D, HORN_FACE = 19.2, 37.25 / 2   # palonniers des DEUX côtés (double sortie), faces extérieures à ±18,625
+MP = 35.0 / 2 + 4.0          # plan d'appui = 21,5 ; un bossage Ø19,2 comble l'écart avec le palonnier
 
 def box(x0, x1, y0, y1, z0, z1):
     return cq.Workplane("XY").box(x1 - x0, y1 - y0, z1 - z0).translate(((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2))
@@ -94,13 +97,17 @@ def etrier_roulis():
                 .lineTo(11, 30).lineTo(30, 22.5).lineTo(30, 17.5).lineTo(-30, 17.5).lineTo(-30, 22.5)
                 .lineTo(-11, 30).close().extrude(x1 - x0).translate((x0, 0, 0)))
         return prof.cut(cyl_x(0, S1_Z, trou / 2, x0 - 1, x1 + 1))
-    av = plaque(SH / 2 + HORN_T, SH / 2 + HORN_T + 5, M3)           # sur le palonnier de S1
+    av = plaque(SH / 2 + HORN_T, SH / 2 + HORN_T + 5, M3)           # sur le palonnier avant de S1
+    av = av.union(cyl_x(0, S1_Z, HORN_D / 2, HORN_FACE, MP)).cut(cyl_x(0, S1_Z, M3 / 2, 0, 40))
     for i in range(HORN_N):                                            # motif provisoire du palonnier
         import math
-        a = 2 * math.pi * i / HORN_N + math.pi / 4
+        a = 2 * math.pi * i / HORN_N + HORN_A0
         av = av.cut(cyl_x(HORN_PCD / 2 * math.cos(a), S1_Z + HORN_PCD / 2 * math.sin(a), HORN_HOLE / 2, 0, 40))
-    ar = plaque(-SH / 2 - HORN_T - 5, -SH / 2 - HORN_T, 6.2)       # reculée : la joue du berceau de S1 passe devant
-    ar = ar.union(cyl_x(0, S1_Z, 6.5, -SH / 2 - HORN_T, -SH / 2 - 0.8).cut(cyl_x(0, S1_Z, 3.1, -40, 0)))  # bague sur le moyeu arrière
+    ar = plaque(-MP - 5, -MP, M3)                                       # sur le palonnier arrière de S1
+    ar = ar.union(cyl_x(0, S1_Z, HORN_D / 2, -MP, -HORN_FACE)).cut(cyl_x(0, S1_Z, M3 / 2, -40, 0))
+    for i in range(HORN_N):
+        a = 2 * math.pi * i / HORN_N + HORN_A0
+        ar = ar.cut(cyl_x(HORN_PCD / 2 * math.cos(a), S1_Z + HORN_PCD / 2 * math.sin(a), HORN_HOLE / 2, -40, 0))
     plancher = box(-38, SH / 2 + HORN_T + 5, -30, 30, 17.5, 22.5)
     plancher = plancher.union(box(-SH / 2 - HORN_T - 5, -SH / 2 - HORN_T, -30, 30, 17.5, 22.5))
     # berceau de S2 : S2 arbre d'axe y en (0,0), boîtier x de -SL+S_END à S_END, z ±SW/2, y ±SH/2
@@ -122,8 +129,9 @@ def etrier_roulis():
 # ── 4. Chape de cuisse + raccord haut + berceau de S3 + patte d'ancrage des ressorts
 def chape_cuisse():
     bras_ext = box(-12, 12, SH / 2 + HORN_T, SH / 2 + HORN_T + 5, -31, 0).union(cyl_y(0, 0, 12, SH / 2 + HORN_T, SH / 2 + HORN_T + 5))
-    bras_int = box(-12, 12, -SH / 2 - 0.8 - 5.5, -SH / 2 - 0.8 - 0.5, -31, 0).union(cyl_y(0, 0, 12, -SH / 2 - 6.3, -SH / 2 - 1.3))
-    traverse = box(-12, 12, -SH / 2 - 6.3, SH / 2 + HORN_T + 5, -37, -31)
+    bras_int = box(-12, 12, -MP - 5, -MP, -31, 0).union(cyl_y(0, 0, 12, -MP - 5, -MP))
+    bossages = cyl_y(0, 0, HORN_D / 2, HORN_FACE, MP).union(cyl_y(0, 0, HORN_D / 2, -MP, -HORN_FACE))
+    traverse = box(-12, 12, -MP - 5, MP + 5, -37, -31)
     corps = box(-12, 9, -12, 12, -TOP1, -31)                   # autour du tube Ø12
     # berceau de S3 : arbre en (x=-OFF, z=-40), boîtier vertical vers le bas
     s3z = -40.0
@@ -131,14 +139,14 @@ def chape_cuisse():
     cad = box(-OFF - SW / 2 - 3.5, -OFF + SW / 2 + 3.5, -SH / 2 - 3.5, SH / 2 + 3.5, zf - 3, s3z - 12)
     pont = box(-OFF, -6, -12, 12, -TOP1, -50)
     patte = box(6, 18, -20, 20, -TOP1, -TOP1 + 6)               # ancrage des ressorts (axe M3 d'axe y)
-    c = bras_ext.union(bras_int).union(traverse).union(corps).union(cad).union(pont).union(patte)
+    c = bras_ext.union(bras_int).union(bossages).union(traverse).union(corps).union(cad).union(pont).union(patte)
     c = c.cut(servo_pocket_vertical(-OFF, s3z))
-    c = c.cut(cyl_y(0, 0, 6.2 / 2, -40, -SH / 2 + 1))          # moyeu arrière de S2
-    c = c.cut(cyl_y(0, 0, M3 / 2, 0, 40))
+    c = c.cut(cyl_y(-OFF, s3z, HORN_D / 2 + 1, -MP - 1, -HORN_FACE + 4))   # dégagement du palonnier intérieur de S3
+    c = c.cut(cyl_y(0, 0, M3 / 2, -40, 40))
     import math
     for i in range(HORN_N):
-        a = 2 * math.pi * i / HORN_N + math.pi / 4
-        c = c.cut(cyl_y(HORN_PCD / 2 * math.cos(a), HORN_PCD / 2 * math.sin(a), HORN_HOLE / 2, 0, 40))
+        a = 2 * math.pi * i / HORN_N + HORN_A0
+        c = c.cut(cyl_y(HORN_PCD / 2 * math.cos(a), HORN_PCD / 2 * math.sin(a), HORN_HOLE / 2, -40, 40))
     c = c.cut(cyl_z(0, 0, T12 / 2, -TOP1 - 0.1, -TOP1 + SOCK))  # emmanchement du tube
     c = c.cut(box(-0.75, 0.75, -15, 15, -79, -66) if False else box(4, 14, -0.75, 0.75, -TOP1 - 1, -TOP1 + 16))  # fente
     c = c.cut(cyl_x(9, -70, M3 / 2, -2, 14).rotate((0, 0, 0), (0, 0, 1), 90).translate((0, 0, 0)) if False else cyl_y(9.5, -TOP1 + 6, M3 / 2, -14, 14))
@@ -183,7 +191,7 @@ def raccord_tibia():
         r = r.cut(cyl_x(yc, KZ - 12, 1.0, 8, 22)).cut(cyl_y(15, KZ - 12, INS / 2, yc - 3.5, yc + 3.5))
     for ty in (-10, 10):                                       # emmanchements des 2 tubes Ø10
         r = r.cut(cyl_z(0, ty, T10 / 2, KZ - TOP2 - 0.1, KZ - TOP2 + SOCK))
-    r = r.cut(cyl_y(-OFF + 0, s4z, 6.2 / 2 + 3, -50, -SH / 2 - 0.5) if False else cyl_y(-OFF, s4z, 3.3, -SH / 2 - 6, -SH / 2 + 0.5))
+    r = r.cut(cyl_y(-OFF, s4z, HORN_D / 2 + 1, -MP - 1, -HORN_FACE + 4))   # dégagement du palonnier intérieur de S4
     return r
 
 # ── 7. Bas de tibia (languette de cheville) ───────────────────────────────────
@@ -217,7 +225,7 @@ def bras_servo():
          .union(cq.Workplane("XZ").center(ARM, 0).circle(5).extrude(-4)))
     b = b.cut(cq.Workplane("XZ").circle(M3 / 2).extrude(-5)).cut(cq.Workplane("XZ").center(ARM, 0).circle(M3 / 2).extrude(-5))
     for i in range(HORN_N):
-        a = 2 * math.pi * i / HORN_N + math.pi / 4
+        a = 2 * math.pi * i / HORN_N + HORN_A0
         b = b.cut(cq.Workplane("XZ").center(HORN_PCD / 2 * math.cos(a), HORN_PCD / 2 * math.sin(a)).circle(HORN_HOLE / 2).extrude(-5))
     return b
 
@@ -225,7 +233,7 @@ def entretoise(h):
     import math
     e = cq.Workplane("XZ").circle(10).extrude(-h).cut(cq.Workplane("XZ").circle(M3 / 2).extrude(-h - 1))
     for i in range(HORN_N):
-        a = 2 * math.pi * i / HORN_N + math.pi / 4
+        a = 2 * math.pi * i / HORN_N + HORN_A0
         e = e.cut(cq.Workplane("XZ").center(HORN_PCD / 2 * math.cos(a), HORN_PCD / 2 * math.sin(a)).circle(HORN_HOLE / 2).extrude(-h - 1))
     return e
 
@@ -235,7 +243,8 @@ L_CUISSE = SEG - TOP1 - CLV + 2 * SOCK      # 130
 L_TIBIA = SEG - TOP2 - CLV + 2 * SOCK       # 135
 RE = 16.0                                   # centre de rotule → bout du tube de bielle
 ROD_D, ROD_DI = 4.0, 2.0                    # tube de bielle (Ø5 × 3 conseillé si disponible)
-B1_ROD, B2_ROD = B1_Y + 2 + 3, B2_Y + 2 + 3   # plan des rotules : contre la face extérieure du bras/levier + rondelle
+B1_ROD, B2_ROD = B1_Y + 2 + 3, B2_Y + 2 + 3
+ENT_S3, ENT_S4 = MP + 11.5 - HORN_FACE, MP + 3.5 - HORN_FACE   # 14,4 et 6,4   # plan des rotules : contre la face extérieure du bras/levier + rondelle
 
 def tube(d_ext, d_int, L):
     return cyl_z(0, 0, d_ext / 2, -L, 0).cut(cyl_z(0, 0, d_int / 2, -L - 1, 1))
@@ -275,12 +284,13 @@ def place_entretoise(h, centre, y_face):
 def servo_maquette(axis, center, shaft_end_dir, body_dir):
     """Boîtier STS3215 simplifié. axis : 'x' ou 'y' (axe de l'arbre)."""
     cx, cy, cz = center
-    if axis == "y" and body_dir == "-x":
-        return box(cx - (SL - S_END), cx + S_END, cy - SH / 2, cy + SH / 2, cz - SW / 2, cz + SW / 2)
-    if axis == "y" and body_dir == "-z":
-        return box(cx - SW / 2, cx + SW / 2, cy - SH / 2, cy + SH / 2, cz - (SL - S_END), cz + S_END)
-    if axis == "x":
-        return box(cx - SH / 2, cx + SH / 2, cy - S_END, cy + SL - S_END, cz - SW / 2, cz + SW / 2)
+    if axis == "y":
+        h = cyl_y(cx, cz, HORN_D / 2, cy + 14.5, cy + HORN_FACE).union(cyl_y(cx, cz, HORN_D / 2, cy - HORN_FACE, cy - 14.5))
+        if body_dir == "-x":
+            return box(cx - (SL - S_END), cx + S_END, cy - SH / 2, cy + SH / 2, cz - SW / 2, cz + SW / 2).union(h)
+        return box(cx - SW / 2, cx + SW / 2, cy - SH / 2, cy + SH / 2, cz - (SL - S_END), cz + S_END).union(h)
+    h = cyl_x(cy, cz, HORN_D / 2, cx + 14.5, cx + HORN_FACE).union(cyl_x(cy, cz, HORN_D / 2, cx - HORN_FACE, cx - 14.5))
+    return box(cx - SH / 2, cx + SH / 2, cy - S_END, cy + SL - S_END, cz - SW / 2, cz + SW / 2).union(h)
 
 def composants_jambe():
     """Tous les composants d'une jambe droite (repère de jambe), hors plaque de bassin : {nom: (forme, couleur)}."""
@@ -304,10 +314,10 @@ def composants_jambe():
     pin_s4, pin_talon = (-OFF - ARM, KZ - 35), (-ARM, AZ)
     c["bielle_B1"] = (bielle(pin_s3, pin_genou, B1_ROD)[0], orange)
     c["bielle_B2"] = (bielle(pin_s4, pin_talon, B2_ROD)[0], orange)
-    c["entretoise_S3"] = (place_entretoise(11.5, (-OFF, -40), SH / 2 + HORN_T), pla)
-    c["bras_S3"] = (place_bras((-OFF, -40), pin_s3, SH / 2 + HORN_T + 11.5), pla)
-    c["entretoise_S4"] = (place_entretoise(3.5, (-OFF, KZ - 35), SH / 2 + HORN_T), pla)
-    c["bras_S4"] = (place_bras((-OFF, KZ - 35), pin_s4, SH / 2 + HORN_T + 3.5), pla)
+    c["entretoise_S3"] = (place_entretoise(ENT_S3, (-OFF, -40), HORN_FACE), pla)
+    c["bras_S3"] = (place_bras((-OFF, -40), pin_s3, HORN_FACE + ENT_S3), pla)
+    c["entretoise_S4"] = (place_entretoise(ENT_S4, (-OFF, KZ - 35), HORN_FACE), pla)
+    c["bras_S4"] = (place_bras((-OFF, KZ - 35), pin_s4, HORN_FACE + ENT_S4), pla)
     for n, (y, z) in {"625_genou_ext": (13.0, KZ), "625_genou_int": (-13.0, KZ),
                       "625_cheville_ext": (21.5, AZ), "625_cheville_int": (-21.5, AZ)}.items():
         c[n] = (roulement_625().translate((0, y, z)), acier)
@@ -327,8 +337,8 @@ PIECES = {
     "07_tibia_bas": tibia_bas,
     "08_pied": pied,
     "09_bras_servo_22": bras_servo,
-    "10_entretoise_11_5": lambda: entretoise(11.5),
-    "11_entretoise_3_5": lambda: entretoise(3.5),
+    "10_entretoise_S3_14_4": lambda: entretoise(ENT_S3),
+    "11_entretoise_S4_6_4": lambda: entretoise(ENT_S4),
 }
 
 if __name__ == "__main__":

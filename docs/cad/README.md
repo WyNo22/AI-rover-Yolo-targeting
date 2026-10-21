@@ -13,7 +13,7 @@ Pièces imprimées d'une jambe, générées par `jambe_cad.py` (CadQuery). Les c
 | `07_tibia_bas` | languette de cheville, 2 tubes Ø10 | 2 |
 | `08_pied` | pied 100 × 65 évidé + joues de cheville + levier de talon | 2 (miroir) |
 | `09_bras_servo_22` | bras de 22 mm (S3, S4) | 4 |
-| `10_entretoise_11_5` / `11_entretoise_3_5` | entretoises palonnier → bras (S3 / S4) | 2 / 2 |
+| `10_entretoise_S3_14_4` / `11_entretoise_S4_6_4` | entretoises palonnier → bras (S3 / S4) | 2 / 2 |
 
 - `step/` : une pièce par fichier, les tubes à couper (`12` à `15`), et deux assemblages :
   - `assemblage_jambe.step` : une jambe tendue avec tous ses composants ;
@@ -30,8 +30,9 @@ Contrôles faits : aucune collision entre tous les composants jambe tendue, ni s
 (roulis −20/+30°, hanche −30/+90°, genou 0–110°).
 
 **À faire avant d'imprimer :**
-1. Mesurer le STS3215 (`SL, SW, SH, S_END, S_HOLE_*` en tête du script) : cotes relevées sur un modèle 3D.
-2. Relever le motif de trous de ton palonnier (`HORN_PCD, HORN_N, HORN_HOLE`) : **valeurs provisoires**.
+1. Cotes du STS3215 reprises du plan Feetech (double sortie : palonnier Ø19,2, 4 trous en croix sur Ø14 de chaque côté,
+   37,25 mm palonniers compris). Vérifier le filetage des trous du palonnier (M3 ou M2,5 : `HORN_HOLE`).
+2. Les pièces entraînées se vissent sur les deux palonniers via un bossage Ø19,2 jusqu'au plan d'appui à 21,5 mm.
 3. Imprimer un test d'emmanchement (Ø16,15 pour les 625ZZ, Ø12,2 / Ø10,2 pour les tubes) et ajuster `JEU`, `BRG_D`, `T12`, `T10`.
 
 Régénérer : `pip install cadquery` puis `python jambe_cad.py`.

@@ -218,8 +218,8 @@ svg text{font-family:var(--f-disp)}
     <thead><tr><th>Rep.</th><th>Élément</th><th>Comment il est fixé</th></tr></thead>
     <tbody>
       <tr><td><span class="rep">1</span></td><td>Plaque de bassin, PETG 8 mm</td><td>Porte les deux S1 et le buste. 90 mm entre les axes de hanche.</td></tr>
-      <tr><td><span class="rep">2</span></td><td>S1, hanche roulis</td><td>Dans un berceau vissé sous la plaque, arbre vers l'avant, tenu par les 2 trous de coin du bout opposé à l'arbre sur chaque face. Le palonnier tient la plaque avant de l'étrier ; la plaque arrière tourne sur le <b>moyeu arrière</b> du servo (vis M3 + rondelle). Détail I.</td></tr>
-      <tr><td><span class="rep">3</span></td><td>S2, hanche tangage</td><td>Sous le plancher de l'étrier, dans un berceau qui ne tient que sa moitié arrière (4 vis M2 dans les trous de coin du bout opposé à l'arbre). La chape en U de la cuisse prend le palonnier côté extérieur et le <b>moyeu arrière</b> côté intérieur. Détail I.</td></tr>
+      <tr><td><span class="rep">2</span></td><td>S1, hanche roulis</td><td>Dans un berceau vissé sous la plaque, arbre vers l'avant, tenu par les 2 vis de boîtier du bout opposé à l'arbre sur chaque face. Les plaques avant et arrière de l'étrier sont vissées sur les <b>deux palonniers</b> du servo (double sortie). Détail I.</td></tr>
+      <tr><td><span class="rep">3</span></td><td>S2, hanche tangage</td><td>Sous le plancher de l'étrier, dans un berceau qui ne tient que sa moitié arrière (4 vis M2 dans les trous de coin du bout opposé à l'arbre). La chape en U de la cuisse est vissée sur les <b>deux palonniers</b> de S2. Détail I.</td></tr>
       <tr><td><span class="rep">4</span></td><td>Raccord haut de cuisse + berceau de S3</td><td>Pièce unique en PETG. S3 centré <b>derrière le tube</b>, 4 vis boîtier, arbre à 40 mm sous la hanche et 25 mm en arrière. Palonnier côté extérieur + entretoise de 11,5 mm jusqu'au plan de B1.</td></tr>
       <tr><td><span class="rep">5</span></td><td>Tube de cuisse</td><td>Emmanché 20 mm en haut (4) et en bas (6), collier fendu + vis M3 de serrage, puis époxy une fois réglé.</td></tr>
       <tr><td><span class="rep">6</span></td><td>Chape de genou + came r 20</td><td>Deux joues sur la cuisse, un 625ZZ dans chaque, vis épaulée M5 + écrou frein. La came est solidaire du tibia.</td></tr>
@@ -237,18 +237,17 @@ svg text{font-family:var(--f-disp)}
 <section>
   <h2>Interface du STS3215</h2>
   <div class="sheet det">
-    <svg class="mini" style="max-width:640px" viewBox="__SVB__" role="img" aria-label="Face arbre du STS3215 : 45,2 × 24,7 mm, arbre à 10,2 mm du bout, 4 trous de coin en rectangle 24,5 × 20,5, 4 petits trous en carré de 9,9 autour de l'arbre ; vue de côté : 35 mm, arbre 25 dents, moyeu arrière Ø6 avec trou M3.">
+    <svg class="mini" style="max-width:640px" viewBox="__SVB__" role="img" aria-label="Face palonnier du STS3215 : 45,22 × 24,72 mm, arbre à 10,11 mm du bout, vis de boîtier à 18,41 et 42,86 mm de ce bout, 20,5 mm entre rangées, palonnier Ø19,2 à 4 trous en croix sur Ø14 ; vue de côté : 35 mm de boîtier, 37,25 mm palonniers compris.">
       __SERVO__
     </svg>
-    <p>Cotes relevées sur le modèle 3D du servo publié par le projet SO-ARM100 (précision ±0,2 mm) : <b>mesure ton
-    servo au pied à coulisse avant d'imprimer les poches</b>. Les 4 trous de coin Ø1,5 traversent tout le boîtier : ce sont
-    ceux des vis de boîtier. Vérifie si elles ressortent sur la face qui te sert ; si oui, on les remplace par des vis M2 plus
-    longues qui traversent aussi le berceau. Les 4 petits trous Ø2,5 autour de l'arbre ne font que 2,5 mm de profondeur :
-    ne compte pas dessus pour porter la jambe.</p>
+    <p>Cotes du plan Feetech de la série STS3215 (identiques pour C001, C018, C044, C046 et C049). Le servo est à
+    <b>double sortie</b> : un palonnier aluminium Ø19,2 de chaque côté, 4 trous en croix sur Ø14 ; leurs faces
+    extérieures sont à 37,25 mm l'une de l'autre. Les 4 vis de boîtier sont à 18,41 et 42,86 mm du bout côté arbre, à
+    20,5 mm d'écart : on les remplace par des vis M2 plus longues qui traversent aussi le berceau. Vérifie le filetage
+    des trous du palonnier (M3 ou M2,5) sur ton servo.</p>
     <p><b>Règle de fixation, pour les 4 servos :</b> le berceau tient le servo par la <b>moitié opposée à l'arbre</b>, avec les
     2 trous de coin de ce bout, sur les deux faces (4 vis). La moitié côté arbre reste libre : le palonnier et le bras
-    tournent sans rien toucher. En face du palonnier, la pièce entraînée s'appuie sur le <b>moyeu arrière</b> Ø6 du servo
-    (vis M3 + rondelle) : l'effort passe par les deux côtés du boîtier.</p>
+    tournent sans rien toucher. Les pièces entraînées se vissent sur les <b>deux palonniers</b>, via un bossage Ø19,2 qui les amène au plan d'appui (21,5 mm de l'axe du servo) : l'effort passe par les deux côtés du boîtier.</p>
   </div>
 </section>
 
@@ -261,20 +260,19 @@ svg text{font-family:var(--f-disp)}
     <div class="sheet det wide">
       <h3>I · Hanche : S1, étrier de roulis, S2</h3>
       <div class="hipviews">
-        <svg class="mini" viewBox="__HSVB__" role="img" aria-label="Hanche vue de côté : plaque de bassin, berceau de S1, S1 arbre vers l'avant, étrier avec plaque avant sur le palonnier et plaque arrière sur le moyeu arrière, plancher, berceau de S2, S2 dont l'axe est 63,5 mm sous celui de S1.">
+        <svg class="mini" viewBox="__HSVB__" role="img" aria-label="Hanche vue de côté : plaque de bassin, berceau de S1, S1 arbre vers l'avant, étrier avec plaque avant sur le palonnier et plaque arrière sur le palonnier arrière, plancher, berceau de S2, S2 dont l'axe est 63,5 mm sous celui de S1.">
           __HSIDE__
         </svg>
-        <svg class="mini" viewBox="__HFVB__" role="img" aria-label="Hanche vue de face : S1 avec arbre à 10,2 mm de son bout intérieur, berceau de S1 côté extérieur, étrier en col autour de l'axe de roulis, S2 et chape en U de la cuisse de 49 mm, roulis de −20° à +30°.">
+        <svg class="mini" viewBox="__HFVB__" role="img" aria-label="Hanche vue de face : S1 avec arbre à 10,11 mm de son bout intérieur, berceau de S1 côté extérieur, étrier en col autour de l'axe de roulis, S2 et chape en U de la cuisse de 53 mm sur ses deux palonniers, roulis de −20° à +30°.">
           __HFRONT__
         </svg>
       </div>
       <p><b>Fixe :</b> la plaque de bassin porte le <b>berceau de S1</b> (4 vis M3 dans des inserts). Il tient S1 par son bout
       extérieur, arbre vers l'avant. <b>Mobile en roulis :</b> l'<b>étrier</b> est une pièce en U. Sa plaque avant est vissée
-      sur le palonnier de S1 ; sa plaque arrière tourne sur le moyeu arrière de S1 (vis M3 + rondelle). En haut, les deux
+      sur le palonnier avant de S1, sa plaque arrière sur le palonnier arrière (le servo est à double sortie). En haut, les deux
       plaques se réduisent à un moyeu de rayon 11 autour de l'axe de roulis, pour ne pas toucher le berceau de S1 en
       tournant de −20° à +30°. En bas, un plancher relie les deux plaques et porte le <b>berceau de S2</b>, qui tient S2 par sa
-      moitié arrière. <b>Mobile en tangage :</b> la chape en U de la cuisse (49 mm de large) prend le palonnier de S2 côté
-      extérieur et son moyeu arrière côté intérieur. Axe de roulis 63,5 mm au-dessus de l'axe de tangage.</p>
+      moitié arrière. <b>Mobile en tangage :</b> la chape en U de la cuisse (53 mm de large) est vissée sur les deux palonniers de S2. Axe de roulis 63,5 mm au-dessus de l'axe de tangage.</p>
     </div>
     <div class="sheet det">
       <h3>A · Berceau sur le tube</h3>
@@ -313,10 +311,10 @@ svg text{font-family:var(--f-disp)}
         <text class="small" x="18" y="22">servo dans l'étrier</text>
         <text class="small" x="60" y="72">pièce entraînée, vissée au palonnier</text>
         <text class="small" x="60" y="79">(4 vis sur le pourtour + vis centrale)</text>
-        <text class="small" x="104" y="22">moyeu arrière + vis M3</text>
+        <text class="small" x="104" y="22">palonnier arrière + 4 vis</text>
       </svg>
       <p>Le palonnier aluminium du STS3215 se visse sur un flasque de la pièce entraînée. En face, la pièce tourne sur le
-      moyeu arrière Ø6 du servo, tenue par une vis M3 et une rondelle : l'effort passe par les deux côtés du boîtier, pas par
+      palonnier arrière du servo (double sortie), avec ses 4 vis : l'effort passe par les deux côtés du boîtier, pas par
       l'arbre seul (dessiné ici avec une paroi pour la lisibilité).</p>
     </div>
     <div class="sheet det">
@@ -584,7 +582,7 @@ svg text{font-family:var(--f-disp)}
       <tr><td>Poche de servo</td><td class="n">45,2 × 24,7 × 35</td><td class="n">+0,2 par côté</td></tr>
       <tr><td>Insert laiton M3</td><td class="n">—</td><td class="n">Ø4,0 × 5,7 (selon l'insert)</td></tr>
       <tr><td>Passage vis M3 · M2</td><td class="n">—</td><td class="n">Ø3,3 · Ø2,3</td></tr>
-      <tr><td>Moyeu arrière du servo</td><td class="n">Ø6</td><td class="n">alésage Ø6,2, appui sur rondelle M3</td></tr>
+      <tr><td>Palonnier alu (×2 par servo)</td><td class="n">Ø19,2, 4 trous en croix sur Ø14</td><td class="n">bossage Ø19,2 + 4 passages Ø3,3 + centre Ø3,3</td></tr>
       <tr><td>Axe de rotule (bras, levier)</td><td class="n">M3</td><td class="n">insert M3, ou écrou frein derrière</td></tr>
     </tbody>
   </table></div>
@@ -601,7 +599,7 @@ svg text{font-family:var(--f-disp)}
     <tbody>
       <tr><td>Vis M2 (longueur selon ton servo) </td><td class="n">16</td><td>berceaux des 4 servos</td></tr>
       <tr><td>Vis de palonnier (fournies) + vis du palonnier vers la pièce</td><td class="n">4 + 16</td><td>S1 à S4</td></tr>
-      <tr><td>Vis M3 × 8 + rondelle M3</td><td class="n">2</td><td>moyeux arrière de S1 et S2</td></tr>
+      <tr><td>Vis de palonnier côté arrière</td><td class="n">8</td><td>palonniers arrière de S1 et S2</td></tr>
       <tr><td>Roulement 625ZZ</td><td class="n">4</td><td>genou, cheville</td></tr>
       <tr><td>Vis épaulée M5 + écrou frein + 2 rondelles</td><td class="n">2</td><td>genou, cheville</td></tr>
       <tr><td>Rotule à œil M3 métal + goujon M3 collé + contre-écrou</td><td class="n">4</td><td>bielles B1 et B2</td></tr>
@@ -612,8 +610,8 @@ svg text{font-family:var(--f-disp)}
       <tr><td>Inserts laiton M3</td><td class="n">≈ 12</td><td>leviers, berceaux, plaque</td></tr>
     </tbody>
   </table></div>
-  <p>Avec le moyeu arrière des servos, la hanche n'a plus besoin de roulement ni de vis épaulée : 4 roulements par
-  jambe au lieu de 6 (environ −9 g).</p>
+  <p>Le servo est à double sortie (un palonnier de chaque côté) : la hanche n'a besoin d'aucun roulement ni vis épaulée,
+  4 roulements par jambe au lieu de 6 (environ −9 g).</p>
 </section>
 
 <section>
