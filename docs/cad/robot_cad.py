@@ -30,7 +30,7 @@ def buste():
     b["LiPo_3S_2200"] = (box(-17.5, 17.5, -52.5, 52.5, Z0 + 4, Z0 + 28), bat, 185, "")
     b["LiPo_4S_1400"] = (box(-17, 17, -37.5, 37.5, Z0 + 32, Z0 + 62), bat, 175, "")
     b["Pi5_AI_HAT_ventilo"] = (box(-42.5, 42.5, -28, 28, 152, 187), elec, 90, "")
-    b["FC_F405_ESC_4en1_RX"] = (box(-18, 18, -18, 18, 192, 208), elec, 36, "")
+    b["ESC_4en1_45A"] = (box(-18, 18, -18, 18, 192, 200), elec, 15, "")      # piloté en DShot par le Pico
     b["Pico2_regulateur_capteurs"] = (box(20, 44, -25, 25, 192, 202), elec, 80, "")
     b["ecran_eink"] = (box(45, 46.5, -32, 32, 165, 195), elec, 15, "")
     b["cablage"] = (box(-40, -30, -45, 45, Z0 + 4, Z_EP - 10), cq.Color(0.6, 0.1, 0.1), 70, "")
@@ -56,8 +56,18 @@ def buste():
     tete = box(-30, 30, -30, 30, Z_EP + 38, Z_EP + 80).edges("|Z").fillet(10).faces(">Z").shell(-1.6)
     b["tete_coque"] = (tete, petg, None, "petg_plein")
     b["tete_servo_tilt"] = (box(-10, 10, -6, 6, Z_EP + 40, Z_EP + 63), cq.Color(0.2, 0.37, 0.55), 9, "")
-    b["camera_Pi_cam3"] = (box(30, 40, -12.5, 12.5, Z_EP + 55, Z_EP + 74), elec, 4, "")
-    b["camera_ToF"] = (box(30, 42, -19, 19, Z_EP + 41, Z_EP + 53), elec, 10, "")
+    b["camera_Pi_cam3_wide"] = (box(30, 40, -12.5, 12.5, Z_EP + 55, Z_EP + 74), elec, 4, "")
+    # LiDAR 360° LD19 (38,6 × 38,9 × 33,5, 47 g) sur le dessus de la tête : seul endroit au-dessus des protections
+    # d'hélices, donc balayage libre sur 360°. Il tourne avec le pan du cou (angle connu, compensé) ; le tilt
+    # n'incline que le bloc caméra, le plan du LiDAR reste horizontal.
+    lid = box(-19.3, 19.3, -19.45, 19.45, Z_EP + 80, Z_EP + 95).union(cyl_z(0, 0, 19, Z_EP + 95, Z_EP + 113.5))
+    b["lidar_LD19"] = (lid, cq.Color(0.12, 0.12, 0.14), 47, "")
+    # 2 ToF multizones VL53L8CX bas, fixés sous l'avant du bassin (supports imprimés, pièce 17)
+    sup = J.support_tof()
+    b["supports_ToF_bas"] = (sup.union(sup.mirror("XZ")), petg, None, "petg")
+    w, h = J.TOF_PCB
+    carte = J.place_tof(box(-2.2, -0.6, -w / 2 + 0.3, w / 2 - 0.3, -h / 2 + 0.3, h / 2 - 0.3))
+    b["ToF_bas_VL53L8CX"] = (carte.union(carte.mirror("XZ")), elec, 2 * 2, "")
     return b
 
 DENS = {"petg": 1.27 * 0.6, "petg_plein": 1.27 * 0.9, "tpu": 1.21 * 0.9, "carbone": 1.6, "acier": 7.85}

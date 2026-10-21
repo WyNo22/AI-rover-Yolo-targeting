@@ -15,6 +15,7 @@ Pièces imprimées d'une jambe, générées par `jambe_cad.py` (CadQuery). Les c
 | `09_bras_servo_22` | bras de 22 mm (S3, S4) | 4 |
 | `10_entretoise_S3_11_8` / `11_entretoise_S4_3_8` | entretoises palonnier → bras de 6 mm (S3 / S4), alésées pour la vis centrale du palonnier | 2 / 2 |
 | `16_semelle_TPU` | semelle TPU 95A, 4 mm, 4 poches FSR 402, rainures, **collée** sous le pied | 2 (miroir) |
+| `17_support_ToF_bas` | support d'un ToF VL53L8CX sous l'avant du bassin : plongée 37°, ouvert de 20° vers l'extérieur, 2 inserts M3 | 2 (miroir) |
 
 - `step/` : une pièce par fichier, les tubes à couper (`12` à `15`), et trois assemblages :
   - **`assemblage_robot_complet.step`** : les deux jambes + bassin + **buste estimé** (batteries, Pi, contrôleur de vol,
@@ -42,6 +43,15 @@ portés par chaque pièce pendant ces mouvements.
 3. Imprimer un test d'emmanchement (Ø16,15 pour les 625ZZ, Ø12,2 / Ø10,2 pour les tubes) et ajuster `JEU`, `BRG_D`, `T12`, `T10`.
 
 Régénérer : `pip install cadquery` puis `python jambe_cad.py`.
+
+## Navigation (après Rév. I)
+
+- **2 ToF bas VL53L8CX** sur supports imprimés (pièce 17) vissés sous l'avant de la plaque de bassin (2 trous M3
+  ajoutés de chaque côté). Champ vérifié : sol vu de 0,30 à 2 m, aucune partie de jambe dans le champ en marche
+  (le genou n'y entre qu'en très grand pas, hanche 60° + genou 90°).
+- **LiDAR LD19** sur le dessus de la tête (`robot_cad.py`) : plan de balayage libre sur 360° (au-dessus des
+  protections d'hélices).
+- Buste : ESC 4-en-1 seul (piloté par le Pico), caméra Module 3 Wide ; plus de ToF dans la tête.
 
 ## Rév. I — servo réel et câblage du bus
 

@@ -10,7 +10,7 @@ câblage dans `docs/schema_electrique.html`. Prix relevés sur les annonces (à 
 |---|---|---|
 | **1. Maintenant** | monter les 2 jambes et les faire bouger au banc | 8 STS3215 C018 + câbles 300 mm · adaptateur de bus (Waveshare chez Eckstein ou FE-URT2) · 625ZZ · rotules M3 · tubes carbone · ressorts · tige filetée M3 · câble acier · inserts · visserie · Molex 5264 · PETG + TPU · fusible, XT60, câble 14 AWG, alarme LiPo · colles, panne à inserts, pince à sertir |
 | **2. Quand une jambe bouge** | tenir debout et s'équilibrer | Pico 2 · BNO085 · 2 ADS1115 · 8 FSR 402 · INA226 · UBEC 5,1 V 5 A (Pi embarqué) |
-| **3. Quand il tient debout** | tête, perception, interaction | caméra Pi Module 3 + nappe · VL53L5CX · écran e-ink 2,13″ · 2 MG90S · BEC 5 V 3 A |
+| **3. Quand il tient debout** | navigation autonome, tête, interaction | **LiDAR LD19** · **2 × VL53L8CX** (ToF bas) · caméra **Module 3 Wide** + nappe · écran e-ink 2,13″ · 2 MG90S · BEC 5 V 3 A |
 | **4. Quand il marche** | sauts et vol assistés | ESC 4-en-1 (ou stack) · 2 jeux d'hélices 5″ · interrupteur de coupure 4S |
 
 Astuce : les composants Alibaba de la vague 2 et 3 sont légers et bon marché ; si tu passes de toute façon une
@@ -34,7 +34,6 @@ Une seule commande, envoi express vers Munich ; prévoir la TVA d'import (19 %).
 | 8 | Rotules **M3 à œil, filetage femelle, pas à droite** | ≈ 0,21–0,26 $ (min. 100) | le lot de 100 coûte ≈ 25 $ ; sinon AliExpress par 10 |
 | 1 kit | **Inserts M3 à chaud** (kit 220 pcs M2–M6) | quelques $ | 16 inserts M3 utilisés ; trou Ø4,0 |
 | 1 | **ESC 4-en-1 45–50 A**, 4S, DShot, 30,5 × 30,5 | ≈ 15–25 $ | piloté par le Pico ; un stack F405 + ESC (≈ 24 $, HAKRC) convient aussi, le FC reste en réserve |
-| 1 | **VL53L5CX** (ToF 8 × 8) | ≈ 10–11 $ | |
 | 2 | **ADS1115** (module) | < 2 $ | 1 par pied |
 | 8 | **FSR 402** | ≈ 1 $ | 4 par pied, version queue courte |
 | 2 | **MG90S** | ≈ 2 $ | cou |
@@ -55,9 +54,11 @@ Une seule commande, envoi express vers Munich ; prévoir la TVA d'import (19 %).
 | 1 | **BNO085** (module type Adafruit) | Eckstein / Amazon | les annonces Alibaba sont incohérentes (prix par lot) |
 | 1 | **INA226** (module) | Eckstein / Amazon | |
 | 1 | **Écran e-ink 2,13″ Waveshare** (SPI) | Eckstein | |
-| 1 | **Caméra Pi Module 3** + nappe Pi 5 (22 → 15 broches) | Eckstein / Berrybase | |
+| 1 | **Caméra Pi Module 3 Wide** + nappe Pi 5 (22 → 15 broches) | Eckstein / Berrybase | grand angle ≈ 102°, autofocus |
+| 1 | **LiDAR LDROBOT LD19** (360°, 12 m, 47 g, UART 230 400) | Eckstein (Waveshare) / AliExpress, ≈ 25–35 € | sur la tête : carte autour du robot |
+| 2 | **VL53L8CX** sur carte avec régulateur (type Pololu 3419) | Eckstein / revendeur Pololu, ≈ 25–30 € | ToF bas sous le bassin : sol et obstacles bas, 2,85 m en plein jour |
 | 1 | **UBEC 5,1 V 5 A** | magasin de modélisme | alimente le Pi |
-| 1 | **BEC 5 V 3 A** | magasin de modélisme | servos du cou |
+| 1 | **BEC 5 V 3 A** | magasin de modélisme | servos du cou + LiDAR |
 | 2 jeux | **Hélices 5″** (2 CW + 2 CCW par jeu) | magasin de modélisme | 1 jeu de rechange, ça casse et ça ne coûte rien |
 | 1 | Porte-fusible lame + fusible 20 A, interrupteur ou XT60 anti-étincelle, prises XT60, câble silicone 14 et 22 AWG, alarme LiPo | magasin de modélisme | |
 | 1 kg + 0,5 kg | **PETG** + **TPU 95A** | Bambu / Amazon | |

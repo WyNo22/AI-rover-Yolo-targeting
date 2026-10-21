@@ -105,7 +105,7 @@ td code, .mono { font: 12.5px var(--mono); }
 <g class="zones">
 <rect x="8" y="26" width="222" height="510" rx="6" class="zone"/><text x="16" y="530" class="zlab">ALIMENTATION 3S</text>
 <rect x="8" y="626" width="222" height="88" rx="6" class="zone z4"/><text x="16" y="726" class="zlab">ALIMENTATION 4S</text>
-<rect x="640" y="186" width="190" height="218" rx="6" class="zone"/><text x="642" y="181" class="zlab">TÊTE</text>
+<rect x="640" y="186" width="190" height="218" rx="6" class="zone"/><text x="642" y="181" class="zlab">TÊTE ET BUSTE</text>
 <rect x="640" y="436" width="388" height="164" rx="6" class="zone"/><text x="642" y="431" class="zlab">CAPTEURS DU PICO</text>
 <rect x="640" y="690" width="190" height="64" rx="6" class="zone z4"/><text x="642" y="767" class="zlab">PROPULSION</text>
 </g>
@@ -128,9 +128,11 @@ td code, .mono { font: 12.5px var(--mono); }
 <path d="M400,390 L400,446" class="w wusb"/>
 <path d="M214,220 L275,220 A5,5 0 0 1 285,220 L340,220" class="w wi2c"/>
 <path d="M560,217 L650,217" class="w wcsi"/>
-<path d="M560,269 L650,269" class="w wi2c"/>
-<path d="M560,321 L650,321" class="w wspi"/>
-<path d="M560,363 L650,363" class="w wpwm"/>
+<path d="M560,262 L650,262" class="w wuart"/>
+<path d="M600,383 L600,279 L650,279" class="w w5"/>
+<path d="M610,466 L610,441 L850,441 L850,466 L868,466" class="w wi2c"/>
+<path d="M560,321 L595,321 A5,5 0 0 1 605,321 L650,321" class="w wspi"/>
+<path d="M560,363 L595,363 A5,5 0 0 1 605,363 L650,363" class="w wpwm"/>
 <path d="M560,518 L610,518" class="w wi2c"/>
 <path d="M610,466 L610,570" class="w wi2c"/>
 <path d="M610,466 L650,466" class="w wi2c"/>
@@ -139,7 +141,7 @@ td code, .mono { font: 12.5px var(--mono); }
 <path d="M820,518 L868,518" class="w wana"/>
 <path d="M820,570 L868,570" class="w wana"/>
 <path d="M450,586 L450,636" class="w wuart"/>
-<path d="M650,622 L585,622 L585,562 L560,562" class="w wpwm"/>
+<path d="M650,622 L585,622 L585,562 L560,562" class="w wuart"/>
 <path d="M730,57 L745,57" class="w w12"/>
 <path d="M730,63 L745,63" class="w wbus"/>
 <path d="M825,57 L840,57" class="w w12"/>
@@ -155,22 +157,25 @@ td code, .mono { font: 12.5px var(--mono); }
 <circle cx="620" cy="57" r="3.6" class="node w12"/>
 <circle cx="620" cy="137" r="3.6" class="node w12"/>
 <circle cx="610" cy="518" r="3.6" class="node wi2c"/>
+<circle cx="610" cy="466" r="3.6" class="node wi2c"/>
+<circle cx="600" cy="383" r="3.6" class="node w5"/>
 <g class="box pwr"><rect x="24" y="36" width="190" height="60" rx="4"/><text x="34" y="55" class="bt">LiPo 3S 2200 mAh</text><text x="34" y="70" class="bs">11,1–12,6 V · servos + électronique</text></g>
 <g class="box pwr"><rect x="24" y="122" width="190" height="48" rx="4"/><text x="34" y="141" class="bt">Interrupteur + fusible 20 A</text><text x="34" y="156" class="bs">coupure générale</text></g>
 <g class="box sens"><rect x="24" y="196" width="190" height="48" rx="4"/><text x="34" y="215" class="bt">INA226 + shunt</text><text x="34" y="230" class="bs">tension et courant → Pi</text></g>
 <g class="box pwr"><rect x="24" y="270" width="190" height="56" rx="4"/><text x="34" y="289" class="bt">Bornier 12 V</text><text x="34" y="304" class="bs">départs jambes et BEC</text></g>
 <g class="box pwr"><rect x="24" y="372" width="190" height="52" rx="4"/><text x="34" y="391" class="bt">UBEC 5,1 V 5 A</text><text x="34" y="406" class="bs">alimente le Pi 5</text></g>
-<g class="box pwr"><rect x="24" y="456" width="190" height="52" rx="4"/><text x="34" y="475" class="bt">BEC 5 V 3 A</text><text x="34" y="490" class="bs">servos du cou</text></g>
+<g class="box pwr"><rect x="24" y="456" width="190" height="52" rx="4"/><text x="34" y="475" class="bt">BEC 5 V 3 A</text><text x="34" y="490" class="bs">servos du cou + LiDAR</text></g>
 <g class="box pwr4"><rect x="24" y="640" width="190" height="60" rx="4"/><text x="34" y="659" class="bt">LiPo 4S 1400 mAh</text><text x="34" y="674" class="bs">14,8–16,8 V · propulseurs seuls</text></g>
 <g class="box cpu"><rect x="340" y="36" width="220" height="64" rx="4"/><text x="350" y="55" class="bt">FE-URT-2</text><text x="350" y="70" class="bs">USB ↔ bus TTL 1 Mbit/s</text></g>
 <g class="box cpu"><rect x="340" y="176" width="220" height="214" rx="4"/><text x="350" y="195" class="bt">Raspberry Pi 5</text><text x="350" y="210" class="bs">+ AI HAT+ (Hailo-8, 26 TOPS)</text></g>
 <g class="box cpu"><rect x="340" y="446" width="220" height="140" rx="4"/><text x="350" y="465" class="bt">Pico 2</text><text x="350" y="480" class="bs">équilibre, capteurs, poussée</text></g>
 <g class="box cpu"><rect x="340" y="636" width="220" height="74" rx="4"/><text x="350" y="655" class="bt">ESC 4-en-1 45 A</text><text x="350" y="670" class="bs">4S · DShot · 30,5 × 30,5 mm</text></g>
-<g class="box sens"><rect x="650" y="196" width="170" height="42" rx="4"/><text x="660" y="215" class="bt">Caméra Pi Module 3</text><text x="660" y="230" class="bs">tête · vision</text></g>
-<g class="box sens"><rect x="650" y="248" width="170" height="42" rx="4"/><text x="660" y="267" class="bt">ToF VL53L5CX</text><text x="660" y="282" class="bs">8 × 8 zones · obstacles</text></g>
+<g class="box sens"><rect x="650" y="196" width="170" height="42" rx="4"/><text x="660" y="215" class="bt">Caméra Module 3 Wide</text><text x="660" y="230" class="bs">tête · personnes, gestes</text></g>
+<g class="box sens"><rect x="650" y="248" width="170" height="42" rx="4"/><text x="660" y="267" class="bt">LiDAR LD19 360°</text><text x="660" y="282" class="bs">dessus de la tête · 12 m</text></g>
 <g class="box act"><rect x="650" y="300" width="170" height="42" rx="4"/><text x="660" y="319" class="bt">E-ink 2,13″</text><text x="660" y="334" class="bs">état du robot</text></g>
 <g class="box act"><rect x="650" y="352" width="170" height="42" rx="4"/><text x="660" y="371" class="bt">2 micro-servos MG90S</text><text x="660" y="386" class="bs">cou : pan / tilt</text></g>
 <g class="box sens"><rect x="650" y="446" width="170" height="40" rx="4"/><text x="660" y="465" class="bt">BNO085</text><text x="660" y="480" class="bs">centrale inertielle</text></g>
+<g class="box sens"><rect x="868" y="446" width="150" height="40" rx="4"/><text x="878" y="465" class="bt">2 × ToF VL53L8CX</text><text x="878" y="480" class="bs">bas · 0x30 / 0x31</text></g>
 <g class="box sens"><rect x="650" y="498" width="170" height="40" rx="4"/><text x="660" y="517" class="bt">ADS1115 pied G</text><text x="660" y="532" class="bs">4 voies analogiques</text></g>
 <g class="box sens"><rect x="650" y="550" width="170" height="40" rx="4"/><text x="660" y="569" class="bt">ADS1115 pied D</text><text x="660" y="584" class="bs">4 voies analogiques</text></g>
 <g class="box sens"><rect x="868" y="498" width="150" height="40" rx="4"/><text x="878" y="517" class="bt">4 × FSR 402</text><text x="878" y="532" class="bs">semelle gauche</text></g>
@@ -187,13 +192,13 @@ td code, .mono { font: 12.5px var(--mono); }
 <g class="box srv"><rect x="935" y="120" width="80" height="40" rx="4"/><text x="943" y="136" class="bt sm">S4 · ID 8</text><text x="943" y="151" class="bs">cheville</text></g>
 <text x="1030" y="58" class="leg">JAMBE G</text><text x="1030" y="74" class="bs">bus en guirlande</text>
 <text x="1030" y="138" class="leg">JAMBE D</text><text x="1030" y="154" class="bs">bus en guirlande</text>
-<text x="350" y="228" class="pin">I²C1 · GPIO 2/3</text>
+<text x="350" y="228" class="pin">I²C1 · UART0 RX</text>
 <text x="350" y="246" class="pin">USB ×4 · CSI · SPI0</text>
 <text x="350" y="264" class="pin">PWM · GPIO 12/13</text>
 <text x="350" y="282" class="pin">5 V · broches 2/4</text>
 <text x="350" y="494" class="pin">I²C0 · GP4/GP5</text>
-<text x="350" y="512" class="pin">DShot · GP6–GP9</text>
-<text x="350" y="530" class="pin">PWM in · GP16/GP17</text>
+<text x="350" y="512" class="pin">DShot · GP6–GP9 · LPn GP10/11</text>
+<text x="350" y="530" class="pin">iBUS · RX GP1</text>
 <text x="450" y="13" text-anchor="middle" class="wl w12t">12 V vers les jambes · 14 AWG</text>
 <text x="590" y="77" text-anchor="middle" class="wl wbust">bus G</text>
 <text x="584" y="108" text-anchor="middle" class="wl wbust">bus D</text>
@@ -205,15 +210,15 @@ td code, .mono { font: 12.5px var(--mono); }
 <text x="406" y="412" text-anchor="start" class="wl wusbt">USB (données + 5 V)</text>
 <text x="300" y="214" text-anchor="middle" class="wl wi2ct">I²C 0x40</text>
 <text x="605" y="211" text-anchor="middle" class="wl wcsit">CSI</text>
-<text x="605" y="263" text-anchor="middle" class="wl wi2ct">I²C 0x29</text>
-<text x="605" y="315" text-anchor="middle" class="wl wspit">SPI</text>
-<text x="605" y="357" text-anchor="middle" class="wl wpwmt">PWM</text>
+<text x="605" y="256" text-anchor="middle" class="wl wuartt">UART</text>
+<text x="578" y="315" text-anchor="middle" class="wl wspit">SPI</text>
+<text x="578" y="357" text-anchor="middle" class="wl wpwmt">PWM</text>
 <text x="585" y="512" text-anchor="middle" class="wl wi2ct">I²C</text>
 <text x="630" y="460" text-anchor="middle" class="wl wi2ct">0x4A</text>
 <text x="630" y="512" text-anchor="middle" class="wl wi2ct">0x48</text>
 <text x="630" y="564" text-anchor="middle" class="wl wi2ct">0x49</text>
 <text x="456" y="614" text-anchor="start" class="wl wuartt">DShot × 4</text>
-<text x="591" y="600" text-anchor="start" class="wl wpwmt">PWM CH5–6</text>
+<text x="591" y="600" text-anchor="start" class="wl wuartt">iBUS</text>
 </svg>
 </div>
 
@@ -230,7 +235,7 @@ td code, .mono { font: 12.5px var(--mono); }
     <li class="wspi"><i></i>SPI</li>
     <li class="wcsi"><i></i>CSI caméra</li>
     <li class="wpwm"><i></i>PWM</li>
-    <li class="wuart"><i></i>DShot (consigne moteurs)</li>
+    <li class="wuart"><i></i>Série (UART, iBUS, DShot)</li>
     <li class="wana"><i></i>Analogique</li>
   </ul>
   <p class="note" style="margin-top:14px">Un point = connexion. Un petit pont = deux fils qui se croisent sans se toucher.</p>
@@ -241,10 +246,10 @@ td code, .mono { font: 12.5px var(--mono); }
   <h2>Règles de câblage</h2>
   <ol class="regles">
     <li><span><strong>Jamais la 4S sur les servos.</strong> Deux réseaux séparés : la 3S (12 V) pour les servos et l'électronique, la 4S uniquement pour l'ESC des moteurs. 16,8 V grillent les STS3215.</span></li>
-    <li><span><strong>Masse commune.</strong> Le − de la 3S, le − de la 4S, le Pi, le Pico et l'ESC sont reliés. Sans ça, le DShot, le bus servo et la radio ne fonctionnent pas.</span></li>
+    <li><span><strong>Masse commune.</strong> Le − de la 3S, le − de la 4S, le Pi, le Pico et l'ESC sont reliés. Sans ça, le DShot, le bus servo, le LiDAR et la radio ne fonctionnent pas.</span></li>
     <li><span><strong>Le 12 V des servos ne traverse pas l'URT-2.</strong> L'adaptateur ne passe que les données et la masse ; le 12 V est injecté juste après, sur chaque départ de jambe (câble en Y).</span></li>
     <li><span><strong>Fusible 20 A juste après l'interrupteur,</strong> puis câble 14 AWG jusqu'aux départs de jambe. Les 8 servos peuvent tirer 10 à 20 A ensemble.</span></li>
-    <li><span><strong>Arrêt d'urgence par la radio.</strong> L'interrupteur CH5 arrive au Pico, qui coupe le couple des servos et envoie 0 aux 4 moteurs. En plus, un interrupteur de coupure sur la 4S arrête physiquement les moteurs.</span></li>
+    <li><span><strong>Arrêt d'urgence par la radio.</strong> L'interrupteur CH5 de la radio arrive au Pico (iBUS), qui coupe le couple des servos et envoie 0 aux 4 moteurs. En plus, un interrupteur de coupure sur la 4S arrête physiquement les moteurs.</span></li>
     <li><span><strong>Pi alimenté par les broches 5 V</strong> (UBEC réglé à 5,1 V) : garder <code class="mono">usb_max_current_enable=1</code> dans <code class="mono">config.txt</code>, déjà en place.</span></li>
   </ol>
 </section>
@@ -257,10 +262,12 @@ td code, .mono { font: 12.5px var(--mono); }
       <tr><td>Pi 5 → FE-URT-2 → S1…S4 ×2</td><td><span class="pill pbus">Bus TTL</span></td><td>consignes et retours des 8 servos (IDs 1–8)</td></tr>
       <tr><td>Pi 5 ↔ Pico 2</td><td><span class="pill pusb">USB</span></td><td>ordres de marche ↓, état d'équilibre ↑ ; alimente le Pico</td></tr>
       <tr><td>Pico 2 → ESC 4-en-1</td><td><span class="pill puart">DShot</span></td><td>poussée de chaque moteur, calculée par la boucle d'équilibre</td></tr>
-      <tr><td>FS-iA6B → Pico</td><td><span class="pill ppwm">PWM</span></td><td>CH5 arrêt d'urgence, CH6 MANUEL / AUTO</td></tr>
+      <tr><td>FS-iA6B → Pico</td><td><span class="pill puart">iBUS</span></td><td>toutes les voies : CH5 arrêt d'urgence, CH6 MANUEL / AUTO</td></tr>
+      <tr><td>Pico ↔ 2 ToF bas</td><td><span class="pill pi2c">I²C</span></td><td>sol et obstacles bas devant les pieds, réflexe d'arrêt</td></tr>
+      <tr><td>LiDAR LD19 → Pi</td><td><span class="pill puart">UART</span></td><td>scan 360° à 10 tours/s, carte autour du robot</td></tr>
       <tr><td>Pico ↔ BNO085, ADS1115 ×2</td><td><span class="pill pi2c">I²C</span></td><td>inclinaison, appuis des pieds</td></tr>
       <tr><td>FSR 402 → ADS1115</td><td><span class="pill pana">Analog.</span></td><td>4 par pied, pont diviseur 10 kΩ</td></tr>
-      <tr><td>Pi ↔ ToF, INA226</td><td><span class="pill pi2c">I²C</span></td><td>obstacles devant ; batterie 3S</td></tr>
+      <tr><td>Pi ↔ INA226</td><td><span class="pill pi2c">I²C</span></td><td>tension et courant de la 3S</td></tr>
       <tr><td>Pi → caméra Module 3</td><td><span class="pill pcsi">CSI</span></td><td>vision, gestes (YOLO sur Hailo)</td></tr>
       <tr><td>Pi → e-ink 2,13″</td><td><span class="pill pspi">SPI</span></td><td>affiche l'état (SUIVI, ÉCOUTE, ARRÊT…)</td></tr>
       <tr><td>Pi → servos du cou</td><td><span class="pill ppwm">PWM</span></td><td>pan / tilt de la tête, comme la tourelle</td></tr>
@@ -276,7 +283,8 @@ td code, .mono { font: 12.5px var(--mono); }
     <thead><tr><th>Fonction</th><th>Broches</th><th>Branché sur</th></tr></thead>
     <tbody>
       <tr><td>Alimentation</td><td class="mono">5 V : 2, 4 · GND : 6</td><td>UBEC 5,1 V</td></tr>
-      <tr><td>I²C1</td><td class="mono">SDA GPIO2 (3) · SCL GPIO3 (5)</td><td>ToF 0x29, INA226 0x40</td></tr>
+      <tr><td>I²C1</td><td class="mono">SDA GPIO2 (3) · SCL GPIO3 (5)</td><td>INA226 0x40</td></tr>
+      <tr><td>UART0</td><td class="mono">RX GPIO15 (10)</td><td>LiDAR LD19 (TX, 230 400 bauds, 3,3 V) ; 5 V du BEC</td></tr>
       <tr><td>SPI0</td><td class="mono">MOSI GPIO10 (19) · SCLK GPIO11 (23) · CE0 GPIO8 (24)</td><td>e-ink (+ DC GPIO25, RST GPIO17, BUSY GPIO24)</td></tr>
       <tr><td>PWM matériel</td><td class="mono">GPIO12 (32) · GPIO13 (33)</td><td>pan, tilt</td></tr>
       <tr><td>USB</td><td class="mono">ports bleus</td><td>FE-URT-2, Pico 2</td></tr>
@@ -289,10 +297,11 @@ td code, .mono { font: 12.5px var(--mono); }
   <div class="tbl"><table>
     <thead><tr><th>Fonction</th><th>Broches</th><th>Branché sur</th></tr></thead>
     <tbody>
-      <tr><td>I²C0</td><td class="mono">SDA GP4 · SCL GP5</td><td>BNO085 0x4A, ADS1115 0x48 (pied G) / 0x49 (pied D)</td></tr>
+      <tr><td>I²C0</td><td class="mono">SDA GP4 · SCL GP5</td><td>BNO085 0x4A, ADS1115 0x48 / 0x49, ToF bas 0x30 / 0x31</td></tr>
+      <tr><td>LPn ToF</td><td class="mono">GP10 · GP11</td><td>allumage un par un au démarrage pour changer leur adresse (0x29 d'usine)</td></tr>
       <tr><td>DShot (PIO)</td><td class="mono">GP6 · GP7 · GP8 · GP9</td><td>ESC 4-en-1, moteurs 1 à 4</td></tr>
       <tr><td>Récepteur</td><td class="mono">VBUS (5 V) · GND</td><td>alimentation du FS-iA6B</td></tr>
-      <tr><td>Entrées PWM</td><td class="mono">GP16 · GP17</td><td>FS-iA6B CH5, CH6 (pont 10 k / 20 k si 5 V)</td></tr>
+      <tr><td>iBUS</td><td class="mono">RX GP1</td><td>FS-iA6B, prise iBUS (signal 3,3 V)</td></tr>
       <tr><td>USB</td><td class="mono">micro-USB / USB-C</td><td>Pi 5 (données + alimentation)</td></tr>
     </tbody>
   </table></div>
@@ -304,7 +313,7 @@ td code, .mono { font: 12.5px var(--mono); }
   <div class="cols">
     <p class="note">Pour démarrer, c'est le Pi qui pilote les servos par l'URT-2. Plus tard, le Pico pourra piloter le bus directement (port série + petit circuit de passage en fil unique) pour une boucle d'équilibre plus rapide ; l'URT-2 ne servira alors plus qu'à l'établi.</p>
     <p class="note">Les ADS1115 se posent sur les pieds : un seul câble I²C à 4 fils descend chaque jambe au lieu de 8 fils de FSR. Ce câble n'est pas encore dans le faisceau de la CAO (seul le bus servo l'est) ; les passe-câbles seront à agrandir.</p>
-    <p class="note">Ajout par rapport à la liste de courses : un BEC 5 V 3 A séparé pour les servos du cou, pour ne pas faire chuter le 5 V du Pi quand ils forcent.</p>
+    <p class="note">Navigation à 3 niveaux : réflexe d'arrêt sur le Pico (ToF bas, servos, pieds), carte locale sur le Pi (LiDAR + ToF + odométrie), tête libre pour regarder les gens. Le BEC 5 V 3 A alimente le cou et le LiDAR, à part du 5 V du Pi.</p>
     <p class="note">Aujourd'hui sur le banc (rover) : Pi 5 → USB → Arduino Uno → servos MG996R de la tourelle, et la DJI en USB comme caméra. La DJI et l'Arduino ne vont pas sur LEO-S.</p>
   </div>
 </section>

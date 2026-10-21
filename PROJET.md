@@ -72,9 +72,10 @@ Vision (Pi, Hailo) ──► Comportement (Pi) ──► Pico 2 (marche, équili
   geste et progression, direction pointée, squelette) ; `cible` ; `obstacles` et `sol` (vides tant qu'il n'y
   a pas de capteur de profondeur). Passage au repère du robot (x avant, y gauche, z haut, en mètres)
   quand les angles de la tête seront connus.
-- **Obstacles et sauts :** YOLO ne suffit pas (pas de classe « mur », pas de mesure en cm). Prévu : caméra ToF
-  Arducam (~40 €) + VL53L1X. Par obstacle : distance, hauteur, largeur, épaisseur, type
-  (mur / marche / trou), atterrissage libre. Il faut voir l'obstacle ≥ 1,5 m avant à 1 m/s.
+- **Obstacles et sauts :** YOLO ne suffit pas (pas de classe « mur », pas de mesure en cm). Les obstacles viennent
+  des capteurs de navigation fixés au corps (LiDAR 360° + 2 ToF bas, voir « Perception et navigation ») : par
+  obstacle distance, hauteur, largeur, type (mur / marche / trou), atterrissage libre. Il faut voir l'obstacle
+  ≥ 1,5 m avant à 1 m/s.
 - **Commande vers le Pico** (50 Hz, binaire + CRC) : mode (ARRÊT_URGENCE / REPOS / DEBOUT / MARCHE / SAUT),
   vx, vy, rotation, tête, hauteur du corps ; pour SAUT : hauteur, distance du mur, distance d'appel.
   Le Pico garde l'obstacle en mémoire (odométrie des jambes + IMU) quand il sort du champ de la caméra.
@@ -150,20 +151,41 @@ Hauteur ≈ 710 mm · hanche à 370 mm · cuisse 170 mm · tibia 170 mm · chevi
 | Bus servos | half-duplex 1 Mbit/s (adaptateur Waveshare ou 74HC126) |
 | Centrale inertielle | BNO085 |
 | Capteurs de pied | 4 capteurs de force (FSR) par pied + 2 × ADS1115 |
-| Propulseurs | contrôleur de vol FPV F405 (Betaflight, mode angle) + ESC 4-en-1 45 A ; le Pico envoie ses consignes en **CRSF** et lit l'attitude en **MSP** |
+| Propulseurs | ESC 4-en-1 45 A piloté **directement par le Pico en DShot** (pas de contrôleur de vol : l'équilibre est déjà sur le Pico) |
 | Arrêt d'urgence | FS-iA6B (possédée) en iBUS vers le Pico, prioritaire sur tout |
-| Distance | VL53L1X vers l'avant (V2 : un second vers le bas) |
-| Mesure batteries | 2 × INA226 |
+| Navigation | **LiDAR LD19** 360° sur la tête (Pi, UART) + **2 × VL53L8CX** sous l'avant du bassin (Pico, I²C) |
+| Caméra | Pi **Camera Module 3 Wide** (≈ 102°, autofocus) sur la tête |
+| Mesure batterie | INA226 sur la 3S |
 
 **Boucles :**
 
 | Boucle | Fréquence | Rôle |
 |---|---|---|
-| Contrôleur de vol | plusieurs kHz | assiette du buste |
-| Pico | 200 Hz | marche, équilibre, séquence de saut |
-| Pi 5 | 30 Hz | vision et décisions |
+| Pico | 200 Hz | marche, équilibre, poussée, séquence de saut, réflexe d'arrêt |
+| Pi 5 | 30 Hz / 10 Hz | vision et décisions / carte locale et navigation |
 
-Si le Pi plante, le Pico garde le robot debout.
+Si le Pi plante, le Pico garde le robot debout et s'arrête devant un obstacle.
+
+### Perception et navigation (3 niveaux)
+
+La tête sert à regarder les gens ; elle ne peut pas en même temps surveiller le chemin. Les capteurs de
+navigation sont donc **fixés au corps**, et la sécurité ne dépend jamais de l'endroit où regarde la tête.
+
+| Niveau | Où | Capteurs | Rôle |
+|---|---|---|---|
+| Réflexe | Pico, 200 Hz | 2 × ToF VL53L8CX bas, charge des servos, FSR | arrêt immédiat si obstacle < 25 cm, ou si une jambe ou un pied touche quelque chose |
+| Navigation locale | Pi, 10 Hz | LiDAR LD19, ToF bas, odométrie (angles des servos + IMU) | carte 4 × 4 m autour du robot ; le comportement dit *où* aller, la navigation choisit *comment* |
+| Social | Pi + Hailo, 30 Hz | caméra de tête | personnes, gestes, propriétaire ; la tête est libre de regarder où elle veut |
+
+- **LiDAR LD19** (360°, 0,02–12 m, 10 tours/s, 47 g) sur le **dessus de la tête** : seul endroit au-dessus
+  des protections d'hélices, balayage libre sur 360° (vérifié en CAO). Il tourne avec le pan du cou (angle connu,
+  scan corrigé) ; le tilt n'incline que le bloc caméra. Plan de balayage à ≈ 0,78 m du sol : il ne voit pas
+  les obstacles bas, d'où les ToF.
+- **2 × VL53L8CX** (8 × 8 zones, 45° × 45°, 2,85 m en plein jour) sous l'avant du bassin, sur des supports
+  imprimés (pièce 17) : plongée 37°, ouverts de 20° vers l'extérieur. Ils voient le sol de **0,30 à 2 m**
+  devant les pieds. Aucune partie de jambe dans leur champ en marche ; en très grand pas (hanche 60°,
+  genou 90°) le genou y entre : le Pico masque les zones où il sait que sa jambe se trouve.
+- Plus tard : SLAM avec le LiDAR (carte de l'appartement, aller à un endroit nommé).
 
 ### Énergie
 
@@ -234,7 +256,7 @@ Si le Pi plante, le Pico garde le robot debout.
 1. ✅ Pi 5 + Hailo vérifié, tourelle pilotée depuis le Pi (30 FPS, 18 ms).
 2. ✅ Pose + gestes + couche comportement (à valider en vrai sur le Pi).
 3. Récepteur FS-iA6B : arrêt d'urgence et MANUEL / AUTO.
-4. Caméra ToF : test obstacles sur le rover (« j'aurais sauté ici »).
+4. LiDAR + ToF bas : test obstacles sur le rover (« j'aurais sauté ici »), puis carte locale.
 5. Écran e-ink d'état ; démarrage automatique (service systemd, à déboguer).
 
 **Bipède LEO-S :**
@@ -242,7 +264,7 @@ Si le Pi plante, le Pico garde le robot debout.
 2. **Jambe de test** : 4 STS3215 sur un rail vertical avec une masse au-dessus. Tester 2, 3,5 et 5 N/mm de ressort avec une came interchangeable, mesurer le couple réel et l'accroupi/détente.
 3. **Banc de poussée** (carte HyPrSpace + capteur de force) : poussée, courant et chauffe des propulseurs.
 4. Deuxième jambe + bassin → premiers pas sous longe.
-5. Torse volant attaché : contrôleur de vol en mode angle, pont CRSF depuis le Pico, kill radio.
+5. Torse volant attaché : poussée pilotée par le Pico en DShot, kill radio, coupure 4S.
 6. Marche avec rattrapage par les propulseurs → sauts (sur place, 10 cm, puis muret de 30 cm).
 7. Vision et missions sur le Pi 5 + Hailo.
 

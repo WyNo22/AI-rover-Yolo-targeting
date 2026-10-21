@@ -93,7 +93,34 @@ def plaque_bassin():
             p = p.cut(cyl_z(x, yl + s_ * 40, M3 / 2, z0 - 1, z0 + 7))
         y0, y1 = sorted((yl + s_ * 9.5, yl + s_ * 18.5))
         p = p.cut(box(-22.5, -15.5, y0, y1, z0 - 1, z0 + 7).edges("|Z").fillet(2.5))       # passage du câble du bus
+        for (hx, hy) in TOF_VIS:                                                       # vis des supports de ToF bas
+            p = p.cut(cyl_z(hx, s_ * hy, M3 / 2, z0 - 1, z0 + 7))
     return p
+
+# ── 17. Support d'un ToF bas (VL53L8CX) sous l'avant du bassin ────────────────
+# Navigation : 2 ToF multizones fixés au corps regardent le sol et les obstacles bas devant les pieds,
+# indépendamment de la tête. Repère robot, côté gauche (y > 0) ; le droit est son symétrique (plan xz).
+TOF_P0 = (52.0, 30.0)        # centre de la face du capteur (x, y), à mi-hauteur du support
+TOF_PITCH, TOF_YAW = 37.0, 20.0   # plongée sous l'horizontale, ouverture vers l'extérieur (champ 45° × 45°)
+TOF_PCB = (19.0, 27.0)       # logement de la carte (largeur, hauteur) : à ajuster sur la carte reçue
+TOF_VIS = ((42.0, 26.0), (42.0, 34.0))
+
+def place_tof(w):
+    """Repère local du capteur (x = axe de visée, face en x = 0) → repère robot."""
+    zb = S1_Z + SW / 2 + 0.15
+    return (w.rotate((0, 0, 0), (0, 1, 0), TOF_PITCH).rotate((0, 0, 0), (0, 0, 1), TOF_YAW)
+            .translate((TOF_P0[0], TOF_P0[1], zb - 11)))
+
+def support_tof():
+    zb = S1_Z + SW / 2 + 0.15                                   # dessous de la plaque de bassin
+    s_ = box(36, 58, 20, 40, zb - 22, zb).edges("|Z").fillet(2)
+    s_ = s_.cut(place_tof(box(0, 100, -60, 60, -60, 60)))       # face avant inclinée et tournée
+    w, h = TOF_PCB
+    s_ = s_.cut(place_tof(box(-2.2, 1, -w / 2, w / 2, -h / 2, h / 2)))      # logement de la carte
+    s_ = s_.cut(place_tof(box(-2.2, 1, -3, 3, h / 2 - 1, h / 2 + 12)))      # sortie des fils vers le haut
+    for (hx, hy) in TOF_VIS:
+        s_ = s_.cut(cyl_z(hx, hy, INS / 2, zb - 8, zb + 0.1))              # inserts M3
+    return cq.Workplane().add(max(s_.solids().vals(), key=lambda v: v.Volume()))   # sans l'éclat laissé en haut par la sortie des fils
 
 # ── 2. Berceau de S1 (fixe) ───────────────────────────────────────────────────
 def berceau_s1():
@@ -529,7 +556,7 @@ def composants_jambe():
     acier, orange, vert = cq.Color(0.62, 0.62, 0.65), cq.Color(0.72, 0.42, 0.06), cq.Color(0.17, 0.53, 0.34)
     c = {}
     for n, fn in PIECES.items():
-        if n[:2] in ("01", "09", "10", "11"):
+        if n[:2] in ("01", "09", "10", "11", "17"):
             continue
         c[n[3:]] = (fn(), pla)
     for n in SERVOS:
@@ -574,6 +601,7 @@ PIECES = {
     "10_entretoise_S3_11_8": lambda: entretoise(ENT_S3),
     "11_entretoise_S4_3_8": lambda: entretoise(ENT_S4),
     "16_semelle_TPU": semelle_tpu,
+    "17_support_ToF_bas": support_tof,
 }
 
 if __name__ == "__main__":
