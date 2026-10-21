@@ -1,4 +1,4 @@
-# CAO LEO-S (Rév. H)
+# CAO LEO-S (Rév. I)
 
 Pièces imprimées d'une jambe, générées par `jambe_cad.py` (CadQuery). Les cotes viennent du plan `docs/jambe_leo_s.html`.
 
@@ -13,7 +13,7 @@ Pièces imprimées d'une jambe, générées par `jambe_cad.py` (CadQuery). Les c
 | `07_tibia_bas` | languette de cheville, 2 tubes Ø10 | 2 |
 | `08_pied` | pied 100 × 65, dessous plein (collage), poches par le dessus, joues en A + levier de talon intégré | 2 (miroir) |
 | `09_bras_servo_22` | bras de 22 mm (S3, S4) | 4 |
-| `10_entretoise_S3_12_4` / `11_entretoise_S4_4_4` | entretoises palonnier → bras de 6 mm (S3 / S4) | 2 / 2 |
+| `10_entretoise_S3_11_8` / `11_entretoise_S4_3_8` | entretoises palonnier → bras de 6 mm (S3 / S4), alésées pour la vis centrale du palonnier | 2 / 2 |
 | `16_semelle_TPU` | semelle TPU 95A, 4 mm, 4 poches FSR 402, rainures, **collée** sous le pied | 2 (miroir) |
 
 - `step/` : une pièce par fichier, les tubes à couper (`12` à `15`), et trois assemblages :
@@ -21,7 +21,7 @@ Pièces imprimées d'une jambe, générées par `jambe_cad.py` (CadQuery). Les c
     bras et propulseurs, protections, tête) — généré par `robot_cad.py`, avec `bilan_masse.md` ;
   - `assemblage_jambe.step` : une jambe tendue avec tous ses composants ;
   - **`assemblage_deux_jambes.step`** : plaque de bassin + les deux jambes (gauche et droite symétriques), tous composants :
-    servos (maquettes), pièces imprimées, tubes carbone, bielles avec rotules, bras, entretoises, roulements 625ZZ,
+    servos (**modèle réel `STS3215_c.step`**, inséré par instance), **câble du bus**, pièces imprimées, tubes carbone, bielles avec rotules, bras, entretoises, roulements 625ZZ,
     vis épaulées M5, ressorts de genou, semelles, **toute la visserie** (vis de palonnier, vis de boîtier M2, rotules,
     colliers, goupilles des tubes, axe des ressorts, tendeurs, vis du berceau de S1).
 - `stl/` : mêmes pièces, prêtes à trancher.
@@ -30,16 +30,39 @@ Pièces imprimées d'une jambe, générées par `jambe_cad.py` (CadQuery). Les c
   coupées à **130 mm** (B1, entraxe 162) et **135 mm** (B2, entraxe 167).
 - Les rotules se montent à côté du bras ou du levier (rondelle) : bielles à 40 mm (B1) et 32 mm (B2) de l'axe de jambe.
 
-Contrôles faits : aucune collision entre tous les composants jambe tendue, ni sur les débattements
-(roulis −20/+30°, hanche −30/+90°, genou 0–110°).
+Contrôles faits : aucune collision entre tous les composants jambe tendue (servo réel et câble compris), ni sur les
+débattements (roulis −20/+30°, hanche −30/+90°, genou 0–110°, cheville ±40°, bielles), ni pour les tronçons de câble
+portés par chaque pièce pendant ces mouvements.
 
 **À faire avant d'imprimer :**
-1. Cotes du STS3215 reprises du plan Feetech (double sortie : palonnier Ø19,2, 4 trous en croix sur Ø14 de chaque côté,
-   37,25 mm palonniers compris). Vérifier le filetage des trous du palonnier (M3 ou M2,5 : `HORN_HOLE`).
-2. Les pièces entraînées se vissent sur les deux palonniers via un bossage Ø19,2 jusqu'au plan d'appui à 21,5 mm.
+1. Servo : modèle `STS3215_c.step` (palonniers Ø19,2, 4 trous en croix sur Ø14). Vérifier le filetage des trous du
+   palonnier (M3 ou M2,5 : `HORN_HOLE`).
+2. Les pièces entraînées se vissent sur les deux palonniers via un bossage Ø19,2 jusqu'au plan d'appui à 21,5 mm
+   (bossage de 2,3 mm côté palonnier en saillie, 3,45 mm côté connecteurs, où le palonnier affleure).
 3. Imprimer un test d'emmanchement (Ø16,15 pour les 625ZZ, Ø12,2 / Ø10,2 pour les tubes) et ajuster `JEU`, `BRG_D`, `T12`, `T10`.
 
 Régénérer : `pip install cadquery` puis `python jambe_cad.py`.
+
+## Rév. I — servo réel et câblage du bus
+
+- **Servo = `STS3215_c.step`** (fourni) : un seul composant (boîtier, palonniers, connecteurs Molex, visserie interne),
+  inséré par instance dans les assemblages (1 seul exemplaire du modèle par fichier STEP). Ce qu'il a changé :
+  - boîtier asymétrique : plots à −17,9 côté connecteurs, étiquette à +17,3 → enveloppe ±18 (poches ±18,2) ;
+  - palonniers : en saillie à 19,2 côté opposé aux connecteurs, presque affleurants à 18,05 côté connecteurs →
+    bossages asymétriques ; entretoises S3 / S4 = 11,8 / 3,8 mm pour garder le plan des bielles ;
+  - vis centrale d'origine du palonnier conservée (tête jusqu'à 21,55) → lamage Ø8,4 dans les bossages et les plaques,
+    entretoises alésées Ø6,6 ; plus de vis centrale à nous.
+- **Orientation** : connecteurs de S2, S3, S4 vers l'intérieur de la jambe, S1 vers l'arrière. Jambe droite : servo
+  retourné autour de son axe long (pas de servo « miroir »), connecteurs toujours vers l'intérieur.
+- **Bus en guirlande** bassin → S1 → S2 → S3 → S4 (câble Ø2,6 modélisé, `cablage_bus`, un seul corps par jambe) :
+  - plaque de bassin : lumière au-dessus de chaque S1 ; berceau de S1 : fenêtre des connecteurs ouverte sur toute la hauteur ;
+  - roulis : le câble S1 → S2 passe derrière S1 à 13 mm de l'axe de roulis, puis par une lumière du plancher de l'étrier ;
+  - hanche : boucle S2 → S3 le long des faces des servos (le gousset arrière intérieur de la chape est supprimé pour elle) ;
+  - berceaux de S3 et S4 : fenêtre devant les connecteurs (on branche les fiches, les fils sortent à plat) ;
+  - cuisse et tibia : **passe-câbles imprimés dans la chape, la languette du genou et le raccord du tibia** ;
+  - **genou : pion coaxial Ø5 sur le raccord**, le câble s'y enroule → longueur quasi constante (±4 mm sur 110°)
+    au lieu d'une boucle de 24 mm. La vis M5 du genou se monte donc tête côté extérieur, écrou côté intérieur.
+- Visserie de palonnier : **M3×12** (S1 et S2), **M3×22** (bras de S3), **M3×14** (bras de S4) — pointes arrêtées au dos du palonnier.
 
 ## Rév. H — corrections
 

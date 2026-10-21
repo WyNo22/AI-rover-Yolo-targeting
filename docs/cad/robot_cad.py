@@ -80,6 +80,8 @@ def masse_jambe(comp):
             m = v * DENS["carbone"]
         elif n.startswith(("vis_", "ecrou_")):
             m = v * DENS["acier"]
+        elif n.startswith("cablage"):
+            m = v * 2.0                                     # câble 3 fils : cuivre + isolant
         elif n == "semelle_TPU":
             m = v * DENS["tpu"]
         else:
@@ -101,8 +103,12 @@ if __name__ == "__main__":
         lignes.append((cat, nom, m)); M += m; mz += m * cz; mx += m * cx
     compte("bassin", "plaque de bassin", plaque.val().Volume() / 1000 * DENS["petg"], plaque.val().Center().z)
     for n, (sh, col) in comp.items():
-        asm.add(sh.translate((0, 45, 0)), name="G_" + n, color=col)
-        asm.add(sh.mirror("XZ").translate((0, -45, 0)), name="D_" + n, color=col)
+        if n in J.SERVOS:                                   # modèle du servo inséré par instance
+            asm.add(J.servo_sts3215(), name="G_" + n, loc=J.loc_servo(n, "G"), color=col)
+            asm.add(J.servo_sts3215(), name="D_" + n, loc=J.loc_servo(n, "D"), color=col)
+        else:
+            asm.add(sh.translate((0, 45, 0)), name="G_" + n, color=col)
+            asm.add(sh.mirror("XZ").translate((0, -45, 0)), name="D_" + n, color=col)
         m, c = mj[n]
         compte("jambes (×2)", n, 2 * m, c.z, c.x)
     for n, (sh, col, m, mat) in b.items():
