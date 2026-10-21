@@ -109,6 +109,9 @@ svg text{font-family:var(--f-disp)}
 .ext{stroke:var(--dim);stroke-width:.35}
 .arrow{fill:var(--dim)}
 .glue{fill:url(#glue)}
+.tag{fill:var(--sheet);stroke:var(--rod);stroke-width:.7}
+.tagt{font-size:5.4px;fill:var(--rod);font-family:var(--f-mono)!important;font-weight:500}
+.det.wide{grid-column:1/-1}
 .grid{stroke:var(--rule);stroke-width:1}
 .tick{font-size:11px;fill:var(--muted);font-family:var(--f-mono)!important}
 .foot{fill:var(--petg);stroke:var(--petg-line);stroke-width:1.5}
@@ -206,11 +209,11 @@ svg text{font-family:var(--f-disp)}
       <tr><td><span class="rep">4</span></td><td>Raccord haut de cuisse + berceau de S3</td><td>Pièce unique en PETG. S3 centré <b>derrière le tube</b>, 4 vis boîtier, arbre à 40 mm sous la hanche et 25 mm en arrière. Palonnier côté extérieur + entretoise de 11,5 mm jusqu'au plan de B1.</td></tr>
       <tr><td><span class="rep">5</span></td><td>Tube de cuisse</td><td>Emmanché 20 mm en haut (4) et en bas (6), collier fendu + vis M3 de serrage, puis époxy une fois réglé.</td></tr>
       <tr><td><span class="rep">6</span></td><td>Chape de genou + came r 20</td><td>Deux joues sur la cuisse, un 625ZZ dans chaque, vis épaulée M5 + écrou frein. La came est solidaire du tibia.</td></tr>
-      <tr><td><span class="rep">7</span></td><td>Bielle B1, côté extérieur</td><td>Rotule M3 métal vissée sur le bras de S3 (22 mm) et sur le levier du genou (22 mm, sur la joue extérieure). Plan à 35 mm de l'axe de jambe.</td></tr>
-      <tr><td><span class="rep">8</span></td><td>Ressort de genou, 2 × traction</td><td>Le long de l'avant de la cuisse (comme un quadriceps), câble Dyneema sur l'avant de la came. Mou jusqu'à 10° de flexion, puis il porte une partie du poids.</td></tr>
+      <tr><td><span class="rep">7</span></td><td>Bielle B1, côté extérieur</td><td>Extrémité <b>a</b> sur le bras de S3, extrémité <b>b</b> sur le levier du genou (joue extérieure du tibia). Plan à 35 mm de l'axe de jambe. Montage : détail H.</td></tr>
+      <tr><td><span class="rep">8</span></td><td>Ressorts de genou, 2 × traction</td><td>Devant la cuisse, un au droit de chaque joue du tibia. Ancrés en haut sur un axe M3 du raccord de cuisse, câble Dyneema jusqu'au profil de came (rayon 20) de chaque joue, réglé par un tendeur M3. Mous jusqu'à 10° de flexion. Specs : détail G.</td></tr>
       <tr><td><span class="rep">9</span></td><td>S4, cheville, dans le raccord haut de tibia</td><td>Centré <b>derrière les deux tubes</b>, 4 vis boîtier, arbre à 35 mm sous le genou et 25 mm en arrière de l'axe du tibia. Palonnier côté extérieur + entretoise de 3,5 mm pour amener le bras dans le plan de B2. Ce raccord porte aussi les joues et le levier du genou.</td></tr>
       <tr><td><span class="rep">10</span></td><td>2 tubes de tibia Ø10</td><td>Côte à côte, 20 mm d'entraxe (vue E). Chaque tube entre de 20 mm dans le raccord haut et dans la chape de cheville, collier M3, époxy.</td></tr>
-      <tr><td><span class="rep">11</span></td><td>Bielle B2, côté extérieur</td><td>Du bras de S4 (22 mm) au levier de talon (22 mm, à l'arrière de la cheville, sur la joue extérieure du pied). Plan à 27 mm de l'axe de jambe, derrière les tubes.</td></tr>
+      <tr><td><span class="rep">11</span></td><td>Bielle B2, côté extérieur</td><td>Extrémité <b>c</b> sur le bras de S4, extrémité <b>d</b> sur le levier de talon (joue extérieure du pied, 22 mm derrière la cheville). Plan à 27 mm de l'axe de jambe, derrière les tubes. Montage : détail H.</td></tr>
       <tr><td><span class="rep">12</span></td><td>Chape de cheville + pied évidé</td><td>Deux joues sur le pied, 2 × 625ZZ, vis épaulée M5. Pied de <b>100 × 65 mm</b> (35 derrière l'axe, 65 devant, dimensionné par le test de stabilité), PETG évidé en treillis, ≈ 22 g. Joues de cheville à ±19–25 mm de l'axe.</td></tr>
       <tr><td><span class="rep">13</span></td><td>Semelle TPU 3–4 mm</td><td>Collée sous le pied, ≈ 10 g. Place pour 4 capteurs de force ; leurs fils remontent en boucle souple autour de la cheville.</td></tr>
     </tbody>
@@ -334,6 +337,103 @@ svg text{font-family:var(--f-disp)}
       </svg>
       <p>Coupe juste sous le genou, vue de dessus. Les tubes sont devant, S4 derrière eux, au centre ; son palonnier
       sort côté extérieur et une entretoise amène le bras dans le plan de B2. Le raccord haut de tibia (pointillé) tient les trois.</p></div>
+    <div class="sheet det wide">
+      <h3>G · Ressorts de genou</h3>
+      <svg viewBox="0 0 340 120" role="img" aria-label="Ressort de genou vu de côté : patte d'ancrage sur l'avant du raccord de cuisse, ressort de traction, câble Dyneema enroulé sur le profil de came de rayon 20 de la joue du tibia, tendeur M3.">
+        <line class="axis" x1="20" y1="60" x2="320" y2="60"/>
+        <rect class="tube" x="20" y="64" width="210" height="10"/>
+        <rect class="fit" x="20" y="44" width="34" height="34" rx="2"/>
+        <rect class="fit" x="40" y="34" width="10" height="12"/>
+        <circle class="pin" cx="45" cy="40" r="1.8"/>
+        <polyline class="spr" points="45,40 49,34 53,46 57,34 61,46 65,34 69,46 73,34 77,46 81,34 85,46 89,34 93,46 97,34 101,46 105,34 109,46 113,34 117,46 121,40"/>
+        <line class="cable" x1="121" y1="40" x2="268" y2="40"/>
+        <circle class="cam" cx="268" cy="60" r="20" style="stroke-dasharray:none;stroke-width:1.2"/>
+        <rect class="fit" x="240" y="48" width="30" height="24" rx="3" style="fill-opacity:.4"/>
+        <circle class="bearing" cx="268" cy="60" r="7"/><circle class="pin" cx="268" cy="60" r="2.4"/>
+        <path class="cable" d="M268,40 A20,20 0 0 1 288,60" style="fill:none;stroke-dasharray:none;stroke-width:1.2"/>
+        <circle class="pin" cx="288" cy="66" r="1.8"/>
+        <line class="dim" x1="45" y1="22" x2="121" y2="22" marker-start="url(#ar)" marker-end="url(#ar)"/>
+        <text class="dimt" x="83" y="18" text-anchor="middle">≈ 58 au repos</text>
+        <line class="ext" x1="45" y1="25" x2="45" y2="36"/><line class="ext" x1="121" y1="25" x2="121" y2="36"/>
+        <line class="dim" x1="268" y1="60" x2="268" y2="40" marker-end="url(#ar)"/>
+        <text class="dimt" x="246" y="38">r 20</text>
+        <text class="small" x="22" y="96">raccord haut de cuisse</text>
+        <text class="small" x="22" y="103">patte + axe d'ancrage M3</text>
+        <text class="small" x="78" y="56">ressort de traction (×2, côte à côte)</text>
+        <text class="small" x="150" y="34">câble Dyneema Ø1</text>
+        <text class="small" x="228" y="96">profil de came sur la joue</text>
+        <text class="small" x="228" y="103">du tibia (×2), tendeur M3</text>
+        <text class="small" x="296" y="70">fin du</text><text class="small" x="296" y="77">câble</text>
+      </svg>
+      <table>
+        <thead><tr><th>Spécification (par ressort, 2 en parallèle)</th><th class="n">Valeur</th></tr></thead>
+        <tbody>
+          <tr><td>Type</td><td class="n">traction, acier ressort, crochets</td></tr>
+          <tr><td>Raideur</td><td class="n">1,75 N/mm (3,5 N/mm à deux)</td></tr>
+          <tr><td>Fil · Ø extérieur</td><td class="n">Ø 1,4 mm · Ø 10–11 mm</td></tr>
+          <tr><td>Spires · longueur au repos</td><td class="n">≈ 29 · ≈ 58 mm crochets compris</td></tr>
+          <tr><td>Allongement utile · maxi admissible</td><td class="n">35 mm · ≥ 40 mm</td></tr>
+          <tr><td>Force à 35 mm</td><td class="n">≈ 61 N (contrainte ≈ 630 MPa, admissible ≈ 900)</td></tr>
+          <tr><td>Couple au genou (les deux)</td><td class="n">1,4 N·m/rad au-delà de 10° : 3,7 kg·cm à 25°, 20 kg·cm à 90°</td></tr>
+        </tbody>
+      </table>
+      <p>Les ressorts sont ancrés en haut sur un axe M3 traversant une patte du raccord de cuisse, 76 mm sous la hanche, un ressort
+      au droit de chaque joue du tibia (±14,5 mm de l'axe de jambe, vue de face). En bas, un câble Dyneema s'enroule sur le profil
+      de came de la joue, rayon 20 devant l'axe du genou, et se bloque sous un tendeur M3. Plier le genou déroule le câble :
+      20 mm de câble par radian, soit 35 mm entre 10° et 110°. Le tendeur sert à régler l'engagement : câble juste tendu à 10°
+      de flexion. Au plus plié, le bas du ressort descend à 169 mm sous la hanche, avant la chape du genou.</p>
+    </div>
+    <div class="sheet det wide">
+      <h3>H · Attaches des bielles (a, b, c, d)</h3>
+      <svg viewBox="0 0 340 112" role="img" aria-label="Empilage vu en coupe à chaque extrémité de bielle : côté servo, palonnier, entretoise, bras, rondelle, rotule à œil, rondelle, vis M3 et écrou frein ; côté articulation, levier imprimé avec insert M3.">
+        <text class="lbl" x="10" y="12">Côté servo (a, c)</text>
+        <rect class="servo" x="10" y="20" width="26" height="60" rx="2"/>
+        <rect class="horn" x="36" y="34" width="5" height="32"/>
+        <rect class="fit" x="41" y="38" width="14" height="24"/>
+        <rect class="arm2" x="55" y="34" width="5" height="40"/>
+        <rect class="bolt" x="60" y="64" width="1.5" height="10"/>
+        <circle class="rodend" cx="66.5" cy="69" r="5"/>
+        <rect class="bolt" x="71.5" y="64" width="1.5" height="10"/>
+        <line class="bolt" x1="55" y1="69" x2="77.5" y2="69" style="stroke-width:2.6;stroke:var(--axis)"/>
+        <rect class="bolt" x="73.5" y="65" width="4" height="8"/>
+        <line class="rod" x1="66.5" y1="74" x2="66.5" y2="104" style="stroke-width:3"/>
+        <text class="small" x="10" y="90">servo</text>
+        <text class="small" x="30" y="104">palonnier</text>
+        <text class="small" x="44" y="56">entretoise</text>
+        <text class="small" x="49" y="30">bras 22</text>
+        <text class="small" x="81.5" y="86">rotule à œil M3</text>
+        <text class="small" x="81.5" y="93">vis M3 + écrou frein</text>
+        <text class="lbl" x="200" y="12">Côté articulation (b, d)</text>
+        <rect class="fit" x="200" y="20" width="12" height="62"/>
+        <rect class="arm2" x="212" y="56" width="6" height="22"/>
+        <rect class="bolt" x="218" y="64" width="1.5" height="10"/>
+        <circle class="rodend" cx="224" cy="69" r="5"/>
+        <rect class="bolt" x="229" y="64" width="1.5" height="10"/>
+        <line class="bolt" x1="212" y1="69" x2="236" y2="69" style="stroke-width:2.6;stroke:var(--axis)"/>
+        <rect class="bolt" x="236" y="65" width="3" height="8"/>
+        <line class="rod" x1="224" y1="74" x2="224" y2="104" style="stroke-width:3"/>
+        <text class="small" x="186" y="96">joue extérieure</text>
+        <text class="small" x="244" y="60">levier 22 venu avec la joue,</text>
+        <text class="small" x="244" y="67">insert laiton M3</text>
+        <text class="small" x="244" y="76">vis M3 × 16 + frein filet</text>
+        <text class="small" x="244" y="85">rondelle de chaque côté</text>
+        <text class="small" x="244" y="92">de la rotule</text>
+      </svg>
+      <table>
+        <thead><tr><th>Extrémité</th><th>Sur quoi</th><th>Empilage</th></tr></thead>
+        <tbody>
+          <tr><td><b>a</b> · B1 haut</td><td>bras de S3, 22 mm</td><td>palonnier S3 → entretoise 11,5 mm → bras alu ou PETG → rondelle → rotule → rondelle → vis M3 × 25 + écrou frein</td></tr>
+          <tr><td><b>b</b> · B1 bas</td><td>levier du genou, sur la joue extérieure du tibia, 22 mm de l'axe</td><td>levier imprimé avec insert laiton M3 → rondelle → rotule → rondelle → vis M3 × 16 + frein filet</td></tr>
+          <tr><td><b>c</b> · B2 haut</td><td>bras de S4, 22 mm</td><td>palonnier S4 → entretoise 3,5 mm → bras → rondelle → rotule → rondelle → vis M3 × 16 + écrou frein</td></tr>
+          <tr><td><b>d</b> · B2 bas</td><td>levier de talon, sur la joue extérieure du pied, 22 mm derrière la cheville</td><td>levier imprimé avec insert laiton M3 → rondelle → rotule → rondelle → vis M3 × 16 + frein filet</td></tr>
+        </tbody>
+      </table>
+      <p>Chaque bielle = tube carbone + goujon M3 collé à chaque bout + <b>rotule à œil M3 femelle</b> (embout à rotule
+      métallique) vissée sur le goujon et bloquée par un contre-écrou. La vis traverse l'œil de la rotule et se serre dans
+      le bras ou le levier ; les deux rondelles laissent la rotule pivoter de quelques degrés, ce qui absorbe les petits
+      défauts d'alignement entre les plans. Côté servo, l'entretoise est vissée avec le bras sur le palonnier par les vis
+      du palonnier : elle amène le bras dans le plan de la bielle (35 mm de l'axe de jambe pour B1, 27 mm pour B2).</p>
+    </div>
     <div class="sheet det">
       <h3>F · Bilan de masse d'une jambe</h3>
       <table>

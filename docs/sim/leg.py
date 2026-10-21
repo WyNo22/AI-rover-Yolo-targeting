@@ -110,18 +110,25 @@ s.append(circle(S4, 6, "horn")); s.append(circle(S4, 1.6, "pin"))
 s.append(circle(K, 20, "cam"))
 s.append(circle(K, 8, "bearing")); s.append(circle(K, 2.5, "pin"))
 # ressort de genou le long de l'arrière de la cuisse + câble
-sa = H + 80 * u1 - 15 * nb1; sb = H + 128 * u1 - 15 * nb1
-s.append(circle(sa, 1.8, "pin")); s.append(spring(sa, sb))
+# 2 ressorts côte à côte (vus superposés), ancrés sur l'avant du raccord haut de cuisse,
+# câble Dyneema jusqu'au profil de came des joues du tibia (rayon 20 devant l'axe du genou)
+sa = H + 76 * u1 - 15 * nb1; sb = H + 134 * u1 - 15 * nb1
+s.append(rect_on(H + 72 * u1 - 15 * nb1, u1, -3, 3, 9, "fit"))          # patte d'ancrage
+s.append(circle(sa, 1.8, "pin")); s.append(spring(sa, sb, turns=12, amp=4.5))
 cable_end = K - 20 * nb1
 s.append(line(sb, cable_end, "cable"))
+s.append(circle(cable_end + 6 * u1, 1.6, "pin"))                       # serre-câble / tendeur M3
+s.append(text(sa + P(16, -2), "ancrage M3", "small"))
+s.append(text(cable_end + P(6, 14), "tendeur M3", "small"))
 # leviers et bielles
 s.append(line(S3, P1, "arm")); s.append(line(K, P2, "arm"))
 s.append(line(S4, P3, "arm"));
 s.append(line(P1, P2, "stud")); s.append(line(P3, P4, "stud"))     # goujons M3 jusqu'aux rotules
 s.append(rect_on(P1, P2 - P1, RE, B1 - RE, 4, "rod"))
 s.append(rect_on(P3, P4 - P3, RE, B2 - RE, 4, "rod"))
-for p_ in (P1, P2, P3, P4):
-    s.append(circle(p_, 3.2, "rodend"))
+for p_, tag, off in ((P1, "a", P(-9, -5)), (P2, "b", P(-10, 8)), (P3, "c", P(-9, -6)), (P4, "d", P(-9, 9))):
+    s.append(circle(p_, 3.2, "rodend")); s.append(circle(p_, 1.1, "pin"))
+    s.append(circle(p_ + off, 4.2, "tag")); s.append(text(p_ + off + P(0, 1.9), tag, "tagt", "middle"))
 # pied : chapes, levier talon, semelle
 foot_top = GROUND - 8
 s.append(f'<polygon class="fit" points="-12,{f(foot_top)} 12,{f(foot_top)} 9,{f(A[1]-4)} -9,{f(A[1]-4)}"/>')

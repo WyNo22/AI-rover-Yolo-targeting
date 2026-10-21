@@ -41,8 +41,10 @@ for sgn in (-1, 1):
     o.append(R(cx, sgn, -29, 29, AY - 1.6, AY + 1.6, "bolt"))
     o.append(R(cx, sgn, -32.5, 32.5, GY - 8, GY - 4, "plate", 1))
     o.append(R(cx, sgn, -32.5, 32.5, GY - 4, GY, "tpu", 1.5))
-    for y in (KY + 35, AY):
-        o.append(circle(P(X(B2X), y), 3.2, "rodend"))
+    for y, tag in ((KY + 35, "c"), (AY, "d")):
+        o.append(circle(P(X(B2X), y), 3.2, "rodend")); o.append(circle(P(X(B2X), y), 1.1, "pin"))
+        if sgn > 0:
+            o.append(circle(P(X(B2X) + 8, y - 6), 4.2, "tag")); o.append(text(P(X(B2X) + 8, y - 4.1), tag, "tagt", "middle"))
     # — cuisse : S3 derrière le tube —
     o.append(R(cx, sgn, -17.5, 17.5, 29, 74, "servo", 2))
     o.append(R(cx, sgn, 17.5, 21.5, 34, 46, "horn"))
@@ -61,8 +63,18 @@ for sgn in (-1, 1):
     # B1
     o.append(line(P(X(B1X), 58), P(X(B1X), KY + 18), "stud"))
     o.append(R(cx, sgn, B1X - 2, B1X + 2, 58 + 16, KY + 18 - 16, "rod"))
-    for y in (58, KY + 18):
-        o.append(circle(P(X(B1X), y), 3.2, "rodend"))
+    for y, tag in ((58, "a"), (KY + 18, "b")):
+        o.append(circle(P(X(B1X), y), 3.2, "rodend")); o.append(circle(P(X(B1X), y), 1.1, "pin"))
+        if sgn > 0:
+            o.append(circle(P(X(B1X) + 8, y - 6), 4.2, "tag")); o.append(text(P(X(B1X) + 8, y - 4.1), tag, "tagt", "middle"))
+    # 2 ressorts de genou devant la cuisse, au droit des joues du tibia (±14,5)
+    o.append(R(cx, sgn, -20, 20, 70, 77, "fit", 1.5))                         # patte d'ancrage
+    o.append(R(cx, sgn, -17.5, 17.5, 73, 74.6, "bolt"))                       # axe d'ancrage M3
+    for lx in (-14.5, 14.5):
+        x0 = X(lx)
+        pts = [(x0, 76)] + [(x0 + (4.5 if i % 2 else -4.5), 76 + 58 * i / 24) for i in range(1, 24)] + [(x0, 134)]
+        o.append('<polyline class="spr" points="' + " ".join(f"{f(a)},{f(b)}" for a, b in pts) + '"/>')
+        o.append(line(P(x0, 134), P(x0, KY - 12), "cable"))
     # hanche : chape de cuisse en U autour de S2, S2, étrier de roulis, S1
     o.append(R(cx, sgn, -17.5, 17.5, -12.35, 12.35, "servo", 2))
     o.append(R(cx, sgn, 17.5, 21.5, -10, 10, "horn"))
@@ -82,9 +94,8 @@ for sgn in (-1, 1):
 # ── cotes (jambe de droite sur le dessin : extérieur vers +x) ──
 o.append(dim(P(-HIP, -96), P(HIP, -96), 0, "90 entre axes de hanche", side=-1))
 o.append(line(P(-HIP, -88), P(-HIP, -99), "ext")); o.append(line(P(HIP, -88), P(HIP, -99), "ext"))
-o.append(dim(P(HIP, 120), P(HIP + B1X, 120), 0, str(B1X), side=-1))
-o.append(dim(P(HIP - 17.5, 92), P(HIP + 17.5, 92), 0, "35", side=-1))
-o.append(line(P(HIP - 17.5, 75), P(HIP - 17.5, 95), "ext")); o.append(line(P(HIP + 17.5, 75), P(HIP + 17.5, 95), "ext"))
+o.append(dim(P(HIP, 165), P(HIP + B1X, 165), 0, str(B1X), side=-1))
+
 o.append(dim(P(HIP - 10, KY + 95), P(HIP + 10, KY + 95), 0, "20", side=-1))
 o.append(dim(P(HIP, KY + 125), P(HIP + B2X, KY + 125), 0, str(B2X), side=-1))
 o.append(dim(P(-HIP - 32.5, GY + 14), P(-HIP + 32.5, GY + 14), 0, "65", side=-1))
@@ -105,7 +116,7 @@ o.append(line(P(VX + 3, GY), P(VX + 19, GY), "ext"))
 # libellés en colonne à gauche, avec trait de rappel (jambe de gauche du dessin)
 LX = -134
 lab = [(-63, P(-62, -63), "S1 roulis"), (-30, P(-30, -40), "étrier de roulis"), (0, P(-45, 0), "S2"),
-       (40, P(-45, 52), "S3 (derrière)"), (100, P(-45, 110), "Ø12"), (150, P(-80, 150), "B1"),
+       (40, P(-45, 52), "S3 (derrière)"), (100, P(-59.5, 105), "2 ressorts"), (130, P(-45, 150), "Ø12"), (160, P(-80, 160), "B1"),
        (KY - 12, P(-30.5, KY - 4), "625ZZ"), (KY + 45, P(-45, KY + 50), "S4 (derrière)"),
        (KY + 100, P(-55, KY + 100), "2 × Ø10"), (KY + 140, P(-72, KY + 140), "B2"),
        (AY + 22, P(-60, GY - 6), "pied")]
