@@ -49,13 +49,13 @@ bout, pivot sur vis M3. Entraxes : **B1 = 161,9 mm**, **B2 = 166,9 mm** (axe à 
 
 | Vague | Quand | À acheter |
 |---|---|---|
-| **2** | une jambe bouge | Pico 2 · BNO085 · INA226 · UBEC 5,1 V 5 A · fusible 20 A + porte-fusible, prises XT60, câble 14 AWG (alimentation embarquée) |
+| **2** | une jambe bouge | Pico 2 · INA226 · UBEC 5,1 V 5 A · fusible 20 A + porte-fusible, prises XT60, câble 14 AWG (alimentation embarquée) |
 | **3** | il tient debout | LiDAR LD19 · caméra Pi Module 3 Wide + nappe Pi 5 · écran e-ink 2,13″ · BEC 5 V 3 A |
 | **4** | il marche | ESC 4-en-1 45 A (ou stack F405 + ESC) · 2 jeux d'hélices 5″ · interrupteur de coupure 4S |
 
 ## Déjà possédé
 
-✅ inserts M3 · ✅ visserie · ✅ Dyneema Ø2,4 (câbles des ressorts) · ✅ câbles servo et connecteurs (bricolés)
+✅ MPU6050 (centrale inertielle pour démarrer ; BNO085 plus tard si besoin) · ✅ inserts M3 · ✅ visserie · ✅ Dyneema Ø2,4 (câbles des ressorts) · ✅ câbles servo et connecteurs (bricolés)
 · ✅ PETG + TPU · ✅ colles (cyanoacrylate souple + primaire, époxy, frein-filet) · ✅ panne à inserts, pince à sertir, clé de 8
 · ✅ Raspberry Pi 5 + AI HAT+ · ✅ LiPo 3S 2200 (servos) · ✅ LiPo 4S 1400 (propulseurs) · ✅ moteurs 2206 (vérifier qu'il y en a 4)
 · ✅ radio FlySky + FS-iA6B · ✅ chargeur LiPo (à vérifier) · ✅ imprimante Bambu P1S · ✅ PicoBoard
