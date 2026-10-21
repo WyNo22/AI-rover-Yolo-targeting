@@ -37,14 +37,14 @@ presque gratuit. ✅ = déjà possédé · 🛒 = dans un panier · 📦 = comma
 
 | Qté | Article | Rôle |
 |---|---|---|
-| 1 | **INA226, version 36 V / 20 A** (shunt **R002**, 2 mΩ) | tension et courant de la 3S ; la version courante à shunt R100 ne mesure que 0,8 A |
-| 1 | **Régulateur 5 V 5 A** réglable (UBEC ou module abaisseur type XL4015), réglé à **5,1 V** | alimente le Pi 5 depuis la 3S |
+| 1 | **Régulateur 5 V 5 A** réglable (UBEC ou module abaisseur type XL4015), réglé à **5,1 V** | alimente le Pi 5 depuis la 3S (le LM2596 ✅ ne tient que ~2–3 A : il servira au cou et au LiDAR) |
 | 1 | Porte-fusible lame en ligne 14 AWG + fusibles **20 A** | protection juste après la batterie |
 | 1 | Interrupteur ≥ 20 A 12 V (ou boucle XT60 à débrancher) | coupure générale des servos |
 | 3 paires | Prises **XT60** | batterie, interrupteur, distribution |
 | 1 m + 1 m | Câble silicone **14 AWG** rouge + noir | 3S → départs des jambes |
 | 1 lot | Bornes **Wago 221** | distribution du 12 V vers les 2 jambes et le régulateur |
 | 2 × 1 m | Câble souple 4 fils fin (26 AWG) | I²C des pieds : ADS1015 → Pico, le long de chaque jambe |
+| 2 | Résistances 100 kΩ + 33 kΩ (ou prises dans un lot) | tension de la 3S sur l'entrée analogique GP26 du Pico ; le courant vient des servos eux-mêmes, pas besoin d'INA226 |
 
 **Bielles** : tube carbone Ø5 × 3 + un embout imprimé collé à l'époxy à chaque bout, pivot sur vis M3.
 Entraxes **B1 = 161,9 mm**, **B2 = 166,9 mm** (axe à axe). Option : 8 roulements 683ZZ (3 × 7 × 3) dans les embouts.
@@ -53,12 +53,12 @@ Entraxes **B1 = 161,9 mm**, **B2 = 166,9 mm** (axe à axe). Option : 8 roulement
 
 | Vague | Quand | À acheter |
 |---|---|---|
-| **3** | il tient debout | LiDAR LD19 · 2 ToF bas (VL53L8CX, ou VL53L1X pour démarrer) · caméra Pi Module 3 Wide + nappe Pi 5 · écran e-ink 2,13″ · 2 MG90S · BEC 5 V 3 A |
+| **3** | il tient debout | LiDAR LD19 · 2 ToF bas (VL53L8CX, ou VL53L1X pour démarrer) · caméra Pi Module 3 Wide + nappe Pi 5 · écran e-ink 2,13″ · 2 MG90S (5 V par le LM2596 ✅) |
 | **4** | il marche | stack F405 + ESC (si pas pris) · 2 jeux d'hélices 5″ · interrupteur de coupure 4S |
 
 ## Déjà possédé
 
-✅ MPU6050 (centrale inertielle ; BNO085 plus tard si besoin) · ✅ inserts M3 · ✅ visserie · ✅ Dyneema Ø2,4 (câbles des ressorts)
+✅ MPU6050 (centrale inertielle ; BNO085 plus tard si besoin) · ✅ LM2596 (5 V du cou et du LiDAR) · ✅ inserts M3 · ✅ visserie · ✅ Dyneema Ø2,4 (câbles des ressorts)
 · ✅ câbles servo et connecteurs (bricolés) · ✅ PETG + TPU · ✅ colles (cyanoacrylate souple + primaire, époxy, frein-filet)
 · ✅ panne à inserts, pince à sertir, clé de 8 · ✅ Raspberry Pi 5 + AI HAT+ · ✅ LiPo 3S 2200 (servos) · ✅ LiPo 4S 1400 (propulseurs)
 · ✅ moteurs 2206 (vérifier qu'il y en a 4) · ✅ radio FlySky + FS-iA6B (arrêt d'urgence, en iBUS vers le Pico)
