@@ -1,5 +1,5 @@
 """
-jambe_cad.py — CAO paramétrique des pièces imprimées d'une jambe LEO-S (Rév. F), en CadQuery.
+jambe_cad.py — CAO paramétrique des pièces imprimées d'une jambe LEO-S (Rév. G : pièces renforcées / allégées, semelle TPU, visserie, buste estimé), en CadQuery.
 
   python jambe_cad.py            → STEP + STL de chaque pièce dans ./step et ./stl, assemblage dans ./step/assemblage_jambe.step
 
@@ -8,6 +8,7 @@ origine sur l'axe de tangage de hanche (S2). La jambe gauche = symétrie par rap
 Toutes les cotes sont en mm et viennent du plan docs/jambe_leo_s.html.
 À VÉRIFIER avant impression : cotes du STS3215 (relevées sur un modèle 3D), motif de trous du palonnier.
 """
+import math
 import os
 import cadquery as cq
 
@@ -23,6 +24,7 @@ M5, M3, M2, INS = 5.2, 3.3, 2.3, 4.0   # passages et insert M3
 T12, T10, SOCK = 12.2, 10.2, 20.0      # emmanchements tubes
 B1_Y, B2_Y = 35.0, 27.0     # plans des bielles (vers l'extérieur)
 ARM = 22.0                  # bras / leviers
+ARM_T = 6.0                 # épaisseur des bras de servo (4 → 6 : 9 MPa au blocage)
 OFF = 25.0                  # S3 et S4 en arrière de l'axe des tubes
 S1_Z = 63.5                 # axe de roulis au-dessus de l'axe de tangage
 FOOT = (35.0, 65.0, 65.0)   # talon, pointe, largeur
@@ -76,50 +78,54 @@ def plaque_bassin():
 
 # ── 2. Berceau de S1 (fixe) ───────────────────────────────────────────────────
 def berceau_s1():
-    """Joues fines entre S1 et les plaques de l'étrier (x), bloc de vissage au-delà du bout extérieur (y 36–44)."""
+    """Joues entre S1 et les plaques de l'étrier, fond sous S1 hors de la zone balayée par l'étrier, bloc de vissage."""
     y_far = SL - S_END
     z0, z1 = S1_Z - SW / 2, S1_Z + SW / 2
     top = z1 + 0.15
-    joue_av = box(SH / 2 + JEU, SH / 2 + HORN_T - 0.3, 13, y_far + 1, z0 - 1, top)
-    joue_ar = box(-SH / 2 - HORN_T + 0.3, -SH / 2 - JEU, 13, y_far + 1, z0 - 1, top)
-    bloc = box(-SH / 2 - HORN_T + 0.3, SH / 2 + HORN_T - 0.3, y_far + JEU, y_far + 10, z0 - 1, top)
-    b = joue_av.union(joue_ar).union(bloc)
+    xa, xb = SH / 2 + JEU, SH / 2 + HORN_T - 0.3
+    joue_av = box(xa, xb, 13, y_far + 1, z0 - 4, top)
+    joue_ar = box(-xb, -xa, 13, y_far + 1, z0 - 4, top)
+    fond = box(-xb, xb, 24, y_far + 1, z0 - 4, z0 - JEU)                 # fond sous S1 (y ≥ 24 : hors du balayage de l'étrier)
+    bloc = box(-xb, xb, y_far + JEU, y_far + 12, z0 - 4, top)
+    b = joue_av.union(joue_ar).union(fond).union(bloc)
     for dz in (-S_HOLE_Y, S_HOLE_Y):
         b = b.cut(cyl_x(y_far - S_HOLE_X, S1_Z + dz, M2 / 2, -30, 30))
     for x in (-12, 12):                                       # inserts M3 sous la plaque
         b = b.cut(cyl_z(x, 40, INS / 2, top - 6, top + 1))
-    return b
+    return b.cut(box(-12, 12, y_far + 3, y_far + 9, z0 - 5, top - 8))   # allègement du bloc
 
 # ── 3. Étrier de roulis + berceau de S2 ───────────────────────────────────────
 def etrier_roulis():
     def plaque(x0, x1, trou):
         prof = (cq.Workplane("YZ").moveTo(-11, S1_Z).threePointArc((0, S1_Z + 11), (11, S1_Z))
-                .lineTo(11, 30).lineTo(30, 22.5).lineTo(30, 17.5).lineTo(-30, 17.5).lineTo(-30, 22.5)
+                .lineTo(11, 30).lineTo(30, 23.5).lineTo(30, 17.5).lineTo(-30, 17.5).lineTo(-30, 23.5)
                 .lineTo(-11, 30).close().extrude(x1 - x0).translate((x0, 0, 0)))
         return prof.cut(cyl_x(0, S1_Z, trou / 2, x0 - 1, x1 + 1))
-    av = plaque(SH / 2 + HORN_T, SH / 2 + HORN_T + 5, M3)           # sur le palonnier avant de S1
-    av = av.union(cyl_x(0, S1_Z, HORN_D / 2, HORN_FACE, MP)).cut(cyl_x(0, S1_Z, M3 / 2, 0, 40))
-    for i in range(HORN_N):                                            # motif provisoire du palonnier
-        import math
-        a = 2 * math.pi * i / HORN_N + HORN_A0
-        av = av.cut(cyl_x(HORN_PCD / 2 * math.cos(a), S1_Z + HORN_PCD / 2 * math.sin(a), HORN_HOLE / 2, 0, 40))
-    ar = plaque(-MP - 5, -MP, M3)                                       # sur le palonnier arrière de S1
-    ar = ar.union(cyl_x(0, S1_Z, HORN_D / 2, -MP, -HORN_FACE)).cut(cyl_x(0, S1_Z, M3 / 2, -40, 0))
+    av = plaque(MP, MP + 6, M3).union(cyl_x(0, S1_Z, HORN_D / 2, HORN_FACE, MP))
+    ar = plaque(-MP - 6, -MP, M3).union(cyl_x(0, S1_Z, HORN_D / 2, -MP, -HORN_FACE))
     for i in range(HORN_N):
         a = 2 * math.pi * i / HORN_N + HORN_A0
-        ar = ar.cut(cyl_x(HORN_PCD / 2 * math.cos(a), S1_Z + HORN_PCD / 2 * math.sin(a), HORN_HOLE / 2, -40, 0))
-    plancher = box(-38, SH / 2 + HORN_T + 5, -30, 30, 17.5, 22.5)
-    plancher = plancher.union(box(-SH / 2 - HORN_T - 5, -SH / 2 - HORN_T, -30, 30, 17.5, 22.5))
-    # berceau de S2 : S2 arbre d'axe y en (0,0), boîtier x de -SL+S_END à S_END, z ±SW/2, y ±SH/2
+        hy, hz = HORN_PCD / 2 * math.cos(a), S1_Z + HORN_PCD / 2 * math.sin(a)
+        av = av.cut(cyl_x(hy, hz, HORN_HOLE / 2, 0, 40))
+        ar = ar.cut(cyl_x(hy, hz, HORN_HOLE / 2, -40, 0))
+    av, ar = av.cut(cyl_x(0, S1_Z, M3 / 2, 0, 40)), ar.cut(cyl_x(0, S1_Z, M3 / 2, -40, 0))
+    plancher = box(-38, MP + 6, -30, 30, 17.5, 23.5)
+    # goussets plaques ↔ plancher (dans le plan du col, ±11), pour reprendre le moment de la jambe en roulis
+    gous = None
+    for (x0, x1) in ((MP - 5, MP), (-MP, -MP + 5)):
+        for ys in (-1, 1):
+            g = (cq.Workplane("YZ").polyline([(ys * 11, 23.5), (ys * 11, 34), (ys * 24, 23.5)]).close()
+                 .extrude(x1 - x0).translate((x0, 0, 0)))
+            gous = g if gous is None else gous.union(g)
+    # berceau de S2 : joues 5,5 mm, fond, nervure sous le plancher
     x_far = -(SL - S_END)
-    joues = (box(x_far - 3, -18, SH / 2 + JEU, SH / 2 + 3.5, -SW / 2 - 1, 17.5)
-             .union(box(x_far - 3, -18, -SH / 2 - 3.5, -SH / 2 - JEU, -SW / 2 - 1, 17.5))
-             .union(box(x_far - 3, x_far - JEU, -SH / 2 - 3.5, SH / 2 + 3.5, -SW / 2 - 1, 17.5)))
-    e = av.union(ar).union(plancher).union(joues)
+    joues = (box(x_far - 4, -18, SH / 2 + JEU, SH / 2 + 5.5, -SW / 2 - 2, 17.5)
+             .union(box(x_far - 4, -18, -SH / 2 - 5.5, -SH / 2 - JEU, -SW / 2 - 2, 17.5))
+             .union(box(x_far - 4, x_far - JEU, -SH / 2 - 5.5, SH / 2 + 5.5, -SW / 2 - 2, 17.5)))
+    e = av.union(ar).union(plancher).union(gous).union(joues)
     for dz in (-S_HOLE_Y, S_HOLE_Y):
         e = e.cut(cyl_y(x_far + S_HOLE_X, dz, M2 / 2, -30, 30))
-    e = e.cut(box(-30, 10, -14, 14, 16, 24).edges("|Z").fillet(3))   # allègement du plancher
-    # dégagement : volume balayé par S3 et la chape quand la hanche s'étend jusqu'à −35° (jeu 1 mm)
+    e = e.cut(box(-12, 10, -8, 8, 16, 25).edges("|Z").fillet(3))       # allègement réduit (le plancher porte S2)
     s3 = box(-OFF - SW / 2 - 1, -OFF + SW / 2 + 1, -SH / 2 - 1, SH / 2 + 1, -40 - (SL - S_END), -40 + S_END + 1)
     ch = chape_cuisse()
     for a in (-15, -20, -25, -30, -35):
@@ -132,6 +138,12 @@ def chape_cuisse():
     bras_int = box(-12, 12, -MP - 5, -MP, -31, 0).union(cyl_y(0, 0, 12, -MP - 5, -MP))
     bossages = cyl_y(0, 0, HORN_D / 2, HORN_FACE, MP).union(cyl_y(0, 0, HORN_D / 2, -MP, -HORN_FACE))
     traverse = box(-12, 12, -MP - 5, MP + 5, -37, -31)
+    gous = None
+    for ys in (1, -1):                                         # goussets bras ↔ traverse (le coin le plus chargé)
+        y0, y1 = (MP - 6, MP) if ys > 0 else (-MP, -MP + 6)
+        g = (cq.Workplane("XZ").polyline([(-12, -31), (-12, -25), (-6, -31)]).close().extrude(-(y1 - y0)).translate((0, y0, 0))
+             .union(cq.Workplane("XZ").polyline([(12, -31), (12, -25), (6, -31)]).close().extrude(-(y1 - y0)).translate((0, y0, 0))))
+        gous = g if gous is None else gous.union(g)
     corps = box(-12, 9, -12, 12, -TOP1, -31)                   # autour du tube Ø12
     # berceau de S3 : arbre en (x=-OFF, z=-40), boîtier vertical vers le bas
     s3z = -40.0
@@ -139,7 +151,7 @@ def chape_cuisse():
     cad = box(-OFF - SW / 2 - 3.5, -OFF + SW / 2 + 3.5, -SH / 2 - 3.5, SH / 2 + 3.5, zf - 3, s3z - 12)
     pont = box(-OFF, -6, -12, 12, -TOP1, -50)
     patte = box(6, 18, -20, 20, -TOP1, -TOP1 + 6)               # ancrage des ressorts (axe M3 d'axe y)
-    c = bras_ext.union(bras_int).union(bossages).union(traverse).union(corps).union(cad).union(pont).union(patte)
+    c = bras_ext.union(bras_int).union(bossages).union(traverse).union(gous).union(corps).union(cad).union(pont).union(patte)
     c = c.cut(servo_pocket_vertical(-OFF, s3z))
     c = c.cut(cyl_y(-OFF, s3z, HORN_D / 2 + 1, -MP - 1, -HORN_FACE + 4))   # dégagement du palonnier intérieur de S3
     c = c.cut(cyl_y(0, 0, M3 / 2, -40, 40))
@@ -149,7 +161,7 @@ def chape_cuisse():
         c = c.cut(cyl_y(HORN_PCD / 2 * math.cos(a), HORN_PCD / 2 * math.sin(a), HORN_HOLE / 2, -40, 40))
     c = c.cut(cyl_z(0, 0, T12 / 2, -TOP1 - 0.1, -TOP1 + SOCK))  # emmanchement du tube
     c = c.cut(box(-0.75, 0.75, -15, 15, -79, -66) if False else box(4, 14, -0.75, 0.75, -TOP1 - 1, -TOP1 + 16))  # fente
-    c = c.cut(cyl_x(9, -70, M3 / 2, -2, 14).rotate((0, 0, 0), (0, 0, 1), 90).translate((0, 0, 0)) if False else cyl_y(9.5, -TOP1 + 6, M3 / 2, -14, 14))
+    c = c.cut(cyl_x(9, -70, M3 / 2, -2, 14).rotate((0, 0, 0), (0, 0, 1), 90).translate((0, 0, 0)) if False else cyl_y(9.5, -TOP1 + 12, M3 / 2, -14, 14))
     c = c.cut(servo_corner_holes_y(-OFF, zf, +1, -30, 30))
     c = c.cut(cyl_y(12, -TOP1 + 3, M3 / 2, -25, 25))           # axe d'ancrage
     return c
@@ -165,72 +177,105 @@ def languette_genou():
 def raccord_tibia():
     joues = cyl_y(0, KZ, 20, 10.5, 18).union(cyl_y(0, KZ, 20, -18, -10.5))           # came r 20
     corps = box(-8.5, 8.5, -18, 18, KZ - TOP2, KZ - 12)
-    # levier du genou (B1) : pont au-dessus de la zone de S4, plaque dans le plan de B1
-    import math
-    b0 = math.radians(55)                                    # jambe tendue : bras à 55° vers le bas/arrière
+    b0 = math.radians(55)
     lx, lz = -ARM * math.cos(b0), KZ - ARM * math.sin(b0)
-    pont = box(-6, 6, 18, B1_Y + 2, KZ + 7, KZ + 15)         # au-dessus de l'écrou de la vis M5
-    plaque = (cq.Workplane("XZ").polyline([(-6, KZ + 7), (6, KZ + 7), (lx + 5, lz - 3), (lx - 5, lz + 3)]).close()
+    pont = box(-7, 7, 16, B1_Y + 2, KZ + 7, KZ + 19)          # 14 × 12 (8 MPa au blocage), au-dessus de l'écrou M5
+    gous = (cq.Workplane("XZ").polyline([(7, KZ + 7), (15, KZ + 7), (15, KZ - 3)]).close().extrude(-(B1_Y - 4 - 18)).translate((0, 18, 0)))
+    plaque = (cq.Workplane("XZ").polyline([(-7, KZ + 7), (7, KZ + 7), (lx + 5, lz - 3), (lx - 5, lz + 3)]).close()
               .extrude(-6).translate((0, B1_Y - 4, 0)))
-    moyeu = cyl_y(lx, lz, 5, B1_Y - 4, B1_Y + 2)
+    moyeu = cyl_y(lx, lz, 6, B1_Y - 4, B1_Y + 2)
     s4z = KZ - 35.0
     zf = s4z - (SL - S_END)
     cad = box(-OFF - SW / 2 - 3.5, -OFF + SW / 2 + 3.5, -SH / 2 - 3.5, SH / 2 + 3.5, zf - 3, s4z - 12)
-    pont4 = box(-OFF, -15, -20, 20, zf - 3, KZ - 50)
-    r = joues.union(corps).union(pont).union(plaque).union(moyeu).union(cad).union(pont4)
+    nerv = box(-OFF + SW / 2, -8, -3, 3, zf - 3, KZ - 50).union(box(-OFF + SW / 2, -8, -18, 18, zf - 3, zf + 2))   # nervures au lieu du bloc plein
+    r = joues.union(corps).union(pont).union(gous).union(plaque).union(moyeu).union(cad).union(nerv)
     r = r.cut(servo_pocket_vertical(-OFF, s4z))
     r = r.cut(servo_corner_holes_y(-OFF, zf, +1, -30, 30))
-    r = r.cut(box(-21, 21, -10.6, 10.6, KZ - 21, KZ + 21))   # place de la languette entre les joues
-    for ys in (1, -1):                                        # logements 625ZZ côté intérieur des joues
-        r = r.cut(cyl_y(0, KZ, BRG_D / 2, ys * 10.5 if ys > 0 else -10.5 - BRG_W, (10.5 + BRG_W) if ys > 0 else -10.5))
+    r = r.cut(box(-21, 21, -10.6, 10.6, KZ - 21, KZ + 21))
+    for ys in (1, -1):
+        r = r.cut(cyl_y(0, KZ, BRG_D / 2, 10.5 if ys > 0 else -10.5 - BRG_W, (10.5 + BRG_W) if ys > 0 else -10.5))
     r = r.cut(cyl_y(0, KZ, M5 / 2, -25, 25))
-    r = r.cut(cyl_y(lx, lz, INS / 2, B1_Y - 4.5, B1_Y + 2.5))  # insert M3 du levier
-    for (g0, g1) in ((13.5, 15.0), (-15.0, -13.5)):            # gorge du câble Dyneema sur la came (r 20 → 18,5)
+    r = r.cut(cyl_y(lx, lz, INS / 2, B1_Y - 4.5, B1_Y + 2.5))
+    for (g0, g1) in ((13.5, 15.0), (-15.0, -13.5)):
         r = r.cut(cyl_y(0, KZ, 21, g0, g1).cut(cyl_y(0, KZ, 18.5, g0 - 1, g1 + 1)))
-    for yc in (14.25, -14.25):                                 # trou du câble + insert du tendeur M3
-        r = r.cut(cyl_x(yc, KZ - 12, 1.0, 8, 22)).cut(cyl_y(15, KZ - 12, INS / 2, yc - 3.5, yc + 3.5))
-    for ty in (-10, 10):                                       # emmanchements des 2 tubes Ø10
+    for yc in (14.25, -14.25):
+        r = r.cut(cyl_x(yc, KZ - 12, 1.0, 8, 22)).cut(cyl_y(15, KZ - 12, INS / 2, yc - 4, yc + 4))
+    for ty in (-10, 10):
         r = r.cut(cyl_z(0, ty, T10 / 2, KZ - TOP2 - 0.1, KZ - TOP2 + SOCK))
-    r = r.cut(cyl_y(-OFF, s4z, HORN_D / 2 + 1, -MP - 1, -HORN_FACE + 4))   # dégagement du palonnier intérieur de S4
+    r = r.cut(cyl_y(0, KZ - TOP2 + 8, M3 / 2, -25, 25))                # goupille M3 à travers les deux tubes
+    r = r.cut(box(-4, 4, -3, 3, KZ - TOP2 + 22, KZ - 22))              # allègement entre les tubes
+    r = r.cut(cyl_y(-OFF, s4z, HORN_D / 2 + 1, -MP - 1, -HORN_FACE + 4))
     return r
 
 # ── 7. Bas de tibia (languette de cheville) ───────────────────────────────────
 def tibia_bas():
-    t = box(-9, 9, -18.5, 18.5, AZ, AZ + CLV).union(cyl_y(0, AZ, 10, -18.5, 18.5))
+    t = box(-8, 8, -18.5, 18.5, AZ, AZ + CLV).union(cyl_y(0, AZ, 10, -18.5, 18.5))
     for ty in (-10, 10):
         t = t.cut(cyl_z(0, ty, T10 / 2, AZ + CLV - SOCK, AZ + CLV + 1))
+    t = t.cut(cyl_y(0, AZ + CLV - 8, M3 / 2, -25, 25))                   # goupille M3 à travers les deux tubes
+    t = t.cut(box(-9, 9, -3.5, 3.5, AZ + 13, AZ + CLV - 12))              # allègement entre les tubes (sous la goupille)
     return t.cut(cyl_y(0, AZ, M5 / 2, -25, 25))
 
 # ── 8. Pied évidé + joues de cheville + levier de talon ───────────────────────
 def pied():
     talon, pointe, larg = FOOT
     sole = box(-talon, pointe, -larg / 2, larg / 2, GZ + 4, GZ + 8).edges("|Z").fillet(8)
-    for (x0, x1) in ((-28, -12), (12, 30), (36, 56)):
+    for (x0, x1) in ((-30, -14), (14, 32), (38, 58)):
         sole = sole.cut(box(x0, x1, -larg / 2 + 6, larg / 2 - 6, GZ + 3, GZ + 9).edges("|Z").fillet(3))
     joues = None
     for (y0, y1) in ((19, 25), (-25, -19)):
         j = box(-12, 12, y0, y1, GZ + 4, AZ).union(cyl_y(0, AZ, 12, y0, y1))
+        # goussets avant et arrière : la joue ne tient plus seulement par son pied
+        for sgn in (1, -1):
+            j = j.union(cq.Workplane("XZ").polyline([(sgn * 12, GZ + 8), (sgn * 12, GZ + 30), (sgn * 30, GZ + 8)]).close()
+                        .extrude(-(y1 - y0)).translate((0, y0, 0)))
         joues = j if joues is None else joues.union(j)
-    levier = box(-ARM - 5, -8, 25, B2_Y + 2, AZ - 5, AZ + 5).union(cyl_y(-ARM, AZ, 5, 25, B2_Y + 2))
-    p = sole.union(joues).union(levier)
+    traverse = box(-12, 12, -25, 25, GZ + 8, GZ + 13)                    # relie les joues sous la cheville
+    levier = box(-ARM - 5, -8, 25, B2_Y + 2, AZ - 5, AZ + 5).union(cyl_y(-ARM, AZ, 6, 25, B2_Y + 2))
+    bossages = None
+    for (bx, by) in SOLE_SCREWS:                                        # bossages des inserts de la semelle
+        b_ = cyl_z(bx, by, 4.5, GZ + 4, GZ + 11)
+        bossages = b_ if bossages is None else bossages.union(b_)
+    p = sole.union(joues).union(traverse).union(levier).union(bossages)
     p = p.cut(cyl_y(0, AZ, M5 / 2, -30, 30))
     p = p.cut(cyl_y(0, AZ, BRG_D / 2, 19, 19 + BRG_W)).cut(cyl_y(0, AZ, BRG_D / 2, -19 - BRG_W, -19))
+    for (bx, by) in SOLE_SCREWS:
+        p = p.cut(cyl_z(bx, by, INS / 2, GZ + 3, GZ + 10))
     return p.cut(cyl_y(-ARM, AZ, INS / 2, 24, B2_Y + 3))
+
+SOLE_SCREWS = ((-22, 18), (-22, -18), (45, 18), (45, -18))
+FSR = ((-24, 0), (8, 0), (52, 17), (52, -17))           # 4 capteurs de force FSR 402 (Ø18 actif)
+
+def semelle_tpu():
+    """Semelle TPU 95A, 4 mm : poches pour 4 FSR sur le dessus, rainures sous la semelle, 4 vis M3 fraisées."""
+    talon, pointe, larg = FOOT
+    s_ = box(-talon, pointe, -larg / 2, larg / 2, GZ, GZ + 4).edges("|Z").fillet(8)
+    s_ = s_.edges(">Z or <Z").chamfer(0.6)
+    for (fx, fy) in FSR:
+        s_ = s_.cut(cyl_z(fx, fy, 9.6, GZ + 3.2, GZ + 4.1))                 # poche FSR, 0,8 mm
+        s_ = s_.cut(box(fx - 1, fx + 1, fy, larg / 2 + 1, GZ + 3.2, GZ + 4.1) if fy >= 0 else box(fx - 1, fx + 1, -larg / 2 - 1, fy, GZ + 3.2, GZ + 4.1))  # passage de la queue
+    for i in range(-4, 13):                                              # rainures 1 mm sous la semelle
+        x = i * 7.5
+        if -talon + 4 < x < pointe - 4:
+            s_ = s_.cut(box(x - 1, x + 1, -larg / 2 + 5, larg / 2 - 5, GZ - 0.1, GZ + 1))
+    for (bx, by) in SOLE_SCREWS:
+        s_ = s_.cut(cyl_z(bx, by, M3 / 2, GZ - 1, GZ + 5)).cut(cyl_z(bx, by, 3.2, GZ - 1, GZ + 1.6))
+    return s_
 
 # ── 9. Bras de servo 22 mm et entretoises ─────────────────────────────────────
 def bras_servo():
-    import math
-    b = (cq.Workplane("XZ").circle(10).extrude(-4)
-         .union(cq.Workplane("XZ").polyline([(0, 6), (ARM, 4), (ARM, -4), (0, -6)]).close().extrude(-4))
-         .union(cq.Workplane("XZ").center(ARM, 0).circle(5).extrude(-4)))
-    b = b.cut(cq.Workplane("XZ").circle(M3 / 2).extrude(-5)).cut(cq.Workplane("XZ").center(ARM, 0).circle(M3 / 2).extrude(-5))
+    t = ARM_T
+    b = (cq.Workplane("XZ").circle(10).extrude(-t)
+         .union(cq.Workplane("XZ").polyline([(0, 7), (ARM, 5), (ARM, -5), (0, -7)]).close().extrude(-t))
+         .union(cq.Workplane("XZ").center(ARM, 0).circle(5.5).extrude(-t)))
+    b = b.cut(cq.Workplane("XZ").circle(M3 / 2).extrude(-t - 1)).cut(cq.Workplane("XZ").center(ARM, 0).circle(INS / 2).extrude(-t - 1))
     for i in range(HORN_N):
         a = 2 * math.pi * i / HORN_N + HORN_A0
-        b = b.cut(cq.Workplane("XZ").center(HORN_PCD / 2 * math.cos(a), HORN_PCD / 2 * math.sin(a)).circle(HORN_HOLE / 2).extrude(-5))
+        b = b.cut(cq.Workplane("XZ").center(HORN_PCD / 2 * math.cos(a), HORN_PCD / 2 * math.sin(a)).circle(HORN_HOLE / 2).extrude(-t - 1))
     return b
 
+
 def entretoise(h):
-    import math
     e = cq.Workplane("XZ").circle(10).extrude(-h).cut(cq.Workplane("XZ").circle(M3 / 2).extrude(-h - 1))
     for i in range(HORN_N):
         a = 2 * math.pi * i / HORN_N + HORN_A0
@@ -244,7 +289,7 @@ L_TIBIA = SEG - TOP2 - CLV + 2 * SOCK       # 135
 RE = 16.0                                   # centre de rotule → bout du tube de bielle
 ROD_D, ROD_DI = 4.0, 2.0                    # tube de bielle (Ø5 × 3 conseillé si disponible)
 B1_ROD, B2_ROD = B1_Y + 2 + 3, B2_Y + 2 + 3
-ENT_S3, ENT_S4 = MP + 11.5 - HORN_FACE, MP + 3.5 - HORN_FACE   # 14,4 et 6,4   # plan des rotules : contre la face extérieure du bras/levier + rondelle
+ENT_S3, ENT_S4 = MP + 11.5 + 4 - ARM_T - HORN_FACE, MP + 3.5 + 4 - ARM_T - HORN_FACE   # 12,4 et 4,4 (bras de 6 mm, face extérieure inchangée)   # plan des rotules : contre la face extérieure du bras/levier + rondelle
 
 def tube(d_ext, d_int, L):
     return cyl_z(0, 0, d_ext / 2, -L, 0).cut(cyl_z(0, 0, d_int / 2, -L - 1, 1))
@@ -276,9 +321,85 @@ def place_bras(centre, cible, y_face):
     b = b.translate((0, y_face - b.val().BoundingBox().ymin, 0))
     return b.rotate((0, 0, 0), (0, 1, 0), ang).translate((centre[0], 0, centre[1]))
 
-def place_entretoise(h, centre, y_face):
+def place_entretoise(h, centre, y_face, cible=None):
     e = entretoise(h)
-    return e.translate((centre[0], y_face - e.val().BoundingBox().ymin, centre[1]))
+    e = e.translate((0, y_face - e.val().BoundingBox().ymin, 0))
+    if cible is not None:
+        e = e.rotate((0, 0, 0), (0, 1, 0), math.degrees(math.atan2(-(cible[1] - centre[1]), cible[0] - centre[0])))
+    return e.translate((centre[0], 0, centre[1]))
+
+# ── Visserie (simplifiée : tige + tête, écrous hexagonaux) ────────────────────
+def vis(axis, p, sens, L, d):
+    """Vis d'axe x/y/z : tête posée en p (face d'appui), tige de longueur L dans le sens +1/-1 de l'axe."""
+    hd, hh = 1.8 * d, 0.6 * d
+    a0, a1 = sorted((0, sens * L)); h0, h1 = sorted((0, -sens * hh))
+    if axis == "x":
+        return cyl_x(p[1], p[2], d / 2, p[0] + a0, p[0] + a1).union(cyl_x(p[1], p[2], hd / 2, p[0] + h0, p[0] + h1))
+    if axis == "y":
+        return cyl_y(p[0], p[2], d / 2, p[1] + a0, p[1] + a1).union(cyl_y(p[0], p[2], hd / 2, p[1] + h0, p[1] + h1))
+    return cyl_z(p[0], p[1], d / 2, p[2] + a0, p[2] + a1).union(cyl_z(p[0], p[1], hd / 2, p[2] + h0, p[2] + h1))
+
+def ecrou(axis, p, sens, d):
+    """Écrou hexagonal posé en p (face d'appui), épaisseur 0,8 d dans le sens donné."""
+    e = cq.Workplane("XY").polygon(6, 2 * d).extrude(0.8 * d * sens)
+    if axis == "y":
+        e = e.rotate((0, 0, 0), (1, 0, 0), -90)
+    elif axis == "x":
+        e = e.rotate((0, 0, 0), (0, 1, 0), 90)
+    return e.translate(p)
+
+def croix(cx, cz, phi=0.0):
+    return [(cx + HORN_PCD / 2 * math.cos(phi + k * math.pi / 2), cz + HORN_PCD / 2 * math.sin(phi + k * math.pi / 2)) for k in range(4)]
+
+def visserie_jambe(pins):
+    """Toute la visserie d'une jambe droite, en place : {nom: forme}."""
+    pin_s3, pin_genou, pin_s4, pin_talon = pins
+    v = {}
+    def add(nom, f):
+        v[nom] = f if nom not in v else v[nom].union(f)
+    y_far = SL - S_END
+    # palonniers de S1 (étrier, avant et arrière) et de S2 (chape, extérieur et intérieur) : 4 vis M3 + vis centrale
+    for (yy, zz) in croix(0, S1_Z) + [(0, S1_Z)]:
+        add("vis_palonnier_S1", vis("x", (MP + 6, yy, zz), -1, 9, 3).union(vis("x", (-MP - 6, yy, zz), 1, 9, 3)))
+    for (xx, zz) in croix(0, 0) + [(0, 0)]:
+        add("vis_palonnier_S2", vis("y", (xx, MP + 5, zz), -1, 9, 3).union(vis("y", (xx, -MP - 5, zz), 1, 9, 3)))
+    # bras de S3 / S4 : 4 vis à travers bras + entretoise jusque dans le palonnier, suivant l'orientation du bras
+    for nom, c_, pin, yb in (("S3", (-OFF, -40), pin_s3, B1_Y + 2), ("S4", (-OFF, KZ - 35), pin_s4, B2_Y + 2)):
+        phi = math.atan2(pin[1] - c_[1], pin[0] - c_[0])
+        for (xx, zz) in croix(c_[0], c_[1], phi) + [c_]:
+            add(f"vis_bras_{nom}", vis("y", (xx, yb, zz), -1, yb - HORN_FACE + 4, 3))
+    # vis de boîtier M2 (2 par face, au bout opposé à l'arbre) : S1 sur x, S2/S3/S4 sur y
+    for dz in (-S_HOLE_Y, S_HOLE_Y):
+        for sx in (1, -1):
+            add("vis_boitier_S1", vis("x", (sx * (SH / 2 + HORN_T - 0.3), y_far - S_HOLE_X, S1_Z + dz), -sx, 12, 2))
+            add("vis_boitier_S2", vis("y", (-(SL - S_END) + S_HOLE_X, sx * (SH / 2 + 5.5), dz), -sx, 12, 2))
+    for nom, zc in (("S3", -40.0), ("S4", KZ - 35.0)):
+        zf = zc - (SL - S_END) + S_HOLE_X
+        for dx in (-S_HOLE_Y, S_HOLE_Y):
+            for sy in (1, -1):
+                add(f"vis_boitier_{nom}", vis("y", (-OFF + dx, sy * (SH / 2 + 3.5), zf), -sy, 12, 2))
+    # vis épaulées M5 : écrous
+    add("ecrou_M5", ecrou("y", (0, 18.2, KZ), 1, 5).union(ecrou("y", (0, 25.2, AZ), 1, 5)))
+    # rotules : vis M3 à travers l'œil dans le bras / le levier
+    for nom, pin, y_ext in (("B1", pin_s3, B1_ROD + 3), ("B1", pin_genou, B1_ROD + 3), ("B2", pin_s4, B2_ROD + 3), ("B2", pin_talon, B2_ROD + 3)):
+        add(f"vis_rotules_{nom}", vis("y", (pin[0], y_ext, pin[1]), -1, 16, 3))
+    # colliers et goupilles des tubes
+    add("vis_tubes", vis("y", (9.5, 12, -TOP1 + 12), -1, 25, 3).union(ecrou("y", (9.5, -12, -TOP1 + 12), -1, 3)))
+    add("vis_tubes", vis("x", (10, 0, KZ + CLV - 6), -1, 25, 3).union(ecrou("x", (-10, 0, KZ + CLV - 6), -1, 3)))
+    add("vis_tubes", vis("y", (0, 18, KZ - TOP2 + 8), -1, 40, 3).union(ecrou("y", (0, -18, KZ - TOP2 + 8), -1, 3)))
+    add("vis_tubes", vis("y", (0, 18.5, AZ + CLV - 8), -1, 40, 3).union(ecrou("y", (0, -18.5, AZ + CLV - 8), -1, 3)))
+    # ressorts : axe d'ancrage M3 × 45 + tendeurs de câble
+    add("vis_ressorts", vis("y", (12, 20, -TOP1 + 3), -1, 45, 3).union(ecrou("y", (12, -20, -TOP1 + 3), -1, 3)))
+    for yc in (14.25, -14.25):
+        sy = 1 if yc > 0 else -1
+        add("vis_ressorts", vis("y", (15, sy * 18, KZ - 12), -sy, 7, 3))
+    # semelle : 4 vis M3 fraisées par dessous ; berceau de S1 sous la plaque de bassin
+    for (bx, by) in SOLE_SCREWS:
+        add("vis_semelle", vis("z", (bx, by, GZ + 1.6), 1, 8, 3))
+    ztop = S1_Z + SW / 2 + 0.15 + 6
+    for x in (-12, 12):
+        add("vis_berceau_S1", vis("z", (x, 40, ztop), -1, 12, 3))
+    return v
 
 # ── Maquettes (non imprimées) pour l'assemblage ───────────────────────────────
 def servo_maquette(axis, center, shaft_end_dir, body_dir):
@@ -314,9 +435,9 @@ def composants_jambe():
     pin_s4, pin_talon = (-OFF - ARM, KZ - 35), (-ARM, AZ)
     c["bielle_B1"] = (bielle(pin_s3, pin_genou, B1_ROD)[0], orange)
     c["bielle_B2"] = (bielle(pin_s4, pin_talon, B2_ROD)[0], orange)
-    c["entretoise_S3"] = (place_entretoise(ENT_S3, (-OFF, -40), HORN_FACE), pla)
+    c["entretoise_S3"] = (place_entretoise(ENT_S3, (-OFF, -40), HORN_FACE, pin_s3), pla)
     c["bras_S3"] = (place_bras((-OFF, -40), pin_s3, HORN_FACE + ENT_S3), pla)
-    c["entretoise_S4"] = (place_entretoise(ENT_S4, (-OFF, KZ - 35), HORN_FACE), pla)
+    c["entretoise_S4"] = (place_entretoise(ENT_S4, (-OFF, KZ - 35), HORN_FACE, pin_s4), pla)
     c["bras_S4"] = (place_bras((-OFF, KZ - 35), pin_s4, HORN_FACE + ENT_S4), pla)
     for n, (y, z) in {"625_genou_ext": (13.0, KZ), "625_genou_int": (-13.0, KZ),
                       "625_cheville_ext": (21.5, AZ), "625_cheville_int": (-21.5, AZ)}.items():
@@ -325,6 +446,10 @@ def composants_jambe():
     c["vis_M5_cheville"] = (vis_epaulee_m5(56).translate((0, 0, AZ)), acier)
     for ys in (14.5, -14.5):
         c[f"ressort_{'ext' if ys > 0 else 'int'}"] = (ressort().translate((12, ys, -TOP1 - 1)), vert)
+    tpu = cq.Color(0.33, 0.42, 0.38)
+    c["semelle_TPU"] = (c.pop("semelle_TPU")[0], tpu)
+    for n, f in visserie_jambe((pin_s3, pin_genou, pin_s4, pin_talon)).items():
+        c[n] = (f, cq.Color(0.45, 0.45, 0.48))
     return c, (pin_s3, pin_genou, pin_s4, pin_talon)
 
 PIECES = {
@@ -337,8 +462,9 @@ PIECES = {
     "07_tibia_bas": tibia_bas,
     "08_pied": pied,
     "09_bras_servo_22": bras_servo,
-    "10_entretoise_S3_14_4": lambda: entretoise(ENT_S3),
-    "11_entretoise_S4_6_4": lambda: entretoise(ENT_S4),
+    "10_entretoise_S3_12_4": lambda: entretoise(ENT_S3),
+    "11_entretoise_S4_4_4": lambda: entretoise(ENT_S4),
+    "16_semelle_TPU": semelle_tpu,
 }
 
 if __name__ == "__main__":
