@@ -39,7 +39,7 @@ Sous-total 135,03 € HT port compris ; prévoir la **TVA d'import (19 %, ≈ 26
 | 0,5 m | Tube carbone **Ø12 × 10** | cuisses, 2 × 130 mm |
 | 1 m | Tube carbone **Ø10 × 8** | tibias, 4 × 135 mm |
 | 1 m | Tube carbone **Ø5 × 3** | bielles : 2 × 130 mm (B1) + 2 × 135 mm (B2) |
-| 5 + 5 | **Ressorts de traction inox 304 à anneaux** (AliExpress, HotXYZ) : fil **1,2 mm × Ø8 × 60 mm** (5 pcs) + **1,2 × Ø9 × 60** (5 pcs) pour comparer | genoux, V1 : ≈ 1,5 N/mm, limiter à ≈ 45 N par ressort (≈ 70 % de l'aide prévue) ; cible finale fil 1,4 × Ø10–11 × 58 mm, 1,75 N/mm |
+| 4 + 2 | **Ressorts de traction 65Mn, fil 1,4 mm** (AliExpress, magasin Jindong) : **4 × Ø10 × 60 mm** + 2 × Ø11 × 60 mm pour comparer | genoux : Ø10 ≈ 1,8–1,9 N/mm (la cible), Ø11 ≈ 1,4 N/mm ; crochets ouverts à refermer à la pince |
 | 1 m | Câble acier gainé Ø1 | ressort → came du genou |
 | 8 | Résistances 10 kΩ | pont diviseur des RFP602 (valeur à ajuster au banc) |
 | 1 | Fusible lame 20 A + porte-fusible, prises XT60, câble silicone 14 AWG, alarme LiPo | banc 12 V |
