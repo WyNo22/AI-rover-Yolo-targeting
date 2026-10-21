@@ -9,7 +9,7 @@ Pièces imprimées d'une jambe, générées par `jambe_cad.py` (CadQuery). Les c
 | `03_etrier_roulis_berceau_S2` | étrier de roulis + berceau de S2 | 2 (miroir) |
 | `04_chape_cuisse_berceau_S3` | chape en U de cuisse + berceau de S3 + ancrage des ressorts | 2 (miroir) |
 | `05_languette_genou` | bas de cuisse, tube Ø12 | 2 |
-| `06_raccord_tibia_berceau_S4` | joues-cames du genou + levier B1 en cadre fermé (pont, arc, colonne) + berceau de S4 + 2 tubes Ø10 | 2 (miroir) |
+| `06_raccord_tibia_berceau_S4` | refait simple : corps extrudé (disque du genou + pavé des tubes) fendu pour la languette, berceau de S4, levier B1 en bague + plaque, bloc passe-câble + pion côté intérieur | 2 (miroir) |
 | `07_tibia_bas` | languette de cheville, 2 tubes Ø10 | 2 |
 | `08_pied` | pied 100 × 65, dessous plein (collage), poches par le dessus, joues en A + levier de talon intégré | 2 (miroir) |
 | `09_bras_servo_22` | bras de 22 mm (S3, S4) | 4 |
@@ -43,6 +43,12 @@ portés par chaque pièce pendant ces mouvements.
 3. Imprimer un test d'emmanchement (Ø16,15 pour les 625ZZ, Ø12,2 / Ø10,2 pour les tubes) et ajuster `JEU`, `BRG_D`, `T12`, `T10`.
 
 Régénérer : `pip install cadquery` puis `python jambe_cad.py`.
+
+## Raccord de tibia refait (après Rév. I)
+
+L'ancienne pièce 06 était **géométriquement invalide** (deux faces cylindriques confondues entre l'arc du levier et la
+colonne) : c'est ce qui la cassait à l'import dans SolidWorks. Nouvelle version en volumes simples avec des
+recouvrements francs ; toutes les pièces sont désormais vérifiées valides après un aller-retour STEP.
 
 ## Navigation (après Rév. I)
 

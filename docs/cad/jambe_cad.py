@@ -228,49 +228,59 @@ def languette_genou():
     return l
 
 # ── 6. Raccord haut de tibia : joues + came + levier du genou + berceau de S4 + 2 emmanchements
+def enveloppe_2_cercles(c1, r1, c2, r2):
+    """Contour XZ convexe de deux cercles (« trombone ») : tangentes extérieures + arcs."""
+    dx, dz = c2[0] - c1[0], c2[1] - c1[1]
+    d = math.hypot(dx, dz)
+    a = math.atan2(dz, dx)
+    b = math.acos((r1 - r2) / d)
+    def p(c, r, t):
+        return (c[0] + r * math.cos(t), c[1] + r * math.sin(t))
+    return (cq.Workplane("XZ").moveTo(*p(c1, r1, a + b)).lineTo(*p(c2, r2, a + b))
+            .threePointArc(p(c2, r2, a), p(c2, r2, a - b)).lineTo(*p(c1, r1, a - b))
+            .threePointArc(p(c1, r1, a + math.pi), p(c1, r1, a + b)).close())
+
 def raccord_tibia():
-    joues = cyl_y(0, KZ, 20, 10.5, 18).union(cyl_y(0, KZ, 20, -18, -10.5))           # came r 20
-    corps = box(-8.5, 8.5, -18, 18, KZ - TOP2, KZ - 12)
+    """Haut de tibia, refait simple : un corps extrudé (disque du genou + pavé des tubes), une fente pour la languette
+    qui forme les deux joues, le berceau de S4 qui recouvre franchement le corps, le levier B1 en bague + plaque
+    (trou dans l'axe pour la vis M5 et la clé), et côté intérieur un seul bloc passe-câble + flasque + pion."""
     b0 = math.radians(55)
-    lx, lz = -ARM * math.cos(b0), KZ - ARM * math.sin(b0)
-    pont = box(-7, 7, 16, B1_Y + 2, KZ + 7, KZ + 19)          # 14 × 12 (8 MPa au blocage), au-dessus de l'écrou M5
-    gous = (cq.Workplane("XZ").polyline([(7, KZ + 7), (15, KZ + 7), (15, KZ - 3)]).close().extrude(-(B1_Y - 4 - 18)).translate((0, 18, 0)))
-    # levier : arc de 8 mm autour de l'axe (laisse passer la vis M5 et la clé), du pont jusqu'au moyeu,
-    # plus une colonne qui ramène le moyeu sur la joue : cadre fermé joue / pont / arc / colonne
-    def pol(r, a):
-        return (r * math.cos(math.radians(a)), KZ + r * math.sin(math.radians(a)))
-    a0, a1 = 70.0, 180.0 + 55.0
-    plaque = (cq.Workplane("XZ").moveTo(*pol(10, a0)).lineTo(*pol(21, a0)).threePointArc(pol(21, (a0 + a1) / 2), pol(21, a1))
-              .lineTo(*pol(10, a1)).threePointArc(pol(10, (a0 + a1) / 2), pol(10, a0)).close()
-              .extrude(-8).translate((0, B1_Y - 6, 0)))
-    moyeu = cyl_y(lx, lz, 6.5, 15.5, B1_Y + 2)                     # colonne jusqu'à la joue (hors gorge du câble)
+    lx, lz = -ARM * math.cos(b0), KZ - ARM * math.sin(b0)          # moyeu du levier B1
     s4z = KZ - 35.0
     zf = s4z - (SL - S_END)
+    corps = cyl_y(0, KZ, 20, -18, 18).union(box(-12.5, 8.5, -18, 18, KZ - TOP2, KZ - 8))
     cad = box(-OFF - SW / 2 - 3.5, -OFF + SW / 2 + 3.5, -SH / 2 - 3.5, SH / 2 + 3.5, zf - 3, s4z - 12).edges("|Z").fillet(3)
-    nerv = box(-OFF + SW / 2, -8, -3, 3, zf - 3, KZ - 50).union(box(-OFF + SW / 2, -8, -18, 18, zf - 3, zf + 2))   # nervures au lieu du bloc plein
-    guide = passe_cable(-6, -27, KZ - 24, KZ - 16, (-10, -2), (-30, -17.5))
-    # pion coaxial au genou : le câble s'enroule dessus (longueur quasi constante), joue extérieure + bras vers le passe-câble
-    guide = (guide.union(cyl_y(0, KZ, 2.5, -28.5, -23.2)).union(cyl_y(0, KZ, 6, -30, -28.5))
-             .union(box(-4, 2, -30, -28.5, KZ - 20, KZ)))
-    r = joues.union(corps).union(pont).union(gous).union(plaque).union(moyeu).union(cad).union(nerv).union(guide)
-    r = r.cut(servo_pocket_vertical(-OFF, s4z))
-    r = r.cut(servo_corner_holes_y(-OFF, zf, +1, -30, 30))
-    r = r.cut(box(-21, 21, -10.6, 10.6, KZ - 21, KZ + 21))
+    # levier B1 (côté extérieur) : bague r14 de la joue au plan du levier, puis plaque axe ↔ moyeu de 8 mm
+    bague = cyl_y(0, KZ, 14, 16, B1_Y - 6)
+    levier = enveloppe_2_cercles((0, KZ), 15, (lx, lz), 7).extrude(-8.5).translate((0, B1_Y - 6.5, 0))   # r15 ≠ r14 : pas de faces confondues
+    # côté intérieur : passe-câble + flasque + pion coaxial du genou (le câble s'enroule sur le pion)
+    guide = box(-10, -2, -30, -15.5, KZ - 24, KZ - 16).edges("|Z").fillet(1.5)
+    flasque = cyl_y(0, KZ, 6, -31, -29).union(box(-4, 2, -31, -29, KZ - 20, KZ))
+    pion = cyl_y(0, KZ, 2.5, -29.5, -23.2)
+    r = corps.union(cad).union(bague).union(levier).union(guide).union(flasque).union(pion).clean()
+    # coupes : genou
+    r = r.cut(box(-21, 21, -10.6, 10.6, KZ - 21, KZ + 21))                       # fente de la languette → 2 joues
     for ys in (1, -1):
         r = r.cut(cyl_y(0, KZ, BRG_D / 2, 10.5 if ys > 0 else -10.5 - BRG_W, (10.5 + BRG_W) if ys > 0 else -10.5))
-    r = r.cut(cyl_y(0, KZ, M5 / 2, -25, 25))
-    r = r.cut(cyl_y(lx, lz, INS / 2, 24, B1_Y + 2.5))
-    for (g0, g1) in ((13.5, 15.0), (-15.0, -13.5)):
+    r = r.cut(cyl_y(0, KZ, M5 / 2, -24, 24)).cut(cyl_y(0, KZ, 5.5, 17, B1_Y + 3))   # vis M5, passage tête + clé
+    for (g0, g1) in ((13.5, 15.0), (-15.0, -13.5)):                               # gorges des câbles de ressort
         r = r.cut(cyl_y(0, KZ, 21, g0, g1).cut(cyl_y(0, KZ, 18.5, g0 - 1, g1 + 1)))
-    for yc in (14.25, -14.25):
+    for yc in (14.25, -14.25):                                                    # tendeurs des ressorts
         r = r.cut(cyl_x(yc, KZ - 12, 1.0, 8, 22)).cut(cyl_y(15, KZ - 12, INS / 2, yc - 4, yc + 4))
+    r = r.cut(cyl_y(lx, lz, INS / 2, B1_Y - 7, B1_Y + 2.5))                      # insert du moyeu B1
+    # tubes
     for ty in (-10, 10):
         r = r.cut(cyl_z(0, ty, T10 / 2, KZ - TOP2 - 0.1, KZ - TOP2 + SOCK))
-    r = r.cut(cyl_y(0, KZ - TOP2 + 8, M3 / 2, -25, 25))                # goupille M3 à travers les deux tubes
-    r = r.cut(box(-4, 4, -3, 3, KZ - TOP2 + 22, KZ - 22))              # allègement entre les tubes
-    r = r.cut(cyl_y(-OFF, s4z, HORN_D / 2 + 1, -MP - 1, -HORN_FACE_C + 4))
+    r = r.cut(cyl_y(0, KZ - TOP2 + 8, M3 / 2, -25, 25))                          # goupille M3 à travers les deux tubes
+    r = r.cut(box(-4, 4, -3, 3, KZ - TOP2 + 22, KZ - 24))                        # allègement entre les tubes
+    r = r.cut(box(-8, 4.5, -19, 19, KZ - 48, KZ - 30).edges("|Y").fillet(3))    # évidement traversant sous le genou
+    # S4
+    r = r.cut(servo_pocket_vertical(-OFF, s4z))
+    r = r.cut(servo_corner_holes_y(-OFF, zf, +1, -30, 30))
+    r = r.cut(cyl_y(-OFF, s4z, HORN_D / 2 + 1, -MP - 1, -HORN_FACE_C + 4))        # palonnier fou de S4
     r = r.cut(fenetre_connecteurs(-OFF, s4z))
-    return r.cut(cyl_z(-6, -27, 1.9, KZ - 30, KZ - 10))
+    r = r.cut(cyl_z(-6, -27, 1.9, KZ - 30, KZ - 10))                              # trou du passe-câble
+    return cq.Workplane().add(max(r.solids().vals(), key=lambda v: v.Volume()))
 
 # ── 7. Bas de tibia (languette de cheville) ───────────────────────────────────
 def tibia_bas():

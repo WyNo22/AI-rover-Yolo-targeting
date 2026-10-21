@@ -5,9 +5,9 @@ Pièces imprimées : PETG à 60 % de densité effective (4 parois, gyroïde 40 %
 | Ensemble | Masse |
 |---|---|
 | bassin | 55 g |
-| jambes (×2) | 1215 g |
+| jambes (×2) | 1216 g |
 | buste (estimé) | 1153 g |
-| **Total** | **2423 g** |
+| **Total** | **2424 g** |
 
 Centre de gravité : **467 mm au-dessus du sol** (+17 mm par rapport à l'axe de hanche), -3.0 mm en x.
 
@@ -21,7 +21,7 @@ Centre de gravité : **467 mm au-dessus du sol** (+17 mm par rapport à l'axe de
 | jambes (×2) | S2 | 110.0 g |
 | jambes (×2) | S3 | 110.0 g |
 | jambes (×2) | S4 | 110.0 g |
-| jambes (×2) | raccord_tibia_berceau_S4 | 99.5 g |
+| jambes (×2) | raccord_tibia_berceau_S4 | 100.9 g |
 | buste (estimé) | Pi5_AI_HAT_ventilo | 90.0 g |
 | jambes (×2) | pied | 80.4 g |
 | buste (estimé) | Pico2_regulateur_capteurs | 80.0 g |
