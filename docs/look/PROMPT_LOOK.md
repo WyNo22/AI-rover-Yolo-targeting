@@ -2,86 +2,82 @@
 
 ## Images à joindre
 
-1. `docs/look/planche_style.png` : silhouettes aux vraies proportions (face / profil), deux variantes de couleurs, palette.
-2. `docs/look/visages_eink.png` : les 8 expressions de l'écran e-ink du visage.
-3. `docs/cad/apercu_robot_complet.png` et `docs/cad/apercu_navigation.png` : la CAO réelle du robot.
-4. **Photos de LEONARDO (Caltech)**, l'inspiration principale, à télécharger soi-même :
+1. **Photos de LEONARDO (Caltech)**, l'inspiration principale, à télécharger soi-même :
    - page du projet : https://aerospacerobotics.caltech.edu/leonardo
    - article et couverture *Science Robotics*, oct. 2021 (LEONARDO en équilibre sur une jambe) : https://authors.library.caltech.edu/records/a3y6x-12v73
    - photos skate : https://community.element14.com/technologies/industrial-automation-space/b/blog/posts/caltech-s-bipedal-robot-can-ride-a-skateboard
+2. **Une ou deux photos du casque de RoboCop (1987)** : pour la visière en bandeau et l'attitude.
+3. `docs/cad/apercu_robot_complet.png` et `docs/cad/apercu_navigation.png` : la CAO réelle (mécanique, proportions).
+4. `docs/look/planche_style.png` : **seulement pour les proportions** (face / profil). Ses couleurs et ses visages ne sont plus d'actualité.
 
-## Direction artistique (résumé)
+## Direction artistique retenue
 
-- **Inspiration principale : LEONARDO** (Caltech). Bipède noir et technique, jambes fines en carbone, mécanique visible,
-  propulseurs sur les épaules. Il doit avoir l'air **sérieux et impressionnant**, pas d'un jouet.
-- **Touche de caractère** : un petit **visage e-ink** (deux yeux expressifs sur papier gris chaud) qui le rend attachant.
-- **Couleurs** : **noir mat + carbone** dominants, **sable / beige** sur les coques (torse, haut des cuisses, cerclage
-  des carénages d'hélices, chants des semelles), **une seule touche ambre** (liseré d'état). Le gris chaud du papier
-  e-ink répond au sable.
-- **Références de style** : produits noir et beige façon Braun / Dieter Rams et Teenage Engineering (sobre, précis),
-  drones FPV en carbone mat, Disney BDX pour l'expressivité.
+- **Ambiance :** LEONARDO × RoboCop. Sérieux, un peu menaçant, mécanique, militaire. Pas de rondeurs, pas de look jouet.
+- **Couleurs :** noir mat + carbone pour toute la mécanique ; **sable militaire** pour quelques plaques d'armure ;
+  **PETG blanc translucide dépoli** pour la visière uniquement.
+- **Formes :** mécanique nue comme LEONARDO, avec seulement quelques plaques facettées à arêtes vives
+  (casque, plastron, protections de cuisse).
+- **Une seule lumière : la visière.** Fente lumineuse diffusée (on ne voit ni écran ni LED), dont la forme et la
+  couleur changent : ambre au repos, blanc en écoute, rouge en colère ou STOP.
+- **Plastron :** une plaque e-ink façon matricule militaire (« LEO-S », état, batterie), noir sur gris, non lumineuse.
 
 ## Prompt principal (anglais)
 
 ```
-Product concept render of "LEO-S", a small bipedal robot with thrusters, about 80 cm tall, inspired by Caltech's
-LEONARDO robot. Serious, technical, impressive, not a toy.
+Product concept render of "LEO-S", a small bipedal robot with thrusters, about 80 cm tall. Design language: Caltech's
+LEONARDO robot crossed with RoboCop. Serious, slightly menacing, military, mechanical. Not cute, not a toy.
 
 Body layout, no arms:
-- Two slim legs, each with 4 joints: hip roll, hip pitch, knee, ankle. The knee and ankle are driven remotely by thin
-  carbon push rods from compact black servos mounted high (one behind the thigh near the hip, one at the top of the
-  shin), so the lower legs are light and slender.
-- Thigh: a single black carbon fiber tube (12 mm) between printed joint housings. Shin: two parallel thin carbon tubes
-  (10 mm). The knee is a round cam joint with exposed bearings and two small extension springs on the front of the
-  thigh. Flat rectangular feet (10 x 6.5 cm) with a thin rubber sole.
-- Compact boxy torso (12 x 9 x 15 cm) above a flat pelvis plate, with rounded-corner shell panels.
-- At shoulder height, a carbon fiber H-frame carries four 5-inch propellers in thin circular ducts (two each side,
+- Two slim legs with exposed mechanics, like LEONARDO. Each leg has 4 joints: hip roll, hip pitch, knee, ankle. The
+  knee and ankle are driven by thin black carbon push rods from compact black servos mounted high (one behind the
+  thigh near the hip, one at the top of the shin), so the lower legs are light and slender.
+- Thigh: a single black carbon fiber tube between angular black joint housings, covered on the front by a faceted
+  military-sand armor plate. Shin: two parallel thin black carbon tubes. Knee: round cam joint with visible bearings
+  and two small steel extension springs on the front of the thigh. Flat angular feet (10 x 6.5 cm) with a thin black
+  rubber sole.
+- Compact torso (12 x 9 x 15 cm) above a flat black pelvis plate, protected by a faceted, chamfered military-sand
+  chest plate with sharp edges. On the chest plate, a small e-paper tag (2 inch) shows "LEO-S" and a status line in
+  black on grey, like a military ID plate. It does not glow.
+- At shoulder height, a black carbon fiber H-frame carries four 5-inch propellers in thin black ducts (two each side,
   front and back), tilted 15 degrees outward. Span about 48 cm.
-- Small rounded head on a short neck (pan/tilt). The front of the head is an e-paper face showing two simple rounded
-  black eyes on warm grey paper. A tiny camera lens sits above the face. A short round LiDAR puck (4 cm) on top of
-  the head.
+- Head: a compact angular helmet in matte black and military sand on a short neck, with a narrow horizontal visor
+  band across the front, RoboCop style. The visor is frosted white translucent plastic, lit from behind: a thin
+  glowing amber slit, soft and diffused, the only light source on the whole robot. A tiny dark camera lens under the
+  visor. A short round black LiDAR puck (4 cm) on top of the helmet.
 
-Materials and colors: matte black 3D-printed parts with a fine layer texture, black twill carbon fiber, black
-serial-bus servos with small brushed aluminum horns, sand / beige matte shell panels on the torso, upper thighs and
-duct rims, warm grey e-paper face, a single thin amber status line on the chest. Visible screws and precise
-engineering details.
+Materials: matte black 3D-printed parts with a fine layer texture, black twill carbon fiber, black servos with small
+brushed aluminum horns, matte military-sand armor plates, frosted translucent white visor, visible hex screws,
+precise engineering details. No other lights, no LEDs anywhere else.
 
-Shot: three-quarter front view, full body, standing in a neutral pose, studio lighting on a seamless light warm-grey
-background, soft shadows, 85 mm lens, high detail, photorealistic industrial design render.
+Shot: three-quarter front view, full body, standing still, head slightly lowered, looking at the camera. Moody studio
+lighting on a dark grey seamless background, hard rim light, soft shadows, 85 mm lens, high detail, photorealistic
+industrial design render.
 ```
-
-### Variantes (remplacer le paragraphe « Materials and colors »)
-
-- **A, noir intégral** : `all matte black and carbon fiber, graphite grey torso shell, no beige, only the warm grey
-  e-paper face and a thin amber status line break the black.`
-- **B, noir + sable** (préférée) : le texte ci-dessus.
-- **C, sable dominant** : `sand / beige printed structural parts, with black carbon tubes, black servos and black
-  ducts as contrast.`
 
 ### Mises en scène (remplacer le paragraphe « Shot »)
 
-- `jumping over a 30 cm concrete step in a city street at dusk, thrusters spinning with motion blur, legs tucked, dynamic action shot`
-- `descending outdoor stairs while hovering on its thrusters, feet just touching the next step, urban setting, golden hour`
-- `riding a skateboard on a smooth plaza, balancing with its thrusters, low angle shot`
-- `kicking a small soccer ball on artificial turf, one leg extended, e-paper face showing happy eyes`
-- `close-up of the head: e-paper face with focused eyes, LiDAR puck on top, shallow depth of field`
+- `jumping over a 30 cm concrete step in a city street at night, thrusters spinning with motion blur, legs tucked, visor glowing amber, dynamic action shot`
+- `descending outdoor stairs while hovering on its thrusters, feet just touching the next step, wet street at dusk, visor glowing amber`
+- `riding a skateboard on an empty concrete plaza, balancing with its thrusters, low angle shot`
+- `standing guard in a dark garage, visor glowing red, menacing low angle shot`
+- `close-up of the helmet: frosted visor with a narrow amber glowing slit, LiDAR puck on top, shallow depth of field`
+
+### États de la visière (pour des gros plans)
+
+| État | Texte à mettre dans le prompt |
+|---|---|
+| neutre | `a thin, dim amber glowing slit` |
+| écoute | `the slit opens wider and glows soft white` |
+| suivi | `a short amber glowing segment shifted toward one side, tracking` |
+| recherche | `an amber light bar sweeping left to right, scanner style` |
+| concentré | `a very thin, bright amber slit with its ends angled down toward the center, intense look` |
+| colère / STOP | `a red glowing V-shaped slit` |
+| fatigué | `a dim amber slit drooping, flickering` |
 
 ### Prompt négatif
 
 ```
-humanoid arms, human face, cartoon, toy, glossy plastic, chrome, LEDs everywhere, RGB lighting, bulky armor,
-thick legs, wheels, extra limbs, text, watermark
+cute, toy, cartoon, rounded bubbly shapes, big eyes, human face, humanoid arms, glossy plastic, chrome, white plastic
+body, LEDs or glowing lines on the body, RGB gaming lights, bulky armor, thick legs, wheels, extra limbs, text,
+watermark
 ```
-
-## Expressions de l'écran e-ink (visages_eink.png)
-
-| Expression | Quand |
-|---|---|
-| neutre | au repos |
-| écoute | main levée vue, attend un ordre |
-| content | ordre compris, salut (coucou) |
-| suivi | suit le propriétaire (yeux tournés vers lui) |
-| concentré | se prépare à sauter |
-| surpris | obstacle imprévu, poussée, chute évitée |
-| fatigué | batterie faible |
-| STOP | arrêt d'urgence |
