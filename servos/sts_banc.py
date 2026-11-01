@@ -169,7 +169,10 @@ class Bus:
         self.ecrire(sid, CONSIGNE, (pos & 0xFF, pos >> 8, 0, 0, vitesse & 0xFF, vitesse >> 8))
         self.ecrire8(sid, COUPLE_ON, 1)
 
-    def attendre(self, sid, cible, tol=15, delai=4.0):
+    def attendre(self, sid, cible, tol=15, delai=None, vitesse=600):
+        """Attend que le servo arrive ; le délai par défaut dépend de la distance à parcourir."""
+        if delai is None:
+            delai = abs(self.lire16(sid, POSITION) - cible) / max(vitesse, 1) + 1.5
         t0 = time.monotonic()
         while time.monotonic() - t0 < delai:
             if abs(self.lire16(sid, POSITION) - cible) <= tol:
@@ -236,11 +239,12 @@ def cmd_installer(bus):
         if old != nid and not bus.changer_id(old, nid):
             sys.exit(f"  ✗ le servo ne répond plus en ID {nid} : relance « scan »")
         verifier_tension(bus, nid)
-        bus.aller(nid, CENTRE, vitesse=300)
-        bus.attendre(nid, CENTRE)
+        bus.aller(nid, CENTRE, vitesse=800)
+        au_centre = bus.attendre(nid, CENTRE, vitesse=800)
         afficher_info(bus, nid)
         bus.ecrire8(nid, COUPLE_ON, 0)
-        print(f"  ✓ ID {nid} fait, servo au centre. Étiquette « {nid} », débranche-le.\n")
+        etat = "servo au centre" if au_centre else "⚠ centre non atteint (refaire « centre » plus tard)"
+        print(f"  ✓ ID {nid} fait, {etat}. Étiquette « {nid} », débranche-le.\n")
     print("Les 8 servos ont leur ID. Rebranche-les en chaîne et lance « scan » pour vérifier.")
 
 
@@ -307,12 +311,14 @@ def main():
         elif a.cmd == "centre":
             for i in a.ids:
                 verifier_tension(bus, i)
-                bus.aller(i, CENTRE, vitesse=300)
+                bus.aller(i, CENTRE, vitesse=800)
             for i in a.ids:
-                print(f"ID {i} au centre" if bus.attendre(i, CENTRE) else f"ID {i} : centre non atteint")
+                ok = bus.attendre(i, CENTRE, vitesse=800)
+                print(f"ID {i} au centre ({bus.lire16(i, POSITION)})" if ok else f"ID {i} : ⚠ centre non atteint ({bus.lire16(i, POSITION)})")
+            print("Couple maintenu : les servos tiennent le centre. « couple <ID> off » pour les libérer.")
         elif a.cmd == "move":
             bus.aller(a.id, a.pos, vitesse=a.vitesse)
-            bus.attendre(a.id, a.pos)
+            bus.attendre(a.id, a.pos, vitesse=a.vitesse)
             afficher_info(bus, a.id)
         elif a.cmd == "test":
             verifier_tension(bus, a.id)
