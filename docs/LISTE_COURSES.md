@@ -25,7 +25,7 @@ presque gratuit. ✅ = déjà possédé · 🛒 = dans un panier · 📦 = comma
 | 2 × 500 mm | Tube carbone **Ø12 × 10** | cuisses, 2 × 130 mm |
 | 2 × 500 mm | Tube carbone **Ø10 × 8** | tibias, 4 × 135 mm |
 | 2 × 500 mm | Tube carbone **Ø5 × 3** | bielles : 2 × 130 mm (B1) + 2 × 135 mm (B2) |
-| 4 | Ressorts de traction 65Mn **fil 1,4 × Ø10 × 60 mm** | genoux ; crochets ouverts à refermer à la pince |
+| 4 | Ressorts de traction 65Mn **fil 1,4 × Ø10 × 60 mm** (AliExpress, magasin Jindong) | genoux ; crochets ouverts à refermer à la pince. **Dyneema réglé pour que le ressort tire de ~40° à 110° de flexion** (≈ 24 mm d'allongement, ≈ 45–50 N) : énergie stockée en accroupi profond, rendue au saut |
 | 10 | Roulements **625ZZ** | genoux et chevilles (8 utilisés) |
 | 6 | **RFP602 5 kg** | 3 capteurs de force par pied (talon + 2 pointes) |
 | 2 | **ADS1015** | 1 par pied, lit ses 3 capteurs (adresses 0x48 / 0x49) |
