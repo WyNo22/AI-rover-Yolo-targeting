@@ -37,16 +37,17 @@ PC ou Pi ──USB-C──► adaptateur ──câble 3 broches──► servo
 
    | ID | Articulation |
    |---|---|
-   | 1 | jambe G · S1 roulis de hanche |
-   | 2 | jambe G · S2 tangage de hanche |
-   | 3 | jambe G · S3 genou |
-   | 4 | jambe G · S4 cheville |
-   | 5 | jambe D · S1 roulis de hanche |
-   | 6 | jambe D · S2 tangage de hanche |
-   | 7 | jambe D · S3 genou |
-   | 8 | jambe D · S4 cheville |
+   | 1 | jambe D · S1 roulis de hanche |
+   | 2 | jambe D · S2 tangage de hanche |
+   | 3 | jambe D · S3 genou |
+   | 4 | jambe D · S4 cheville |
+   | 5 | jambe G · S1 roulis de hanche |
+   | 6 | jambe G · S2 tangage de hanche |
+   | 7 | jambe G · S3 genou |
+   | 8 | jambe G · S4 cheville |
 
-3. **Vérifier la chaîne complète** : branche les 8 servos en guirlande, puis
+3. **Vérifier la chaîne complète** : prise DVG droite → 1 → 2 → 3 → 4 (jambe droite), prise DVG gauche → 5 → 6 → 7 → 8
+   (jambe gauche), puis
    ```
    python sts_banc.py scan
    python sts_banc.py info 1 2 3 4 5 6 7 8

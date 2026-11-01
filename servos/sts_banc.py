@@ -39,10 +39,10 @@ DIFFUSION = 0xFE
 CENTRE = 2048
 
 ARTICULATIONS = {
-    1: "jambe G · S1 roulis de hanche", 2: "jambe G · S2 tangage de hanche",
-    3: "jambe G · S3 genou", 4: "jambe G · S4 cheville",
-    5: "jambe D · S1 roulis de hanche", 6: "jambe D · S2 tangage de hanche",
-    7: "jambe D · S3 genou", 8: "jambe D · S4 cheville",
+    1: "jambe D · S1 roulis de hanche", 2: "jambe D · S2 tangage de hanche",
+    3: "jambe D · S3 genou", 4: "jambe D · S4 cheville",
+    5: "jambe G · S1 roulis de hanche", 6: "jambe G · S2 tangage de hanche",
+    7: "jambe G · S3 genou", 8: "jambe G · S4 cheville",
 }
 
 
