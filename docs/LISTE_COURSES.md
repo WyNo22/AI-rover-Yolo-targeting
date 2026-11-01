@@ -23,9 +23,9 @@ Reçus, ID 1 à 8 donnés et testés au banc (`servos/`).
 
 | Qté | Article | Rôle |
 |---|---|---|
-| 2 × 500 mm | Tube carbone **Ø12 × 10** | cuisses, 2 × 130 mm |
-| 2 × 500 mm | Tube carbone **Ø10 × 8** | tibias, 4 × 135 mm |
-| 2 × 500 mm | Tube carbone **Ø5 × 3** | bielles : 2 × B1 + 2 × B2 |
+| 2 × 500 mm | Tube carbone **Ø12 × 10** | cuisses 2 × 130 mm (tube 1) ; vague 4 : traverse des propulseurs 360 mm (tube 2) |
+| 2 × 500 mm (+ 1 lot conseillé) | Tube carbone **Ø10 × 8** | tibias 4 × 135 mm ; vague 4 : 2 bras de propulseurs × 224 mm. Juste 1000 mm pour 988 de besoin : un 2ᵉ lot (6,39 €) donne de la marge et des rechanges |
+| 2 × 500 mm | Tube carbone **Ø5 × 3** | bielles : 2 × B1 (~130 mm) + 2 × B2 (~135 mm), 2 rechanges |
 
 ### ➕ Amazon : mécanique et capteurs (vague 1)
 
