@@ -34,8 +34,8 @@ Reçus, ID 1 à 8 donnés et testés au banc (`servos/`).
 | 1 lot de 4 | Ressorts de traction inox 304 **GUNGY fil 1,4 × Ø12 × 60 mm** (47,7 N max, 32,4 mm d'allongement max) | genoux. Le Dyneema est réglé pour que le ressort commence à tirer vers **25–40° de flexion** : l'accroupi profond (genou à 110°) reste possible, l'énergie stockée (~2,6 J pour 4 ressorts) est rendue au saut |
 | 10 | Roulements **625ZZ** (5 × 16 × 5) | genoux et chevilles (8 utilisés) |
 | 3 lots de 2 | **FSR402B** QUARKZMAN 20 g – 6 kg (~24,9 €) | 3 capteurs de force par pied (talon + 2 pointes) |
-| 2 | **ADS1115** | 1 par pied, lit ses 3 capteurs (adresses 0x48 / 0x49) |
-| 1 lot | Résistances **10 kΩ** | pont diviseur de chaque FSR (sans elles, l'ADS ne lit rien) |
+| 2 | **ADS1015** (ou ADS1115, plus lent) | 1 par pied, 4 entrées dont 3 utilisées (adresses 0x48 / 0x49 par la broche ADDR), alimenté en 3,3 V par le Pico |
+| 1 lot | Assortiment de résistances (1 k, 2,2 k, 4,7 k, 10 kΩ) | pont diviseur de chaque FSR (sans elles, l'ADS ne lit rien). **1 kΩ conseillé** (voir plus bas), à confirmer au banc |
 | 1 | **Raspberry Pi Pico 2** (sans W) | équilibre, capteurs, arrêt d'urgence |
 
 ### ➕ Amazon : alimentation embarquée (vague 2)
@@ -48,8 +48,15 @@ Reçus, ID 1 à 8 donnés et testés au banc (`servos/`).
 | 3 paires | Prises **XT60** | batterie, interrupteur, distribution |
 | 1 m + 1 m | Câble silicone **14 AWG** rouge + noir | 3S → départs des jambes |
 | 1 lot | Bornes **Wago 221** | distribution du 12 V vers les 2 jambes et le régulateur |
-| 2 × 1 m | Câble souple 4 fils fin (26 AWG) | I²C des pieds : ADS1115 → Pico, le long de chaque jambe |
+| 2 × 1 m | Câble souple 4 fils fin (26 AWG) | I²C des pieds : ADS1015 → Pico, le long de chaque jambe |
 | 1 + 1 | Résistances **100 kΩ + 33 kΩ** (ou prises dans un lot) | tension de la 3S sur GP26 du Pico ; le courant vient de la télémétrie des servos, pas besoin d'INA226 |
+
+**Capteurs de pied** : FSR402B en haut du pont (côté 3,3 V), résistance fixe vers la masse, point milieu sur l'entrée de
+l'ADS1015 (gain ±4,096 V). Avec 10 kΩ la tension sature dès ~1 kg par capteur ; avec **1 kΩ** elle s'étale sur 0,1–3 kg,
+la plage utile d'un robot de 2,4 kg. L'ADS1015 (3300 mesures/s) relit les 3 capteurs d'un pied à ~700 Hz.
+
+**Axes du genou et de la cheville** : vis CHC M5 (genou M5 × 40 + écrou normal + frein-filet, cheville M5 × 55 + écrou),
+partie lisse côté tête de préférence.
 
 **Bielles** : tube carbone Ø5 × 3 + un embout imprimé collé à l'époxy à chaque bout, pivot sur vis M3 directement dans
 l'œil imprimé. Entraxes **B1 = 161,9 mm**, **B2 = 166,9 mm** (axe à axe). Charge max ~135 N, flambage du tube
