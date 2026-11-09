@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 700" font-family="Helvetica, Arial, sans-serif"><rect width="1100" height="700" fill="#fff"/>
+<text x="30" y="42" font-size="28" font-weight="700" fill="#111">Câblage d'un pied : 3 FSR402B + ADS1015 → Pico 2</text>
+<text x="30" y="70" font-size="16" fill="#555">Le symbole ⏚ = relié à la masse (GND). Résistances soudées sur la carte ADS, entre A0/A1/A2 et GND.</text>
+<rect x="40" y="140" width="230" height="330" rx="10" fill="#e8f3e8" stroke="#2e7d32" stroke-width="3"/><text x="155" y="175" font-size="22" font-weight="700" text-anchor="middle" fill="#1b5e20">PICO 2</text>
+<rect x="470" y="140" width="210" height="440" rx="10" fill="#e6efff" stroke="#1e4fbf" stroke-width="3"/><text x="575" y="175" font-size="22" font-weight="700" text-anchor="middle" fill="#0d3a99">ADS1015</text>
+<text x="255" y="232" font-size="16" text-anchor="end">3V3(OUT) · broche 36</text>
+<path d="M270 227 H470" stroke="#d32f2f" stroke-width="4"/>
+<text x="370" y="219" font-size="13" fill="#555" text-anchor="middle">3V3</text>
+<circle cx="270" cy="227" r="6"/><circle cx="470" cy="227" r="6"/>
+<text x="490" y="233" font-size="17" font-weight="600">VDD</text>
+<text x="255" y="302" font-size="16" text-anchor="end">GND · broche 38</text>
+<path d="M270 297 H470" stroke="#111" stroke-width="4"/>
+<text x="370" y="289" font-size="13" fill="#555" text-anchor="middle">GND</text>
+<circle cx="270" cy="297" r="6"/><circle cx="470" cy="297" r="6"/>
+<text x="490" y="303" font-size="17" font-weight="600">GND</text>
+<text x="255" y="372" font-size="16" text-anchor="end">GP5 (SCL) · broche 7</text>
+<path d="M270 367 H470" stroke="#f9a825" stroke-width="4"/>
+<text x="370" y="359" font-size="13" fill="#555" text-anchor="middle">SCL</text>
+<circle cx="270" cy="367" r="6"/><circle cx="470" cy="367" r="6"/>
+<text x="490" y="373" font-size="17" font-weight="600">SCL</text>
+<text x="255" y="442" font-size="16" text-anchor="end">GP4 (SDA) · broche 6</text>
+<path d="M270 437 H470" stroke="#1e88e5" stroke-width="4"/>
+<text x="370" y="429" font-size="13" fill="#555" text-anchor="middle">SDA</text>
+<circle cx="270" cy="437" r="6"/><circle cx="470" cy="437" r="6"/>
+<text x="490" y="443" font-size="17" font-weight="600">SDA</text>
+<text x="490" y="513" font-size="17" font-weight="600">ADDR</text><circle cx="470" cy="507" r="6"/>
+<path d="M470 507 H420" stroke="#111" stroke-width="4"/><path d="M420 507 v14 M406 521 h28 M411 527 h18 M416 533 h8" stroke="#111" stroke-width="3" fill="none"/>
+<text x="150" y="560" font-size="14">ADDR → GND : pied G (0x48)</text><text x="150" y="580" font-size="14">ADDR → 3V3 : pied D (0x49)</text>
+<text x="575" y="560" font-size="13" fill="#555" text-anchor="middle">A3, ALERT : rien</text>
+<path d="M440 227 V105 H1050 V507" stroke="#d32f2f" stroke-width="4" fill="none"/><circle cx="440" cy="227" r="6" fill="#d32f2f"/>
+<text x="1040" y="97" font-size="14" fill="#d32f2f" text-anchor="end">3V3 commun aux 3 FSR</text>
+<text x="660" y="233" font-size="17" font-weight="600" text-anchor="end">A0</text><circle cx="680" cy="227" r="6"/>
+<path d="M680 227 H860" stroke="#2e7d32" stroke-width="4"/>
+<circle cx="740" cy="227" r="6" fill="#2e7d32"/><path d="M740 227 V245" stroke="#7a5a12" stroke-width="3"/>
+<rect x="728" y="245" width="24" height="50" rx="4" fill="#f3d9a4" stroke="#7a5a12" stroke-width="2"/>
+<path d="M740 295 V305" stroke="#7a5a12" stroke-width="3"/><path d="M740 305 v14 M726 319 h28 M731 325 h18 M736 331 h8" stroke="#111" stroke-width="3" fill="none"/>
+<text x="762" y="277" font-size="14" fill="#7a5a12">1 kΩ</text>
+<circle cx="900" cy="227" r="34" fill="#222"/><circle cx="900" cy="227" r="22" fill="#555"/>
+<path d="M934 227 H1050" stroke="#2e7d32" stroke-width="4"/><circle cx="1050" cy="227" r="6" fill="#d32f2f"/>
+<text x="900" y="283" font-size="15" font-weight="700" text-anchor="middle">FSR talon</text>
+<text x="800" y="217" font-size="13" fill="#2e7d32" text-anchor="middle">patte 2</text><text x="990" y="217" font-size="13" fill="#2e7d32" text-anchor="middle">patte 1 → 3V3</text>
+<text x="660" y="373" font-size="17" font-weight="600" text-anchor="end">A1</text><circle cx="680" cy="367" r="6"/>
+<path d="M680 367 H860" stroke="#2e7d32" stroke-width="4"/>
+<circle cx="740" cy="367" r="6" fill="#2e7d32"/><path d="M740 367 V385" stroke="#7a5a12" stroke-width="3"/>
+<rect x="728" y="385" width="24" height="50" rx="4" fill="#f3d9a4" stroke="#7a5a12" stroke-width="2"/>
+<path d="M740 435 V445" stroke="#7a5a12" stroke-width="3"/><path d="M740 445 v14 M726 459 h28 M731 465 h18 M736 471 h8" stroke="#111" stroke-width="3" fill="none"/>
+<text x="762" y="417" font-size="14" fill="#7a5a12">1 kΩ</text>
+<circle cx="900" cy="367" r="34" fill="#222"/><circle cx="900" cy="367" r="22" fill="#555"/>
+<path d="M934 367 H1050" stroke="#2e7d32" stroke-width="4"/><circle cx="1050" cy="367" r="6" fill="#d32f2f"/>
+<text x="900" y="423" font-size="15" font-weight="700" text-anchor="middle">FSR pointe int.</text>
+<text x="800" y="357" font-size="13" fill="#2e7d32" text-anchor="middle">patte 2</text><text x="990" y="357" font-size="13" fill="#2e7d32" text-anchor="middle">patte 1 → 3V3</text>
+<text x="660" y="513" font-size="17" font-weight="600" text-anchor="end">A2</text><circle cx="680" cy="507" r="6"/>
+<path d="M680 507 H860" stroke="#2e7d32" stroke-width="4"/>
+<circle cx="740" cy="507" r="6" fill="#2e7d32"/><path d="M740 507 V525" stroke="#7a5a12" stroke-width="3"/>
+<rect x="728" y="525" width="24" height="50" rx="4" fill="#f3d9a4" stroke="#7a5a12" stroke-width="2"/>
+<path d="M740 575 V585" stroke="#7a5a12" stroke-width="3"/><path d="M740 585 v14 M726 599 h28 M731 605 h18 M736 611 h8" stroke="#111" stroke-width="3" fill="none"/>
+<text x="762" y="557" font-size="14" fill="#7a5a12">1 kΩ</text>
+<circle cx="900" cy="507" r="34" fill="#222"/><circle cx="900" cy="507" r="22" fill="#555"/>
+<path d="M934 507 H1050" stroke="#2e7d32" stroke-width="4"/><circle cx="1050" cy="507" r="6" fill="#d32f2f"/>
+<text x="900" y="563" font-size="15" font-weight="700" text-anchor="middle">FSR pointe ext.</text>
+<text x="800" y="497" font-size="13" fill="#2e7d32" text-anchor="middle">patte 2</text><text x="990" y="497" font-size="13" fill="#2e7d32" text-anchor="middle">patte 1 → 3V3</text>
+<text x="30" y="650" font-size="15" fill="#333">FSR et résistances : pas de sens. Sur chaque A : patte 2 du FSR + une patte de la résistance (l'autre patte → GND).</text>
+<text x="30" y="675" font-size="15" fill="#333">Pied D : même câblage, ADDR au 3V3. SDA et SCL sont partagés avec la centrale et l'autre ADS.</text>
+</svg>
