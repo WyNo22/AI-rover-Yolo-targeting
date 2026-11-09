@@ -19,12 +19,15 @@ def main():
     led.off()
     print("✓ La LED verte a clignoté 3 fois.")
 
-    adresses = B.i2c().scan()
-    if not adresses:
-        print("Bus I²C vide (normal si rien n'est encore branché sur GP4 / GP5).")
-    for a in adresses:
-        print("  0x%02X  %s" % (a, B.NOMS_I2C.get(a, "inconnu")))
-    return adresses
+    trouve = {}
+    for nom, (ctrl, sda, scl) in B.BUS_I2C.items():
+        adresses = B.bus_i2c(nom).scan()
+        trouve[nom] = adresses
+        titre = {"imu": "centrale", "G": "pied G", "D": "pied D"}.get(nom, nom)
+        print("Bus %-8s (SDA GP%d, SCL GP%d) : %s" % (titre, sda, scl, "vide" if not adresses else ""))
+        for a in adresses:
+            print("    0x%02X  %s" % (a, B.NOMS_I2C.get(a, "inconnu")))
+    return trouve
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 # Étape 2 – centrale MPU6050 : détection, calibration du gyroscope, inclinaison en direct.
-# Branchement : VCC → 3V3 (broche 36), GND, SDA → GP4, SCL → GP5, AD0 → GND.
+# Branchement : VCC → 3V3 (broche 36), GND, SDA → GP4 (broche 6), SCL → GP5 (broche 7), AD0 → GND.
 import time
 
 import brochage as B

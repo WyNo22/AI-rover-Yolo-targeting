@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 700" font-family="Helvetica, Arial, sans-serif"><rect width="1100" height="700" fill="#fff"/>
-<text x="30" y="42" font-size="28" font-weight="700" fill="#111">Câblage d'un pied : 3 FSR402B + ADS1015 → Pico 2</text>
+<text x="30" y="42" font-size="28" font-weight="700" fill="#111">Câblage du pied GAUCHE : 3 FSR402B + ADS1015 → Pico 2</text>
 <text x="30" y="70" font-size="16" fill="#555">Le symbole ⏚ = relié à la masse (GND). Résistances soudées sur la carte ADS, entre A0/A1/A2 et GND.</text>
 <rect x="40" y="140" width="230" height="330" rx="10" fill="#e8f3e8" stroke="#2e7d32" stroke-width="3"/><text x="155" y="175" font-size="22" font-weight="700" text-anchor="middle" fill="#1b5e20">PICO 2</text>
 <rect x="470" y="140" width="210" height="440" rx="10" fill="#e6efff" stroke="#1e4fbf" stroke-width="3"/><text x="575" y="175" font-size="22" font-weight="700" text-anchor="middle" fill="#0d3a99">ADS1015</text>
@@ -13,19 +13,19 @@
 <text x="370" y="289" font-size="13" fill="#555" text-anchor="middle">GND</text>
 <circle cx="270" cy="297" r="6"/><circle cx="470" cy="297" r="6"/>
 <text x="490" y="303" font-size="17" font-weight="600">GND</text>
-<text x="255" y="372" font-size="16" text-anchor="end">GP5 (SCL) · broche 7</text>
+<text x="255" y="372" font-size="16" text-anchor="end">GP15 (SCL) · broche 20</text>
 <path d="M270 367 H470" stroke="#f9a825" stroke-width="4"/>
 <text x="370" y="359" font-size="13" fill="#555" text-anchor="middle">SCL</text>
 <circle cx="270" cy="367" r="6"/><circle cx="470" cy="367" r="6"/>
 <text x="490" y="373" font-size="17" font-weight="600">SCL</text>
-<text x="255" y="442" font-size="16" text-anchor="end">GP4 (SDA) · broche 6</text>
+<text x="255" y="442" font-size="16" text-anchor="end">GP14 (SDA) · broche 19</text>
 <path d="M270 437 H470" stroke="#1e88e5" stroke-width="4"/>
 <text x="370" y="429" font-size="13" fill="#555" text-anchor="middle">SDA</text>
 <circle cx="270" cy="437" r="6"/><circle cx="470" cy="437" r="6"/>
 <text x="490" y="443" font-size="17" font-weight="600">SDA</text>
 <text x="490" y="513" font-size="17" font-weight="600">ADDR</text><circle cx="470" cy="507" r="6"/>
 <path d="M470 507 H420" stroke="#111" stroke-width="4"/><path d="M420 507 v14 M406 521 h28 M411 527 h18 M416 533 h8" stroke="#111" stroke-width="3" fill="none"/>
-<text x="150" y="560" font-size="14">ADDR → GND : pied G (0x48)</text><text x="150" y="580" font-size="14">ADDR → 3V3 : pied D (0x49)</text>
+<text x="150" y="560" font-size="14">ADDR → GND (les 2 pieds)</text><text x="150" y="580" font-size="14">adresse 0x48</text>
 <text x="575" y="560" font-size="13" fill="#555" text-anchor="middle">A3, ALERT : rien</text>
 <path d="M440 227 V105 H1050 V507" stroke="#d32f2f" stroke-width="4" fill="none"/><circle cx="440" cy="227" r="6" fill="#d32f2f"/>
 <text x="1040" y="97" font-size="14" fill="#d32f2f" text-anchor="end">3V3 commun aux 3 FSR</text>
@@ -60,5 +60,5 @@
 <text x="900" y="563" font-size="15" font-weight="700" text-anchor="middle">FSR pointe ext.</text>
 <text x="800" y="497" font-size="13" fill="#2e7d32" text-anchor="middle">patte 2</text><text x="990" y="497" font-size="13" fill="#2e7d32" text-anchor="middle">patte 1 → 3V3</text>
 <text x="30" y="650" font-size="15" fill="#333">FSR et résistances : pas de sens. Sur chaque A : patte 2 du FSR + une patte de la résistance (l'autre patte → GND).</text>
-<text x="30" y="675" font-size="15" fill="#333">Pied D : même câblage, ADDR au 3V3. SDA et SCL sont partagés avec la centrale et l'autre ADS.</text>
+<text x="30" y="675" font-size="15" fill="#333">Pied DROIT : même câblage, mais SDA → GP16 (broche 21) et SCL → GP17 (broche 22). Chaque pied a ses broches.</text>
 </svg>

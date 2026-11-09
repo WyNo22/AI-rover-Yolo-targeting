@@ -1,9 +1,13 @@
 # brochage.py – broches, adresses et réglages du Pico 2 de LEO-S (schéma électrique rév. J).
 # Seul fichier à modifier quand un branchement ou une calibration change.
-from machine import Pin, I2C, UART
+from machine import Pin, I2C, SoftI2C, UART
 
 # ── Broches ───────────────────────────────────────────────────────────────────
-I2C_ID, SDA, SCL, I2C_FREQ = 0, 4, 5, 400000          # MPU6050, ADS1015 ×2, ToF bas
+# Un bus I²C par élément, chacun sur ses broches : (contrôleur, SDA, SCL). "soft" = bus logiciel.
+BUS_I2C = {"imu": (0, 4, 5),                           # MPU6050 (et plus tard les ToF bas)
+           "G": (1, 14, 15),                           # ADS1015 du pied gauche
+           "D": ("soft", 16, 17)}                      # ADS1015 du pied droit
+I2C_FREQ = 400000
 UART_SERVOS, SERVO_TX, SERVO_RX = 1, 20, 21            # adaptateur bus servo, cavalier sur A
 SERVO_BAUD = 1000000
 UART_RADIO, RADIO_TX, RADIO_RX = 0, 0, 1               # FS-iA6B en iBUS (GP0 non branché)
@@ -13,9 +17,9 @@ TOF_LPN = (10, 11)                                     # ToF bas (vague 3)
 
 # ── Adresses I²C ──────────────────────────────────────────────────────────────
 MPU = 0x68
-PIEDS = {"G": 0x48, "D": 0x49}                         # ADS1015 : ADDR à GND (G), à 3V3 (D)
-NOMS_I2C = {0x68: "MPU6050", 0x69: "MPU6050 (AD0 au 3V3 ?)", 0x48: "ADS1015 pied G",
-            0x49: "ADS1015 pied D", 0x4A: "ADS1015 (ADDR sur SDA ?)", 0x4B: "ADS1015 (ADDR sur SCL ?)",
+PIEDS = {"G": 0x48, "D": 0x48}                         # ADS1015 : ADDR à GND sur les deux (bus séparés)
+NOMS_I2C = {0x68: "MPU6050", 0x69: "MPU6050 (AD0 au 3V3 ?)", 0x48: "ADS1015",
+            0x49: "ADS1015 (ADDR au 3V3)", 0x4A: "ADS1015 (ADDR sur SDA ?)", 0x4B: "ADS1015 (ADDR sur SCL ?)",
             0x29: "ToF (adresse d'usine)", 0x30: "ToF bas 1", 0x31: "ToF bas 2"}
 
 # ── Capteurs de pied ──────────────────────────────────────────────────────────
@@ -42,8 +46,15 @@ ARRET_SI_HAUT = True                                   # interrupteur vers le ha
 PERTE_RADIO_MS = 100                                   # plus de trame depuis 100 ms = ARRÊT
 
 
+def bus_i2c(nom):
+    ctrl, sda, scl = BUS_I2C[nom]
+    if ctrl == "soft":
+        return SoftI2C(sda=Pin(sda), scl=Pin(scl), freq=I2C_FREQ)
+    return I2C(ctrl, sda=Pin(sda), scl=Pin(scl), freq=I2C_FREQ)
+
+
 def i2c():
-    return I2C(I2C_ID, sda=Pin(SDA), scl=Pin(SCL), freq=I2C_FREQ)
+    return bus_i2c("imu")
 
 
 def uart_servos():

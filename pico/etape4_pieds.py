@@ -1,6 +1,7 @@
 # Étape 4 – FSR402B + ADS1015 : lecture des appuis, puis choix de la résistance du pont par des pesées.
 # Chaque FSR : une patte au 3V3, l'autre sur A0/A1/A2 de l'ADS1015 ET sur la résistance R_FSR vers la masse.
-# ADS1015 : VDD → 3V3, GND, SCL → GP5, SDA → GP4, ADDR → GND (pied G, 0x48) ou → 3V3 (pied D, 0x49).
+# ADS1015 : VDD → 3V3, GND, ADDR → GND. Chaque pied a son bus : pied G SDA → GP14 (broche 19), SCL → GP15 (broche 20) ;
+#           pied D SDA → GP16 (broche 21), SCL → GP17 (broche 22).
 #
 # MODE = "direct" : valeurs en continu (appuie au doigt).
 # MODE = "pesee"  : pose des masses connues (0,1 / 0,5 / 1 / 2 kg sur une pièce de monnaie centrée sur le FSR),
@@ -17,12 +18,12 @@ R_PONT = B.R_FSR                                # la résistance réellement sou
 E12 = (1000, 1200, 1500, 1800, 2200, 2700, 3300, 3900, 4700, 5600, 6800, 8200, 10000)
 
 
-def trouver_pieds(i2c):
-    presents = i2c.scan()
+def trouver_pieds():
     pieds = {}
     for cote, adr in B.PIEDS.items():
-        if adr in presents:
-            pieds[cote] = ADS1x15(i2c, adr, MODELE)
+        bus = B.bus_i2c(cote)
+        if adr in bus.scan():
+            pieds[cote] = ADS1x15(bus, adr, MODELE)
     return pieds
 
 
@@ -81,11 +82,11 @@ def pesee(pieds, saisie=input):
 
 
 def main(tours=None, saisie=input):
-    pieds = trouver_pieds(B.i2c())
+    pieds = trouver_pieds()
     if not pieds:
-        print("✗ Aucun ADS1015 en 0x48 ni 0x49. Vérifie VDD, GND, SDA/SCL et la broche ADDR.")
+        print("✗ Aucun ADS1015 trouvé. Vérifie VDD, GND, ADDR à GND, et SDA/SCL : GP14/GP15 (pied G), GP16/GP17 (pied D).")
         return None
-    print("ADS trouvés : " + ", ".join("pied %s (0x%02X)" % (c, a.adr) for c, a in pieds.items()))
+    print("ADS trouvés : " + ", ".join("pied %s" % c for c in pieds))
     print("Pont : %d Ω (R_PONT en haut du fichier)" % R_PONT)
     if MODE == "pesee":
         return pesee(pieds, saisie)

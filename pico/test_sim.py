@@ -161,17 +161,23 @@ class FausseUART:
 
 
 class FauxI2C:
-    def __init__(self, *a, **kw):
-        pass
+    def __init__(self, ctrl=None, sda=None, scl=None, freq=None):
+        self.cle = sda.n if sda is not None else ctrl                # le bus est identifié par sa broche SDA
+        self.dev = M.i2c.setdefault(self.cle, {})
 
     def scan(self):
-        return sorted(M.i2c)
+        return sorted(self.dev)
 
     def readfrom_mem(self, adr, reg, n):
-        return M.i2c[adr].lire(reg, n)
+        return self.dev[adr].lire(reg, n)
 
     def writeto_mem(self, adr, reg, data):
-        M.i2c[adr].ecrire(reg, data)
+        self.dev[adr].ecrire(reg, data)
+
+
+class FauxSoftI2C(FauxI2C):
+    def __init__(self, sda=None, scl=None, freq=None):
+        FauxI2C.__init__(self, None, sda, scl, freq)
 
 
 class FauxADC:
@@ -185,7 +191,8 @@ class FauxADC:
 class FauxPin:
     OUT, IN = 1, 0
 
-    def __init__(self, *a, **kw):
+    def __init__(self, n=None, *a, **kw):
+        self.n = n
         self.v = 0
 
     def value(self, v=None):
@@ -205,6 +212,7 @@ class FauxPin:
 
 machine = types.ModuleType("machine")
 machine.Pin, machine.I2C, machine.UART, machine.ADC = FauxPin, FauxI2C, FausseUART, FauxADC
+machine.SoftI2C = FauxSoftI2C
 machine.freq = lambda: 150000000
 sys.modules["machine"] = machine
 
@@ -224,11 +232,11 @@ def test():
     import brochage as B
 
     mpu, g, d = FauxMPU(), FauxADS(), FauxADS()
-    M.i2c = {0x68: mpu, 0x48: g, 0x49: d}
+    M.i2c = {4: {0x68: mpu}, 14: {0x48: g}, 16: {0x48: d}}     # un bus par élément (clé = broche SDA)
 
     # 1 – scan I²C
-    adrs, out = silencieux(etape1_pico.main)
-    assert adrs == [0x48, 0x49, 0x68] and "MPU6050" in out and "pied D" in out, out
+    trouve, out = silencieux(etape1_pico.main)
+    assert trouve == {"imu": [0x68], "G": [0x48], "D": [0x48]} and "MPU6050" in out and "pied D" in out, out
 
     # 2 – MPU6050 : biais, puis inclinaison
     biais, out = silencieux(etape2_mpu.main, tours=30)
@@ -241,7 +249,7 @@ def test():
 
     # 4 – pieds : lecture directe, puis pesées et conseil de résistance
     _, out = silencieux(etape4_pieds.main, tours=2)
-    assert "pied G (0x48)" in out and "pied D (0x49)" in out and "1.65V" in out, out
+    assert "pied G, pied D" in out and "1.65V" in out, out
     assert abs(r_fsr(1.65, 1000) - 1000) < 1 and r_fsr(0.0, 1000) is None
     fsr = {"0.5": 2000, "2": 500}                         # FSR à 0,5 kg puis 2 kg
 

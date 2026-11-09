@@ -32,7 +32,9 @@ Après une calibration, modifie `lib/brochage.py` sur le PC **et** téléverse-l
 
 | Broche (n°) | Fonction | Va vers |
 |---|---|---|
-| GP4 (6) · GP5 (7) | I²C0 SDA · SCL | MPU6050, ADS1015 ×2 (et plus tard les ToF) |
+| GP4 (6) · GP5 (7) | I²C0 SDA · SCL | MPU6050 (et plus tard les ToF) |
+| GP14 (19) · GP15 (20) | I²C1 SDA · SCL | ADS1015 du pied gauche |
+| GP16 (21) · GP17 (22) | I²C logiciel SDA · SCL | ADS1015 du pied droit |
 | GP20 (26) · GP21 (27) | UART1 TX · RX | adaptateur bus servo, cavalier sur **A** |
 | GP1 (2) | UART0 RX | récepteur FS-iA6B, prise iBUS |
 | GP26 (31) · AGND (33) | ADC0 | pont de la batterie 3S |
@@ -42,7 +44,7 @@ Après une calibration, modifie `lib/brochage.py` sur le PC **et** téléverse-l
 
 ## Les étapes
 
-**1 – Pico seul** · `etape1_pico.py` : la LED clignote 3 fois et le scan I²C s'affiche (vide si rien n'est branché).
+**1 – Pico seul** · `etape1_pico.py` : la LED clignote 3 fois et chacun des 3 bus I²C est scanné (centrale, pied G, pied D).
 
 **2 – MPU6050** · VCC → 3V3, GND, SDA → GP4, SCL → GP5, AD0 → GND.
 `etape2_mpu.py` : la carte posée à plat 2 s, il donne le biais du gyroscope (à copier dans `GYRO_BIAIS`) puis
@@ -51,7 +53,8 @@ l'inclinaison en direct. Vérifie que roulis et tangage suivent quand tu penches
 **3 – FSR au multimètre (sans script)** · plus de 1 MΩ au repos, quelques kΩ au doigt, quelques centaines d'Ω très appuyé.
 Pas de soudure longue sur les pattes : connecteur Dupont femelle + colle chaude, ou moins de 2 s à ~300 °C.
 
-**4 – FSR + ADS1015** · ADS : VDD → 3V3, GND, SCL → GP5, SDA → GP4, ADDR → GND (pied G, 0x48) ou → 3V3 (pied D, 0x49).
+**4 – FSR + ADS1015** · ADS : VDD → 3V3, GND, ADDR → GND (les deux). Pied G : SDA → GP14, SCL → GP15.
+Pied D : SDA → GP16, SCL → GP17. Schéma : `docs/cablage/pied_fsr.png`.
 Chaque FSR : une patte au 3V3, l'autre sur A0 (talon), A1 (pointe int.) ou A2 (pointe ext.) **et** sur la résistance
 du pont vers la masse.
 - `etape4_pieds.py` avec `MODE = "direct"` : les 3 capteurs de chaque pied en continu, appuie au doigt.

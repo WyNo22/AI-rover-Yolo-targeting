@@ -96,7 +96,7 @@ td code, .mono { font: 12.5px var(--mono); }
   <div class="cartouche" aria-label="Cartouche">
     <span>Projet</span><span>LEO-S bipède</span>
     <span>Planche</span><span>Électrique · 1/1</span>
-    <span>Rév.</span><span>J · 01/11/2026</span>
+    <span>Rév.</span><span>J2 · 09/11/2026</span>
   </div>
 </header>
 
@@ -184,8 +184,8 @@ td code, .mono { font: 12.5px var(--mono); }
 <g class="box act"><rect x="650" y="358" width="170" height="38" rx="4"/><text x="660" y="377" class="bt">2 micro-servos MG90S</text><text x="660" y="392" class="bs">cou : pan / tilt</text></g>
 <g class="box sens"><rect x="650" y="446" width="170" height="40" rx="4"/><text x="660" y="465" class="bt">MPU6050</text><text x="660" y="480" class="bs">centrale inertielle</text></g>
 <g class="box sens"><rect x="868" y="446" width="150" height="40" rx="4"/><text x="878" y="465" class="bt">2 × ToF VL53L8CX</text><text x="878" y="480" class="bs">bas · 0x30 / 0x31</text></g>
-<g class="box sens"><rect x="650" y="498" width="170" height="40" rx="4"/><text x="660" y="517" class="bt">ADS1015 pied G</text><text x="660" y="532" class="bs">3 voies sur 4</text></g>
-<g class="box sens"><rect x="650" y="550" width="170" height="40" rx="4"/><text x="660" y="569" class="bt">ADS1015 pied D</text><text x="660" y="584" class="bs">3 voies sur 4</text></g>
+<g class="box sens"><rect x="650" y="498" width="170" height="40" rx="4"/><text x="660" y="517" class="bt">ADS1015 pied G</text><text x="660" y="532" class="bs">I²C1 GP14/15 · 0x48</text></g>
+<g class="box sens"><rect x="650" y="550" width="170" height="40" rx="4"/><text x="660" y="569" class="bt">ADS1015 pied D</text><text x="660" y="584" class="bs">I²C GP16/17 · 0x48</text></g>
 <g class="box sens"><rect x="868" y="498" width="150" height="40" rx="4"/><text x="878" y="517" class="bt">3 × FSR402B</text><text x="878" y="532" class="bs">semelle G · pont 1 kΩ</text></g>
 <g class="box sens"><rect x="868" y="550" width="150" height="40" rx="4"/><text x="878" y="569" class="bt">3 × FSR402B</text><text x="878" y="584" class="bs">semelle D · pont 1 kΩ</text></g>
 <g class="box cpu"><rect x="650" y="608" width="170" height="44" rx="4"/><text x="660" y="627" class="bt">Récepteur FS-iA6B</text><text x="660" y="642" class="bs">radio FlySky</text></g>
@@ -204,7 +204,7 @@ td code, .mono { font: 12.5px var(--mono); }
 <text x="350" y="246" class="pin">SPI0 CE0 / CE1 · CSI</text>
 <text x="350" y="264" class="pin">PWM · GPIO 12/13 (cou)</text>
 <text x="350" y="282" class="pin">USB → Pico · 5 V broches 2/4</text>
-<text x="350" y="494" class="pin">I²C0 · GP4/GP5</text>
+<text x="350" y="494" class="pin">I²C GP4/5 · GP14/15 · GP16/17</text>
 <text x="350" y="512" class="pin">DShot · GP6–GP9 · LPn GP10/11</text>
 <text x="350" y="530" class="pin">UART1 bus servo · GP20/GP21</text>
 <text x="350" y="548" class="pin">iBUS · RX GP1</text>
@@ -226,8 +226,6 @@ td code, .mono { font: 12.5px var(--mono); }
 <text x="578" y="371" text-anchor="middle" class="wl wpwmt">PWM</text>
 <text x="585" y="512" text-anchor="middle" class="wl wi2ct">I²C</text>
 <text x="630" y="460" text-anchor="middle" class="wl wi2ct">0x68</text>
-<text x="630" y="512" text-anchor="middle" class="wl wi2ct">0x48</text>
-<text x="630" y="564" text-anchor="middle" class="wl wi2ct">0x49</text>
 <text x="456" y="614" text-anchor="start" class="wl wuartt">DShot × 4</text>
 <text x="591" y="600" text-anchor="start" class="wl wuartt">iBUS</text>
 </svg>
@@ -309,7 +307,9 @@ td code, .mono { font: 12.5px var(--mono); }
   <div class="tbl"><table>
     <thead><tr><th>Fonction</th><th>Broches</th><th>Branché sur</th></tr></thead>
     <tbody>
-      <tr><td>I²C0</td><td class="mono">SDA GP4 · SCL GP5</td><td>MPU6050 0x68, ADS1015 0x48 / 0x49, ToF bas 0x30 / 0x31</td></tr>
+      <tr><td>I²C0</td><td class="mono">SDA GP4 · SCL GP5</td><td>MPU6050 0x68, ToF bas 0x30 / 0x31</td></tr>
+      <tr><td>I²C1</td><td class="mono">SDA GP14 · SCL GP15</td><td>ADS1015 du pied G (0x48)</td></tr>
+      <tr><td>I²C logiciel</td><td class="mono">SDA GP16 · SCL GP17</td><td>ADS1015 du pied D (0x48) ; un bus par pied, un câble 4 fils par jambe</td></tr>
       <tr><td>LPn ToF</td><td class="mono">GP10 · GP11</td><td>allumage un par un au démarrage pour changer leur adresse (0x29 d'usine)</td></tr>
       <tr><td>DShot (PIO)</td><td class="mono">GP6 · GP7 · GP8 · GP9</td><td>ESC 4-en-1, moteurs 1 à 4</td></tr>
       <tr><td>Récepteur</td><td class="mono">VBUS (5 V) · GND</td><td>alimentation du FS-iA6B</td></tr>
