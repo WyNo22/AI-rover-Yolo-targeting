@@ -139,9 +139,9 @@ if __name__ == "__main__":
         for cat, m in cats.items():
             f.write(f"| {cat} | {m:.0f} g |\n")
         f.write(f"| **Total** | **{M:.0f} g** |\n\n")
-        f.write(f"Centre de gravité : **{zg + 450:.0f} mm au-dessus du sol** ({zg:+.0f} mm par rapport à l'axe de hanche), {xg:+.1f} mm en x.\n\n")
+        f.write(f"Centre de gravité : **{zg - J.Z_SOL:.0f} mm au-dessus du sol** ({zg:+.0f} mm par rapport à l'axe de hanche), {xg:+.1f} mm en x.\n\n")
         f.write("| Ensemble | Composant | Masse |\n|---|---|---|\n")
         for cat, nom, m in sorted(lignes, key=lambda t: -t[2]):
             f.write(f"| {cat} | {nom} | {m:.1f} g |\n")
-    print(f"Total {M:.0f} g ; CdG à {zg + 450:.0f} mm du sol ; {cats}")
+    print(f"Total {M:.0f} g ; CdG à {zg - J.Z_SOL:.0f} mm du sol ; {cats}")
     print("step/assemblage_robot_complet.step + bilan_masse.md")

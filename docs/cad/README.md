@@ -1,4 +1,4 @@
-# CAO LEO-S (Rév. I)
+# CAO LEO-S (Rév. J)
 
 Pièces imprimées d'une jambe, générées par `jambe_cad.py` (CadQuery). Les cotes viennent du plan `docs/jambe_leo_s.html`.
 
@@ -9,13 +9,15 @@ Pièces imprimées d'une jambe, générées par `jambe_cad.py` (CadQuery). Les c
 | `03_etrier_roulis_berceau_S2` | étrier de roulis + berceau de S2 | 2 (miroir) |
 | `04_chape_cuisse_berceau_S3` | chape en U de cuisse + berceau de S3 + ancrage des ressorts | 2 (miroir) |
 | `05_languette_genou` | bas de cuisse, tube Ø12 | 2 |
-| `06_raccord_tibia_berceau_S4` | refait simple : corps extrudé (disque du genou + pavé des tubes) fendu pour la languette, berceau de S4, levier B1 en bague + plaque, bloc passe-câble + pion côté intérieur | 2 (miroir) |
+| `06_raccord_tibia_berceau_S4` | **Rév. J « bloc-chape »** : un profil rectangulaire extrudé (tête du genou, talon d'ancrage des ressorts, bloc des tubes évidé, cadre fermé autour de S4), levier B1 plein, pion du câble coaxial à la vis M5, gorges 3 mm pour le Dyneema | 2 (miroir) |
 | `07_tibia_bas` | languette de cheville, 2 tubes Ø10 | 2 |
-| `08_pied` | pied 100 × 65, dessous plein (collage), poches par le dessus, joues en A + levier de talon intégré | 2 (miroir) |
+| `08_pied` | **Rév. J** : semelle longue et basse (talon r 22, pointe r 28, pointe et talon amincis), arches de cheville concaves avec trous ronds, levier de talon ; dessous : 3 logements de FSR, chemins des queues, 3 inserts M3 | 2 (miroir) |
 | `09_bras_servo_22` | bras de 22 mm (S3, S4) | 4 |
 | `10_entretoise_S3_11_8` / `11_entretoise_S4_3_8` | entretoises palonnier → bras de 6 mm (S3 / S4), alésées pour la vis centrale du palonnier | 2 / 2 |
-| `16_semelle_TPU` | semelle TPU 95A, 4 mm, 4 poches FSR 402 (Ø19,2 × 0,8, rainure de queue 8 mm), rainures, **collée** sous le pied ; sur chaque FSR, une pastille PETG Ø10 × 0,4 collée sur la zone active | 2 (miroir) |
+| `16_semelle_TPU` | semelle TPU 95A, 3 mm, rainures dessous, trous des têtes de vis ; **collée en plein sous la plaque 18** (plus sous le pied) | 2 (miroir) |
 | `17_support_ToF_bas` | support d'un ToF VL53L8CX sous l'avant du bassin : plongée 37°, ouvert de 20° vers l'extérieur, 2 inserts M3 | 2 (miroir) |
+| `18_plaque_semelle` | plaque rigide suspendue, 2,5 mm : 3 plots Ø11 × 1,2 sur les FSR, 3 trous de guidage Ø6,3 | 2 (miroir) |
+| `19_entretoise_semelle` | entretoise Ø6 × 4,25 des vis-guides (PETG) | 6 |
 
 - `step/` : une pièce par fichier, les tubes à couper (`12` à `15`), et trois assemblages :
   - **`assemblage_robot_complet.step`** : les deux jambes + bassin + **buste estimé** (batteries, Pi, contrôleur de vol,
@@ -43,6 +45,34 @@ portés par chaque pièce pendant ces mouvements.
 3. Imprimer un test d'emmanchement (Ø16,15 pour les 625ZZ, Ø12,2 / Ø10,2 pour les tubes) et ajuster `JEU`, `BRG_D`, `T12`, `T10`.
 
 Régénérer : `pip install cadquery` puis `python jambe_cad.py`.
+
+## Rév. J : genou « bloc-chape » et pied à semelle suspendue
+
+**Genou (pièce 06).** L'ancienne pièce empilait des volumes ronds (disques, bague du levier, flasque de 2 mm, pion
+Ø5, guide en porte-à-faux) : fragile et pénible à imprimer. La nouvelle part d'**un seul profil rectangulaire extrudé**,
+comme une chape usinée de robot à bielles (genoux de Cassie, Digit, H1 : le moteur est en haut, le genou n'est qu'une
+chape + un levier) ou un étrier en U de servo (Robotis) pour le cadre de S4 :
+- tête du genou r 21,5 (joues de 8,4 mm), fendue pour la languette jusqu'au cadre de S4 (la languette y passe à 110°) ;
+- **levier B1 plein** de la joue au plan de la bielle (plus de bague + plaque) ;
+- **cadre fermé autour de S4** (parois 3,3 mm sur 4 côtés, barre au-dessus du servo, flancs et fond ajourés) ;
+- bloc des tubes évidé (parois 3 mm), fenêtre d'allègement à l'avant ;
+- ressorts : **gorges de 3 mm** (Dyneema Ø2,4) dans le plan des ressorts (±14,5), descente à l'avant, trou Ø2,8,
+  câble pincé par une **vis de pression M3** (insert) : on règle la tension en tirant le câble puis en serrant ;
+- câble S3 → S4 : **pion Ø11 coaxial**, traversé par la vis du genou, qui devient une **M5 × 55** (écrou au bout du
+  pion) ; plus de flasque mince. Variation de longueur du câble ≈ 13 mm sur 0–110° : laisser une petite boucle près de S4.
+- impression debout (bas du cadre sur le plateau) : supports seulement sous le moyeu du levier B1.
+- 85 cm³ (66 avant) : ≈ +14 g par jambe, pour une pièce sans parties fines.
+
+**Pied (pièces 08, 16, 18, 19).** Style « lame » : semelle longue et basse, arche concave qui porte la cheville.
+Capteurs : la semelle collée sur le pied faisait porter le poids au TPU autour des FSR (lectures saturées ou nulles
+selon les tolérances, au µm près). Désormais **tout le poids passe par les 3 FSR** :
+- FSR collés (adhésif double face fin) sous le pied, dans des logements de centrage de 0,3 mm ;
+- plaque rigide 18 suspendue : 3 plots Ø11 sur les zones actives, **0,3 mm de course libre** ; semelle TPU collée dessous ;
+- 3 vis M3 × 10 à tête bombée + rondelle + entretoise 19 : la plaque pend sur les rondelles pied en l'air, monte
+  et appuie sur les FSR pied posé ; les entretoises reprennent les efforts en travers ;
+- option : disque de silicone de 1 mm sur chaque plot, joint torique sous les têtes contre le cliquetis ;
+- logiciel : tare à chaque pied levé.
+- La jambe s'allonge de **3,25 mm** (sol à `Z_SOL`).
 
 ## Raccord de tibia refait (après Rév. I)
 

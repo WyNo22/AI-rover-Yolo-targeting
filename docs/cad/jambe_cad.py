@@ -1,5 +1,5 @@
 """
-jambe_cad.py — CAO paramétrique des pièces imprimées d'une jambe LEO-S (Rév. I : servo réel STS3215_c.step, câblage du bus intégré, visserie, buste estimé), en CadQuery.
+jambe_cad.py — CAO paramétrique des pièces imprimées d'une jambe LEO-S (Rév. J : genou « bloc-chape », pied à arche et semelle suspendue sur 3 FSR ; Rév. I : servo réel STS3215_c.step, câblage du bus intégré, visserie, buste estimé), en CadQuery.
 
   python jambe_cad.py            → STEP + STL de chaque pièce dans ./step et ./stl, assemblage dans ./step/assemblage_jambe.step
 
@@ -240,46 +240,69 @@ def enveloppe_2_cercles(c1, r1, c2, r2):
             .threePointArc(p(c2, r2, a), p(c2, r2, a - b)).lineTo(*p(c1, r1, a - b))
             .threePointArc(p(c1, r1, a + math.pi), p(c1, r1, a + b)).close())
 
+RT_W = 21.5                  # demi-largeur du cadre de S4 (parois de 3,3 mm autour du servo)
+RT_WH = 19.0                 # demi-largeur de la tête du genou (joues de 8,4 mm)
+RT_FRONT = 24.0              # face avant du talon d'ancrage des câbles de ressort
+RT_TOP = 20.0                # dessus du cadre de S4 sous l'axe du genou (dégagement de la languette en flexion 110°)
+RES_Y, RES_G = 14.5, 3.0     # plan des câbles de ressort (= ressorts) et largeur de gorge (Dyneema Ø2,4)
+RES_R = 18.5                 # fond de gorge de la came du genou (câble à r 20)
+POST_R, POST_Y = 5.5, -29.0  # pion coaxial du câble S3 → S4 (côté intérieur) et sa collerette
+CAB_X, CAB_Y = -(POST_R + CABLE_R), -24.5             # passage du câble S3 → S4 au ras du pion
+
 def raccord_tibia():
-    """Haut de tibia, refait simple : un corps extrudé (disque du genou + pavé des tubes), une fente pour la languette
-    qui forme les deux joues, le berceau de S4 qui recouvre franchement le corps, le levier B1 en bague + plaque
-    (trou dans l'axe pour la vis M5 et la clé), et côté intérieur un seul bloc passe-câble + flasque + pion."""
-    b0 = math.radians(55)
-    lx, lz = -ARM * math.cos(b0), KZ - ARM * math.sin(b0)          # moyeu du levier B1
-    s4z = KZ - 35.0
+    """Haut de tibia, Rév. J « bloc-chape » : UN profil rectangulaire extrudé sur toute la largeur (tête du genou,
+    talon d'ancrage des ressorts, bloc des tubes, cadre fermé autour de S4), une fente pour la languette, puis des
+    perçages simples. Levier B1 plein (pas de bague en porte-à-faux), pion du câble coaxial à la vis M5 (plus de
+    flasque de 2 mm), gorges de 3 mm pour le Dyneema Ø2,4 et ancrage par vis de pression à l'avant."""
+    K = KZ
+    s4z = K - 35.0
     zf = s4z - (SL - S_END)
-    corps = cyl_y(0, KZ, 20, -18, 18).union(box(-12.5, 8.5, -18, 18, KZ - TOP2, KZ - 8))
-    cad = box(-OFF - SW / 2 - 3.5, -OFF + SW / 2 + 3.5, -SH / 2 - 3.5, SH / 2 + 3.5, zf - 3, s4z - 12).edges("|Z").fillet(3)
-    # levier B1 (côté extérieur) : bague r14 de la joue au plan du levier, puis plaque axe ↔ moyeu de 8 mm
-    bague = cyl_y(0, KZ, 14, 16, B1_Y - 6)
-    levier = enveloppe_2_cercles((0, KZ), 15, (lx, lz), 7).extrude(-8.5).translate((0, B1_Y - 6.5, 0))   # r15 ≠ r14 : pas de faces confondues
-    # côté intérieur : passe-câble + flasque + pion coaxial du genou (le câble s'enroule sur le pion)
-    guide = box(-10, -2, -30, -15.5, KZ - 24, KZ - 16).edges("|Z").fillet(1.5)
-    flasque = cyl_y(0, KZ, 6, -31, -29).union(box(-4, 2, -31, -29, KZ - 20, KZ))
-    pion = cyl_y(0, KZ, 2.5, -29.5, -23.2)
-    r = corps.union(cad).union(bague).union(levier).union(guide).union(flasque).union(pion).clean()
-    # coupes : genou
-    r = r.cut(box(-21, 21, -10.6, 10.6, KZ - 21, KZ + 21))                       # fente de la languette → 2 joues
+    zb = zf - 3.0
+    xr = -OFF - SW / 2 - 3.5
+    b0 = math.radians(55)
+    lx, lz = -ARM * math.cos(b0), K - ARM * math.sin(b0)          # moyeu du levier B1
+    pts = [(xr, zb), (-8.5, zb), (-8.5, K - TOP2), (8.5, K - TOP2), (8.5, K - 46), (RT_FRONT, K - 30.5),
+           (RT_FRONT, K), (0, K), (-16, K - RT_TOP), (xr, K - RT_TOP)]
+    prof = cq.Sketch().polygon(pts + [pts[0]]).push([(0, K)]).circle(RT_W).clean()     # un seul contour : tête + corps
+    corps = cq.Workplane("XZ").placeSketch(prof).extrude(-2 * RT_W).translate((0, -RT_W, 0))
+    for ys in (1, -1):                                  # tête plus étroite que le cadre de S4
+        y0, y1 = sorted((ys * RT_WH, ys * (RT_W + 1)))
+        corps = corps.cut(box(xr - 5, RT_FRONT + 2, y0, y1, s4z + S_END + JEU, K + RT_W + 2))
+    levier = enveloppe_2_cercles((0, K), 14, (lx, lz), 7).extrude(-(B1_Y + 2 - RT_WH + 0.5)).translate((0, RT_WH - 0.5, 0))
+    pion = cyl_y(0, K, POST_R, POST_Y, -RT_WH + 0.5).union(cyl_y(0, K, 8, POST_Y - 2.5, POST_Y))
+    guide = box(-11, -2.6, CAB_Y - 4, -RT_WH + 0.5, K - 26, K - 16).edges("|Z").fillet(1.5)
+    r = corps.union(levier).union(pion).union(guide).clean()
+    # genou : fente de la languette (prolongée jusqu'à S4 : la languette y passe à 110°), roulements, vis M5
+    r = r.cut(box(xr - 5, RT_FRONT + 2, -10.6, 10.6, s4z + S_END + JEU, K + RT_W + 2))
     for ys in (1, -1):
-        r = r.cut(cyl_y(0, KZ, BRG_D / 2, 10.5 if ys > 0 else -10.5 - BRG_W, (10.5 + BRG_W) if ys > 0 else -10.5))
-    r = r.cut(cyl_y(0, KZ, M5 / 2, -24, 24)).cut(cyl_y(0, KZ, 5.5, 17, B1_Y + 3))   # vis M5, passage tête + clé
-    for (g0, g1) in ((13.5, 15.0), (-15.0, -13.5)):                               # gorges des câbles de ressort
-        r = r.cut(cyl_y(0, KZ, 21, g0, g1).cut(cyl_y(0, KZ, 18.5, g0 - 1, g1 + 1)))
-    for yc in (14.25, -14.25):                                                    # tendeurs des ressorts
-        r = r.cut(cyl_x(yc, KZ - 12, 1.0, 8, 22)).cut(cyl_y(15, KZ - 12, INS / 2, yc - 4, yc + 4))
-    r = r.cut(cyl_y(lx, lz, INS / 2, B1_Y - 7, B1_Y + 2.5))                      # insert du moyeu B1
-    # tubes
+        r = r.cut(cyl_y(0, K, BRG_D / 2, 10.5 if ys > 0 else -10.5 - BRG_W, (10.5 + BRG_W) if ys > 0 else -10.5))
+    r = r.cut(cyl_y(0, K, M5 / 2, POST_Y - 4, B1_Y + 4)).cut(cyl_y(0, K, 5.5, 17, B1_Y + 4))   # vis M5 × 55, tête + clé
+    # ressorts : gorge circulaire (came), descente verticale à l'avant, trou Ø2,8, vis de pression M3 (insert)
+    for yc in (RES_Y, -RES_Y):
+        g0, g1 = yc - RES_G / 2, yc + RES_G / 2
+        r = r.cut(cyl_y(0, K, RT_W + 1, g0, g1).cut(cyl_y(0, K, RES_R, g0 - 1, g1 + 1)))
+        r = r.cut(box(RES_R, RT_W, g0, g1, K - 14, K + 0.5))
+        r = r.cut(cyl_z(RES_R + 1.5, yc, 1.4, K - 40, K - 13))
+        r = r.cut(cyl_x(yc, K - 22, INS / 2, RES_R - 2, RT_FRONT + 1))
+    r = r.cut(cyl_y(lx, lz, INS / 2, B1_Y - 9.5, B1_Y + 2.5))                    # insert du moyeu B1 (+ pointe de la vis M3 × 16)
+    # tubes Ø10 et goupille
     for ty in (-10, 10):
-        r = r.cut(cyl_z(0, ty, T10 / 2, KZ - TOP2 - 0.1, KZ - TOP2 + SOCK))
-    r = r.cut(cyl_y(0, KZ - TOP2 + 8, M3 / 2, -25, 25))                          # goupille M3 à travers les deux tubes
-    r = r.cut(box(-4, 4, -3, 3, KZ - TOP2 + 22, KZ - 24))                        # allègement entre les tubes
-    r = r.cut(box(-8, 4.5, -19, 19, KZ - 48, KZ - 30).edges("|Y").fillet(3))    # évidement traversant sous le genou
-    # S4
+        r = r.cut(cyl_z(0, ty, T10 / 2, K - TOP2 - 0.1, K - TOP2 + SOCK))
+    r = r.cut(cyl_y(0, K - TOP2 + 8, M3 / 2, -RT_W - 1, RT_W + 1))
+    r = r.cut(box(-5.5, 5.5, -15.5, 15.5, K - TOP2 + 23, K - 28).edges("|Z").fillet(2))   # bloc des tubes évidé (parois 3 mm)
+    r = r.cut(box(9, 16, -RT_W - 1, RT_W + 1, K - 42, K - 29).edges("|Y").fillet(2))   # fenêtre d'allègement avant
+    # S4 : logement, vis de boîtier, passages des deux palonniers, fenêtre des connecteurs
     r = r.cut(servo_pocket_vertical(-OFF, s4z))
     r = r.cut(servo_corner_holes_y(-OFF, zf, +1, -30, 30))
-    r = r.cut(cyl_y(-OFF, s4z, HORN_D / 2 + 1, -MP - 1, -HORN_FACE_C + 4))        # palonnier fou de S4
+    r = r.cut(cyl_y(-OFF, s4z, HORN_D / 2 + 1.4, HORN_FACE_O - 2, RT_W + 1))      # palonnier + entretoise du bras de S4
+    r = r.cut(cyl_y(-OFF, s4z, HORN_D / 2 + 1, -RT_W - 1, -HORN_FACE_C + 4))      # palonnier fou de S4
     r = r.cut(fenetre_connecteurs(-OFF, s4z))
-    r = r.cut(cyl_z(-6, -27, 1.9, KZ - 30, KZ - 10))                              # trou du passe-câble
+    r = r.cut(box(xr + 5, -15, -12, 12, zb - 1, zf + 1).edges("|Z").fillet(3))   # fond ajouré du cadre (vis de boîtier conservées)
+    for ys in (1, -1):                                                             # allègements latéraux
+        y0, y1 = sorted((ys * 18.0, ys * (RT_W + 1)))
+        r = r.cut(box(-8.6, RT_FRONT + 1, y0, y1, zb - 1, K - 27))                 # bloc des tubes et talon avant
+        r = r.cut(box(-35, -15, y0, y1, K - 62, K - 49).edges("|Y").fillet(3))    # fenêtres des flancs du cadre de S4
+    r = r.cut(cyl_z(CAB_X, CAB_Y, 1.9, K - 30, K - 10))                          # trou du passe-câble
     return cq.Workplane().add(max(r.solids().vals(), key=lambda v: v.Volume()))
 
 # ── 7. Bas de tibia (languette de cheville) ───────────────────────────────────
@@ -291,55 +314,109 @@ def tibia_bas():
     t = t.cut(box(-9, 9, -3.5, 3.5, AZ + 13, AZ + CLV - 12))              # allègement entre les tubes (sous la goupille)
     return t.cut(cyl_y(0, AZ, M5 / 2, -25, 25))
 
-# ── 8. Pied : semelle nervurée (dessous plein pour le collage), joues en A, levier de talon intégré
-def profil_tangent(c, r, p_g, p_d, z_bas):
-    """Contour XZ : base [p_g, p_d] à z_bas, flancs tangents au cercle (c, r) qui coiffe le haut."""
-    def tangente(p, cote):
-        dx, dz = p[0] - c[0], p[1] - c[1]
-        d = math.hypot(dx, dz)
-        a = math.atan2(dz, dx) + cote * math.acos(r / d)
-        return (c[0] + r * math.cos(a), c[1] + r * math.sin(a))
-    tg, td = tangente(p_g, -1), tangente(p_d, +1)
-    return (cq.Workplane("XZ").moveTo(p_g[0], z_bas).lineTo(p_d[0], z_bas).lineTo(*td)
-            .threePointArc((c[0], c[1] + r), tg).close())
+# ── 8. Pied (Rév. J) : semelle longue et basse, arche concave qui porte la cheville, levier de talon ─────────
+# Capteurs : « semelle suspendue ». Les 3 FSR sont collés sous le pied ; une plaque rigide (pièce 18), sur laquelle
+# est collée la semelle TPU, ne touche le pied QUE par 3 plots posés sur les FSR : tout le poids passe par eux.
+# La plaque est tenue par 3 vis M3 + entretoises (pièce 19) : libre de 0,3 mm en hauteur, guidée en travers.
+FSR = ((-24.0, 0.0), (50.0, 15.0), (50.0, -15.0))      # talon, pointe int., pointe ext. (FSR402 : Ø18,3 × 0,45, zone active Ø12,7)
+FSR_QUEUE = 8.0                                          # largeur du chemin de la queue du FSR (sous le pied)
+GUIDES = ((0.0, 22.0), (0.0, -22.0), (38.0, 0.0))        # vis-guides de la plaque, entre les capteurs
+FSR_REC, FSR_EP = 0.3, 0.55                              # logement de centrage du FSR ; FSR + adhésif double face
+JEU_SEM, PLOT_H, PLOT_D = 0.3, 1.2, 11.0                 # course libre ; plots Ø11 (≈ 75 % de la zone active)
+PLAQUE_EP, TPU_EP = 2.5, 3.0
+Z_PIED = GZ + 4.0                                        # dessous du pied
+Z_PLAQUE = Z_PIED + FSR_REC - FSR_EP - JEU_SEM - PLOT_H  # dessus de la plaque suspendue (au repos, pendue aux vis)
+Z_SOL = Z_PLAQUE - PLAQUE_EP - TPU_EP                    # sol (−3,25 mm par rapport à la Rév. I)
+L_ENT_SEM = Z_PIED - (Z_PLAQUE - PLAQUE_EP)              # entretoise : du dessous du pied au dessous de la plaque
+
+def contour_pied(z0, z1, retrait=0.0):
+    """Contour du pied : talon arrondi r 22, pointe arrondie r 28."""
+    talon, pointe, larg = FOOT
+    sk = (cq.Sketch().push([((pointe - talon) / 2, 0)]).rect(talon + pointe - 2 * retrait, larg - 2 * retrait)
+          .reset().vertices("<X").fillet(22 - retrait).reset().vertices(">X").fillet(28 - retrait))
+    return cq.Workplane("XY").placeSketch(sk).extrude(z1 - z0).translate((0, 0, z0))
+
+def _bezier(p0, c, p2, n=14):
+    return [((1 - t) ** 2 * p0[0] + 2 * (1 - t) * t * c[0] + t * t * p2[0],
+             (1 - t) ** 2 * p0[1] + 2 * (1 - t) * t * c[1] + t * t * p2[1]) for t in [k / n for k in range(n + 1)]]
+
+def _tangence(c, centre, r, cote):
+    dx, dz = c[0] - centre[0], c[1] - centre[1]
+    d = math.hypot(dx, dz)
+    a = math.atan2(dz, dx) + cote * math.acos(r / d)
+    return (centre[0] + r * math.cos(a), centre[1] + r * math.sin(a))
+
+def profil_arche(z_base, x_ar=-30.0, x_av=48.0, r=12.0):
+    """Arche de cheville : base plate, flancs concaves (Bézier) tangents au moyeu r 12, arc au-dessus."""
+    h = (0.0, AZ)
+    c_ar, c_av = (-12.0, z_base + 1.0), (12.0, z_base + 1.0)
+    t_ar, t_av = _tangence(c_ar, h, r, -1), _tangence(c_av, h, r, +1)
+    pts = [(x_ar, z_base - 2.0), (x_av, z_base - 2.0)] + _bezier((x_av, z_base), c_av, t_av)
+    w = cq.Workplane("XZ").polyline(pts).threePointArc((0.0, AZ + r), t_ar)
+    for q in _bezier(t_ar, c_ar, (x_ar, z_base))[1:]:
+        w = w.lineTo(*q)
+    return w.close()
 
 def pied():
-    talon, pointe, larg = FOOT
-    z0, peau, z1 = GZ + 4, GZ + 6.5, GZ + 10                             # plaque 6 mm, peau 2,5 mm sous les poches
-    p = box(-talon, pointe, -larg / 2, larg / 2, z0, z1).edges("|Z").fillet(10)
-    for (x0, x1) in ((-31, -14), (14, 36), (40, 61)):                  # poches par le dessus : le dessous reste plein
-        for (y0, y1) in ((3, larg / 2 - 4), (-larg / 2 + 4, -3)):
+    z0, peau, z1 = Z_PIED, GZ + 6.5, GZ + 10
+    p = contour_pied(z0, z1)
+    for (x0, x1, ym) in ((-27, -14, 22), (14, 36, 27), (40, 57, 19)):          # poches par le dessus
+        for (y0, y1) in ((3, ym), (-ym, -3)):
             p = p.cut(box(x0, x1, y0, y1, peau, z1 + 1).edges("|Z").fillet(3))
-    for (y0, y1) in ((19, 25), (-25, -19)):                             # joues en A, tangentes au moyeu r 12
-        j = profil_tangent((0, AZ), 12, (-28, peau), (28, peau), peau).extrude(-(y1 - y0)).translate((0, y0, 0))
-        j = j.cut(cyl_y(0, GZ + 24, 7, y0 - 1, y1 + 1))                 # allègement
+    amincis = (cq.Workplane("XZ").polyline([(36, z1 + 1), (36, z1), (FOOT[1] + 1, z0 + 2.5), (FOOT[1] + 1, z1 + 1)]).close()
+               .extrude(-80).translate((0, -40, 0)))                              # pointe amincie
+    amincis = amincis.union(cq.Workplane("XZ").polyline([(-20, z1 + 1), (-20, z1), (-FOOT[0] - 1, z0 + 3.5), (-FOOT[0] - 1, z1 + 1)])
+                            .close().extrude(-80).translate((0, -40, 0)))          # talon aminci
+    p = p.cut(amincis)
+    for (y0, y1) in ((19, 25), (-25, -19)):                                       # arches de cheville
+        j = profil_arche(peau).extrude(-(y1 - y0)).translate((0, y0, 0))
+        for (hx, hz, hr) in ((0, GZ + 24, 7.0), (-12.5, GZ + 15.5, 3.0), (15, GZ + 16, 4.0)):
+            j = j.cut(cyl_y(hx, hz, hr, y0 - 1, y1 + 1))                          # trous ronds d'allègement
         p = p.union(j)
-    p = p.union(box(-12, 12, -25, 25, peau, GZ + 14).edges("|Y").fillet(3))   # traverse sous la cheville
-    # levier de talon collé à toute la face extérieure de la joue (+y), œil r 6,5 en (-ARM, AZ)
+    p = p.union(box(-12, 12, -25, 25, peau, GZ + 14).edges("|Y").fillet(3))      # traverse sous la cheville
     lev = (cq.Workplane("XZ").moveTo(0, AZ + 12).lineTo(-ARM, AZ + 6.5).threePointArc((-ARM - 6.5, AZ), (-ARM, AZ - 6.5))
-           .lineTo(0, AZ - 12).threePointArc((12, AZ), (0, AZ + 12)).close().extrude(-(B2_Y + 2 - 24)).translate((0, 24, 0)))   # 1 mm noyé dans la joue
-    p = p.union(lev)
-    p = p.cut(cyl_y(0, AZ, 6.5, 25, B2_Y + 3))                           # lamage de l'écrou M5 dans le levier
+           .lineTo(0, AZ - 12).threePointArc((12, AZ), (0, AZ + 12)).close().extrude(-(B2_Y + 2 - 24)).translate((0, 24, 0)))
+    p = p.union(lev)                                                              # levier de talon (bielle B2)
+    p = p.cut(cyl_y(0, AZ, 6.5, 25, B2_Y + 3))                                    # lamage de l'écrou M5
     p = p.cut(cyl_y(0, AZ, BRG_D / 2, 19, 19 + BRG_W)).cut(cyl_y(0, AZ, BRG_D / 2, -19 - BRG_W, -19))
     p = p.cut(cyl_y(0, AZ, M5 / 2, -30, 30))
-    return p.cut(cyl_y(-ARM, AZ, INS / 2, 18, B2_Y + 3))
+    p = p.cut(cyl_y(-ARM, AZ, INS / 2, 18, B2_Y + 3))
+    # dessous : logements de centrage des FSR, chemins des queues vers le bord, inserts des vis-guides
+    larg = FOOT[2]
+    for (fx, fy) in FSR:
+        p = p.cut(cyl_z(fx, fy, 9.6, z0 - 0.1, z0 + FSR_REC))
+        q = FSR_QUEUE / 2
+        y0, y1 = (fy, larg / 2 + 1) if fy >= 0 else (-larg / 2 - 1, fy)
+        p = p.cut(box(fx - q, fx + q, y0, y1, z0 - 0.1, z0 + FSR_REC))
+    for (gx, gy) in GUIDES:
+        p = p.cut(cyl_z(gx, gy, INS / 2, z0 - 0.1, z0 + 6))
+    return p
 
-FSR = ((-24, 0), (8, 0), (52, 17), (52, -17))           # 4 FSR 402 (disque Ø18,3 × 0,45, zone active Ø12,7, queue standard 56 mm)
-FSR_QUEUE = 8.0                                          # largeur de la rainure de la queue
+def plaque_semelle():
+    """Plaque rigide suspendue : 3 plots sur les FSR, 3 trous de guidage ; la semelle TPU est collée dessous."""
+    z1 = Z_PLAQUE
+    p = contour_pied(z1 - PLAQUE_EP, z1, 0.5)
+    for (fx, fy) in FSR:
+        p = p.union(cyl_z(fx, fy, PLOT_D / 2, z1 - 0.1, z1 + PLOT_H))
+    for (gx, gy) in GUIDES:
+        p = p.cut(cyl_z(gx, gy, 3.15, z1 - PLAQUE_EP - 1, z1 + 1))
+    return p
+
+def entretoise_semelle():
+    return cyl_z(0, 0, 3.0, -L_ENT_SEM, 0).cut(cyl_z(0, 0, M3 / 2, -L_ENT_SEM - 1, 1))
 
 def semelle_tpu():
-    """Semelle TPU 95A, 4 mm, collée sous le pied : poches pour 4 FSR sur le dessus, rainures sous la semelle."""
+    """Semelle TPU 95A de 3 mm collée en plein sous la plaque suspendue : trous des têtes de vis, rainures dessous."""
     talon, pointe, larg = FOOT
-    s_ = box(-talon, pointe, -larg / 2, larg / 2, GZ, GZ + 4).edges("|Z").fillet(8)
+    z1 = Z_PLAQUE - PLAQUE_EP
+    s_ = contour_pied(Z_SOL, z1, 0.5)
     s_ = s_.edges(">Z or <Z").chamfer(0.6)
-    for (fx, fy) in FSR:
-        s_ = s_.cut(cyl_z(fx, fy, 9.6, GZ + 3.2, GZ + 4.1))                 # poche FSR, 0,8 mm (FSR 0,45 + pastille Ø10 × 0,4)
-        q = FSR_QUEUE / 2
-        s_ = s_.cut(box(fx - q, fx + q, fy, larg / 2 + 1, GZ + 3.2, GZ + 4.1) if fy >= 0 else box(fx - q, fx + q, -larg / 2 - 1, fy, GZ + 3.2, GZ + 4.1))  # passage de la queue
+    for (gx, gy) in GUIDES:
+        s_ = s_.cut(cyl_z(gx, gy, 4.5, Z_SOL - 1, z1 + 1))
     for i in range(-4, 13):                                              # rainures 1 mm sous la semelle
         x = i * 7.5
-        if -talon + 4 < x < pointe - 4:
-            s_ = s_.cut(box(x - 1, x + 1, -larg / 2 + 5, larg / 2 - 5, GZ - 0.1, GZ + 1))
+        if -talon + 6 < x < pointe - 6:
+            s_ = s_.cut(box(x - 1, x + 1, -larg / 2 + 7, larg / 2 - 7, Z_SOL - 0.1, Z_SOL + 1))
     return s_
 
 # ── 9. Bras de servo 22 mm et entretoises ─────────────────────────────────────
@@ -466,7 +543,7 @@ def visserie_jambe(pins):
             for sy in (1, -1):
                 add(f"vis_boitier_{nom}", vis("y", (-OFF + dx, sy * (SH / 2 + 3.5), zf), -sy, 12, 2))
     # vis épaulées M5 : écrous
-    add("ecrou_M5", ecrou("y", (0, -18.2, KZ), -1, 5).union(ecrou("y", (0, 25.2, AZ), 1, 5)))   # genou : écrou côté intérieur
+    add("ecrou_M5", ecrou("y", (0, POST_Y - 2.5, KZ), -1, 5).union(ecrou("y", (0, 25.2, AZ), 1, 5)))   # genou : écrou au bout du pion
     # rotules : vis M3 à travers l'œil dans le bras / le levier
     for nom, pin, y_ext in (("B1", pin_s3, B1_ROD + 3), ("B1", pin_genou, B1_ROD + 3), ("B2", pin_s4, B2_ROD + 3), ("B2", pin_talon, B2_ROD + 3)):
         add(f"vis_rotules_{nom}", vis("y", (pin[0], y_ext, pin[1]), -1, 16, 3))
@@ -477,9 +554,11 @@ def visserie_jambe(pins):
     add("vis_tubes", vis("y", (0, 18.5, AZ + CLV - 8), -1, 40, 3).union(ecrou("y", (0, -18.5, AZ + CLV - 8), -1, 3)))
     # ressorts : axe d'ancrage M3 × 45 + tendeurs de câble
     add("vis_ressorts", vis("y", (12, 20, -TOP1 + 3), -1, 45, 3).union(ecrou("y", (12, -20, -TOP1 + 3), -1, 3)))
-    for yc in (14.25, -14.25):
-        sy = 1 if yc > 0 else -1
-        add("vis_ressorts", vis("y", (15, sy * 18, KZ - 12), -sy, 7, 3))
+    for yc in (RES_Y, -RES_Y):                                          # vis de pression qui pincent le Dyneema
+        add("vis_ressorts", vis("x", (RT_FRONT, yc, KZ - 22), -1, 6, 3))
+    # semelle suspendue : 3 vis M3 × 10 à tête bombée + rondelle, sous la plaque
+    for (gx, gy) in GUIDES:
+        add("vis_semelle", vis("z", (gx, gy, Z_PLAQUE - PLAQUE_EP - 0.5), 1, 10, 3))
     # berceau de S1 sous la plaque de bassin
     ztop = S1_Z + SW / 2 + 0.15 + 6
     for x in (-12, 12):
@@ -548,7 +627,7 @@ def chemins_cables():
                   (-14, -16, 30), (-14, -16, 21), (-14, -19, 15), s2h],
         "S2_S3": [s2b, (-14.5, -19.2, -28), (-13.8, -19.2, -38), (-13.5, -19.2, -45), (s3a[0], s3a[1], -50), s3a],
         "S3_S4": [s3b, (s3b[0], -24, -58), (s3b[0], -24, -84), (-6, -27, -112), (-2, -27, KZ + 42), (-2, -27, KZ + 20),
-                  (-3.8, -26.6, KZ + 3), (-3.8, -26.6, KZ - 3), (-6, -27, KZ - 12), (-6, -27, KZ - 28), (-14, -26, KZ - 38), (s4a[0], -22, KZ - 45), s4a],
+                  (CAB_X, CAB_Y, KZ + 3), (CAB_X, CAB_Y, KZ - 3), (CAB_X, CAB_Y, KZ - 12), (CAB_X, CAB_Y, KZ - 28), (-14, -24.5, KZ - 38), (s4a[0], -22, KZ - 45), s4a],
     }
 
 def cablage_jambe():
@@ -568,7 +647,7 @@ def composants_jambe():
     acier, orange, vert = cq.Color(0.62, 0.62, 0.65), cq.Color(0.72, 0.42, 0.06), cq.Color(0.17, 0.53, 0.34)
     c = {}
     for n, fn in PIECES.items():
-        if n[:2] in ("01", "09", "10", "11", "17"):
+        if n[:2] in ("01", "09", "10", "11", "17", "19"):
             continue
         c[n[3:]] = (fn(), pla)
     for n in SERVOS:
@@ -590,12 +669,22 @@ def composants_jambe():
     for n, (y, z) in {"625_genou_ext": (13.0, KZ), "625_genou_int": (-13.0, KZ),
                       "625_cheville_ext": (21.5, AZ), "625_cheville_int": (-21.5, AZ)}.items():
         c[n] = (roulement_625().translate((0, y, z)), acier)
-    c["vis_M5_genou"] = (vis_epaulee_m5(40).mirror("XZ").translate((0, 0, KZ)), acier)   # tête côté extérieur
+    c["vis_M5_genou"] = (vis_epaulee_m5(55).mirror("XZ").translate((0, -10.5, KZ)), acier)   # M5 × 55, tête côté extérieur
     c["vis_M5_cheville"] = (vis_epaulee_m5(56).translate((0, 0, AZ)), acier)
     for ys in (14.5, -14.5):
         c[f"ressort_{'ext' if ys > 0 else 'int'}"] = (ressort().translate((12, ys, -TOP1 - 1)), vert)
     tpu = cq.Color(0.33, 0.42, 0.38)
     c["semelle_TPU"] = (c.pop("semelle_TPU")[0], tpu)
+    ent = None
+    for (gx, gy) in GUIDES:
+        e = entretoise_semelle().translate((gx, gy, Z_PIED))
+        ent = e if ent is None else ent.union(e)
+    c["entretoises_semelle"] = (ent, pla)
+    fsr = None
+    for (fx, fy) in FSR:
+        f = cyl_z(fx, fy, 9.15, Z_PIED + FSR_REC - FSR_EP, Z_PIED + FSR_REC - 0.1)
+        fsr = f if fsr is None else fsr.union(f)
+    c["FSR402"] = (fsr, cq.Color(0.1, 0.1, 0.1))
     for n, f in visserie_jambe((pin_s3, pin_genou, pin_s4, pin_talon)).items():
         c[n] = (f, cq.Color(0.45, 0.45, 0.48))
     return c, (pin_s3, pin_genou, pin_s4, pin_talon)
@@ -614,6 +703,8 @@ PIECES = {
     "11_entretoise_S4_3_8": lambda: entretoise(ENT_S4),
     "16_semelle_TPU": semelle_tpu,
     "17_support_ToF_bas": support_tof,
+    "18_plaque_semelle": plaque_semelle,
+    "19_entretoise_semelle": entretoise_semelle,
 }
 
 if __name__ == "__main__":

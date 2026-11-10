@@ -5,48 +5,49 @@ Pièces imprimées : PETG à 60 % de densité effective (4 parois, gyroïde 40 %
 | Ensemble | Masse |
 |---|---|
 | bassin | 55 g |
-| jambes (×2) | 1216 g |
+| jambes (×2) | 1251 g |
 | buste (estimé) | 1153 g |
-| **Total** | **2424 g** |
+| **Total** | **2459 g** |
 
-Centre de gravité : **467 mm au-dessus du sol** (+17 mm par rapport à l'axe de hanche), -3.0 mm en x.
+Centre de gravité : **467 mm au-dessus du sol** (+14 mm par rapport à l'axe de hanche), -3.0 mm en x.
 
 | Ensemble | Composant | Masse |
 |---|---|---|
 | buste (estimé) | LiPo_3S_2200 | 185.0 g |
 | buste (estimé) | LiPo_4S_1400 | 175.0 g |
 | buste (estimé) | protections_helices | 131.8 g |
+| jambes (×2) | raccord_tibia_berceau_S4 | 129.0 g |
 | buste (estimé) | moteurs_2206 | 128.0 g |
 | jambes (×2) | S1 | 110.0 g |
 | jambes (×2) | S2 | 110.0 g |
 | jambes (×2) | S3 | 110.0 g |
 | jambes (×2) | S4 | 110.0 g |
-| jambes (×2) | raccord_tibia_berceau_S4 | 100.9 g |
 | buste (estimé) | Pi5_AI_HAT_ventilo | 90.0 g |
-| jambes (×2) | pied | 80.4 g |
 | buste (estimé) | Pico2_regulateur_capteurs | 80.0 g |
 | jambes (×2) | chape_cuisse_berceau_S3 | 75.1 g |
 | buste (estimé) | bras_propulseurs_carbone | 73.5 g |
 | jambes (×2) | etrier_roulis_berceau_S2 | 73.1 g |
 | buste (estimé) | cablage | 70.0 g |
+| jambes (×2) | pied | 69.4 g |
 | buste (estimé) | cadre_buste | 67.4 g |
 | bassin | plaque de bassin | 55.3 g |
-| jambes (×2) | semelle_TPU | 50.0 g |
 | buste (estimé) | lidar_LD19 | 47.0 g |
+| jambes (×2) | semelle_TPU | 34.2 g |
 | jambes (×2) | tibia_bas | 33.3 g |
 | jambes (×2) | berceau_S1 | 24.9 g |
 | jambes (×2) | languette_genou | 22.9 g |
 | buste (estimé) | tete_coque | 22.5 g |
+| jambes (×2) | plaque_semelle | 22.3 g |
 | jambes (×2) | ressort_ext | 22.0 g |
 | jambes (×2) | ressort_int | 22.0 g |
 | jambes (×2) | vis_M5_cheville | 19.6 g |
 | jambes (×2) | vis_tubes | 19.6 g |
+| jambes (×2) | vis_M5_genou | 19.3 g |
 | buste (estimé) | helices_5po | 18.0 g |
 | jambes (×2) | vis_palonnier_S1 | 15.8 g |
 | jambes (×2) | vis_palonnier_S2 | 15.8 g |
 | buste (estimé) | ESC_4en1_45A | 15.0 g |
 | buste (estimé) | ecran_eink | 15.0 g |
-| jambes (×2) | vis_M5_genou | 14.7 g |
 | jambes (×2) | tube_cuisse | 14.4 g |
 | jambes (×2) | vis_bras_S3 | 12.4 g |
 | jambes (×2) | tube_tibia_int | 12.2 g |
@@ -57,13 +58,14 @@ Centre de gravité : **467 mm au-dessus du sol** (+17 mm par rapport à l'axe de
 | jambes (×2) | 625_genou_int | 9.2 g |
 | jambes (×2) | 625_cheville_ext | 9.2 g |
 | jambes (×2) | 625_cheville_int | 9.2 g |
-| jambes (×2) | vis_ressorts | 9.1 g |
 | buste (estimé) | cou_servo_pan | 9.0 g |
 | buste (estimé) | tete_servo_tilt | 9.0 g |
+| jambes (×2) | vis_ressorts | 8.9 g |
 | jambes (×2) | vis_bras_S4 | 8.8 g |
 | buste (estimé) | supports_ToF_bas | 8.6 g |
 | jambes (×2) | ecrou_M5 | 8.2 g |
 | jambes (×2) | cablage_bus | 7.8 g |
+| jambes (×2) | vis_semelle | 5.3 g |
 | jambes (×2) | vis_rotules_B1 | 4.8 g |
 | jambes (×2) | vis_rotules_B2 | 4.8 g |
 | jambes (×2) | entretoise_S3 | 4.4 g |
@@ -77,3 +79,5 @@ Centre de gravité : **467 mm au-dessus du sol** (+17 mm par rapport à l'axe de
 | jambes (×2) | vis_boitier_S3 | 3.1 g |
 | jambes (×2) | vis_boitier_S4 | 3.1 g |
 | jambes (×2) | entretoise_S4 | 1.4 g |
+| jambes (×2) | FSR402 | 0.5 g |
+| jambes (×2) | entretoises_semelle | 0.4 g |
