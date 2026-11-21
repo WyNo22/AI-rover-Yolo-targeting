@@ -81,3 +81,25 @@ PC ou Pi ──USB-C──► adaptateur ──câble 3 broches──► servo
 | `move 3 2500` | va à une position (0–4095 ; 2048 = centre ; 4096 pas = 360°) |
 | `couple 3 off` / `on` | libère ou bloque le servo (couple libre pour le tourner à la main) |
 | `id 1 5` | change un ID à la main (un seul servo branché) |
+
+## Jambe complète : `jambe_banc.py`
+
+Une fois la jambe montée et les zéros faits (`sts_banc.py zero`, jambe tendue et pied à plat), tout se fait avec ce
+script. Il faut aussi `matplotlib` pour l'animation : `pip install matplotlib`.
+
+Jambe fixée par le haut au bord d'une table, pied dans le vide (sauf l'étape 6). `--jambe G` pour la jambe gauche
+(ID 5–8). Les réglages sont enregistrés dans `jambe_D.json` / `jambe_G.json`.
+
+| # | Commande | Ce que tu fais | C'est bon si |
+|---|---|---|---|
+| 0 | `python jambe_banc.py marche --sim` | rien : la marche des deux jambes s'anime sur le PC | tu vois ce que la vraie jambe va faire |
+| 1 | `python jambe_banc.py butees` | couple coupé, tu amènes chaque articulation à ses deux limites à la main | limites enregistrées ; la jambe s'arrêtera ensuite à 5° de chaque butée |
+| 2 | `python jambe_banc.py sens` | chaque articulation bouge un peu ; tu réponds o/n | chaque articulation part dans le sens annoncé (sinon le sens est inversé automatiquement) |
+| 3 | `python jambe_banc.py cycle` | chaque articulation fait toute sa course, aller-retour | charge < 20 %, rien ne frotte ni n'accroche |
+| 4 | `python jambe_banc.py pied 40 30` | le pied va 40 mm devant et 30 mm plus haut que la position debout | il y va, et **reste à plat** |
+| 5 | `python jambe_banc.py marche` | la vraie jambe fait 6 pas dans le vide | mouvement fluide, charge et température affichées raisonnables |
+| 6 | `python jambe_banc.py charge` | pied posé sur une balance (~1,2 kg d'appui), 5 min de flexions | < 60 % de charge et < 50 °C ; mesures dans `charge_D_….csv` |
+
+`python jambe_banc.py repos` coupe le couple. Ctrl+C à tout moment coupe aussi le couple.
+Réglages de la marche : `--periode 1.2 --pas 50 --levee 25 --roulis 4 --cycles 6` (commence lent, puis accélère).
+`python test_jambe_banc.py` teste le script sans matériel.
