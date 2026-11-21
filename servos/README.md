@@ -101,5 +101,14 @@ Jambe fixée par le haut au bord d'une table, pied dans le vide (sauf l'étape 6
 | 6 | `python jambe_banc.py charge` | pied posé sur une balance (~1,2 kg d'appui), 5 min de flexions | < 60 % de charge et < 50 °C ; mesures dans `charge_D_….csv` |
 
 `python jambe_banc.py repos` coupe le couple. Ctrl+C à tout moment coupe aussi le couple.
-Réglages de la marche : `--periode 1.2 --pas 50 --levee 25 --roulis 4 --cycles 6` (commence lent, puis accélère).
+Rythmes : `marche --rythme lent|moyen|max` (moyen par défaut), en vrai comme en simulation (`--sim`).
+`rythmes` enchaîne les trois sur la vraie jambe, avec Entrée entre chaque (« s » pour s'arrêter).
+
+| Rythme | Un pas toutes les | Pas | Vitesse du robot | Articulation la plus rapide |
+|---|---|---|---|---|
+| lent | 2,0 s | 40 mm | ≈ 0,12 km/h | genou 73°/s |
+| moyen | 1,2 s | 50 mm | ≈ 0,25 km/h | genou 152°/s |
+| max | 0,92 s (calculée) | 60 mm | ≈ 0,39 km/h | genou 200°/s (limite fixée à ~75 % du servo) |
+
+Les options `--periode --pas --levee --roulis --cycles` remplacent celles du rythme.
 `python test_jambe_banc.py` teste le script sans matériel.

@@ -11,6 +11,8 @@ Jambe fixée par le haut au bord d'une table, pied dans le vide (sauf « charge 
   python jambe_banc.py cycle                plie et déplie chaque articulation sur toute sa course
   python jambe_banc.py pied 40 30           pied 40 mm devant, 30 mm plus haut que la position debout
   python jambe_banc.py marche               la vraie jambe joue son rôle dans la marche (pied dans le vide)
+  python jambe_banc.py marche --rythme max  rythmes : lent, moyen (défaut), max (le plus vite que les servos suivent)
+  python jambe_banc.py rythmes              enchaîne lent → moyen → max sur la vraie jambe
   python jambe_banc.py charge               pied posé : flexions 0→60° pendant 5 min, mesures dans un CSV
   python jambe_banc.py repos                couple coupé sur la jambe
 
@@ -90,6 +92,57 @@ def pose_marche(phase, pas=50.0, levee=25.0, roulis=4.0, cote="D"):
     q = cinematique_inverse(x, H_DEBOUT - dz)
     q["roulis"] = roulis * math.sin(2 * math.pi * (phase % 1.0))   # bascule du bassin vers la jambe d'appui
     return q
+
+
+# ── Rythmes de marche ─────────────────────────────────────────────────────────
+VITESSE_MAX = 200.0                   # °/s par articulation (≈ 75 % du STS3215 à vide en 12 V)
+RYTHMES = {"lent": {"periode": 2.0, "pas": 40.0, "levee": 20.0, "roulis": 3.0},
+           "moyen": {"periode": 1.2, "pas": 50.0, "levee": 25.0, "roulis": 4.0},
+           "max": {"periode": None, "pas": 60.0, "levee": 25.0, "roulis": 4.0}}   # période calculée
+
+
+def vitesses_pic(periode, pas, levee, roulis, n=400):
+    """Vitesse angulaire maximale de chaque articulation (°/s) sur un cycle de marche."""
+    pic = {k: 0.0 for k in ARTIC}
+    prec = pose_marche(0.0, pas, levee, roulis)
+    for i in range(1, n + 1):
+        q = pose_marche(i / n, pas, levee, roulis)
+        for k in ARTIC:
+            pic[k] = max(pic[k], abs(q[k] - prec[k]) * n / periode)
+        prec = q
+    return pic
+
+
+def periode_min(pas, levee, roulis, vmax=VITESSE_MAX):
+    """Période la plus courte pour laquelle aucune articulation ne dépasse vmax."""
+    lo, hi = 0.2, 5.0
+    for _ in range(40):
+        m = (lo + hi) / 2
+        if max(vitesses_pic(m, pas, levee, roulis).values()) > vmax:
+            lo = m
+        else:
+            hi = m
+    return hi
+
+
+def vitesse_robot(periode, pas, appui=0.6):
+    """Vitesse d'avance du robot (km/h) : le pied d'appui recule de `pas` pendant la phase d'appui."""
+    return pas / (appui * periode) * 3.6 / 1000
+
+
+def regler_rythme(a):
+    """Complète les réglages de marche avec ceux du rythme choisi (les options données gardent la priorité)."""
+    pre = RYTHMES[a.rythme]
+    for k in ("pas", "levee", "roulis", "periode"):
+        if getattr(a, k) is None:
+            setattr(a, k, pre[k])
+    if a.periode is None:
+        a.periode = round(periode_min(a.pas, a.levee, a.roulis), 2)
+    v = vitesses_pic(a.periode, a.pas, a.levee, a.roulis)
+    print(f"Rythme {a.rythme} : un pas toutes les {a.periode:.2f} s, pas de {a.pas:.0f} mm, levée {a.levee:.0f} mm "
+          f"→ ≈ {vitesse_robot(a.periode, a.pas):.2f} km/h")
+    print("  vitesses max : " + ", ".join(f"{k} {v[k]:.0f}°/s" for k in ARTIC) + f"  (limite {VITESSE_MAX:.0f}°/s)")
+    return a
 
 
 # ── Réglages de la jambe ──────────────────────────────────────────────────────
@@ -243,11 +296,22 @@ def cmd_pied(bus, S, r, ids, dx, dz, dy):
 
 def cmd_marche_reelle(bus, S, r, ids, cote, a):
     q_de_t = lambda t: pose_marche(t / a.periode, a.pas, a.levee, a.roulis, cote)
-    print(f"Position de départ (lentement)… puis {a.cycles} pas de {a.periode:.1f} s. Ctrl+C pour arrêter.")
+    print(f"Position de départ (lentement)… puis {a.cycles} pas de {a.periode:.2f} s. Ctrl+C pour arrêter.")
     aller_doucement(bus, S, r, ids, q_de_t(0.0))
     afficher_pics(jouer(bus, S, r, ids, q_de_t, a.cycles * a.periode), ids)
     aller_doucement(bus, S, r, ids, cinematique_inverse(0, H_DEBOUT))
     print("✓ Marche finie, jambe en position debout.")
+
+
+def cmd_rythmes(bus, S, r, ids, cote, cycles, saisie=None):
+    saisie = saisie or input
+    for nom in RYTHMES:
+        a = argparse.Namespace(rythme=nom, cycles=cycles, periode=None, pas=None, levee=None, roulis=None)
+        print()
+        regler_rythme(a)
+        if saisie(f"Entrée pour lancer le rythme {nom}, « s » + Entrée pour arrêter là : ").strip().lower() == "s":
+            break
+        cmd_marche_reelle(bus, S, r, ids, cote, a)
 
 
 def cmd_charge(bus, S, r, ids, cote, minutes, saisie=None):
@@ -359,17 +423,22 @@ def main():
     s = sp.add_parser("marche")
     s.add_argument("--sim", action="store_true", help="animation sur le PC, sans robot")
     s.add_argument("--gif", help="avec --sim : enregistre l'animation dans ce fichier au lieu de l'afficher")
+    s.add_argument("--rythme", choices=list(RYTHMES), default="moyen", help="lent, moyen ou max")
     s.add_argument("--cycles", type=int, default=6)
-    s.add_argument("--periode", type=float, default=1.2, help="durée d'un pas complet (s)")
-    s.add_argument("--pas", type=float, default=50.0, help="longueur du pas (mm)")
-    s.add_argument("--levee", type=float, default=25.0, help="hauteur de levée du pied (mm)")
-    s.add_argument("--roulis", type=float, default=4.0, help="bascule du bassin (degrés)")
+    s.add_argument("--periode", type=float, help="durée d'un pas complet (s), remplace celle du rythme")
+    s.add_argument("--pas", type=float, help="longueur du pas (mm)")
+    s.add_argument("--levee", type=float, help="hauteur de levée du pied (mm)")
+    s.add_argument("--roulis", type=float, help="bascule du bassin (degrés)")
+    s = sp.add_parser("rythmes", help="la jambe enchaîne lent, moyen et max (Entrée entre chaque)")
+    s.add_argument("--cycles", type=int, default=5)
     s = sp.add_parser("charge"); s.add_argument("--minutes", type=float, default=5.0)
     a = ap.parse_args()
 
-    if a.cmd == "marche" and a.sim:
-        simuler(a, a.gif)
-        return
+    if a.cmd == "marche":
+        regler_rythme(a)
+        if a.sim:
+            simuler(a, a.gif)
+            return
 
     import sts_banc as S
     port = a.port or S.trouver_port()
@@ -391,6 +460,8 @@ def main():
             cmd_pied(bus, S, r, ids, a.dx, a.dz, a.dy)
         elif a.cmd == "marche":
             cmd_marche_reelle(bus, S, r, ids, a.jambe, a)
+        elif a.cmd == "rythmes":
+            cmd_rythmes(bus, S, r, ids, a.jambe, a.cycles)
         elif a.cmd == "charge":
             cmd_charge(bus, S, r, ids, a.jambe, a.minutes)
         elif a.cmd == "repos":

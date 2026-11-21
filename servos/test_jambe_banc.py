@@ -95,6 +95,10 @@ def test():
     assert abs(jambe[2].m[S.POSITION] | (jambe[2].m[S.POSITION + 1] << 8)) == JB.vers_pas(JB.charger("D"), "genou", qv["genou"])
     out = lancer(jambe, "marche", "--cycles", "1", "--periode", "0.4")
     assert "Marche finie" in out and "charge max" in out, out
+    out = lancer(jambe, "marche", "--rythme", "max", "--cycles", "1")
+    assert "Rythme max" in out and "genou 200°/s" in out and "Marche finie" in out, out
+    out = lancer(jambe, "rythmes", "--cycles", "1", entrees=["", "", "s"])
+    assert "Rythme lent" in out and "Rythme moyen" in out and out.count("Marche finie") == 2, out
     out = lancer(jambe, "cycle")
     assert "Cycle fini" in out, out
     out = lancer(jambe, "charge", "--minutes", "0.02", entrees=[""])
@@ -109,7 +113,9 @@ def test():
     os.remove(fichier)
 
     # animation : quelques images sans fenêtre
-    class A: cycles, periode, pas, levee, roulis = 1, 1.2, 50.0, 25.0, 4.0
+    import argparse
+    A = JB.regler_rythme(argparse.Namespace(rythme="max", cycles=1, periode=None, pas=None, levee=None, roulis=None))
+    assert max(JB.vitesses_pic(A.periode, A.pas, A.levee, A.roulis).values()) <= JB.VITESSE_MAX + 1
     assert JB.simuler(A, images=range(0, 30, 3))
     print("tous les tests passent")
 
