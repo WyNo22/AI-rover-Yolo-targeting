@@ -64,6 +64,7 @@ class Bus:
         self.ser = serial.Serial(port, baud, timeout=timeout)
         self.ser.reset_input_buffer()
         self.surplus = False          # des octets en trop après une réponse = plusieurs servos sur le même ID
+        self.echo = False             # l'adaptateur renvoie nos trames : à signaler
 
     def close(self):
         self.ser.close()
@@ -74,11 +75,18 @@ class Bus:
         corps = [sid, len(params) + 2, instr, *params]
         return bytes([0xFF, 0xFF, *corps, (~sum(corps)) & 0xFF])
 
-    def _lire_reponse(self, sid, delai=0.06):
+    def _lire_reponse(self, sid, delai=0.06, envoye=None):
         t0 = time.monotonic()
         buf = b""
         while time.monotonic() - t0 < delai:
             buf += self.ser.read(max(1, self.ser.in_waiting))
+            if envoye is not None:                    # écho de notre propre trame (adaptateur en mode A, Pico branché…)
+                if len(buf) < len(envoye) and envoye.startswith(buf):
+                    continue
+                if buf.startswith(envoye):
+                    buf = buf[len(envoye):]
+                    self.echo = True
+                envoye = None
             i = buf.find(b"\xff\xff")
             if i < 0 or len(buf) < i + 4:
                 continue
@@ -105,10 +113,11 @@ class Bus:
 
     def echange(self, sid, instr, params=(), reponse=True, delai=0.06):
         self.ser.reset_input_buffer()
-        self.ser.write(self.trame(sid, instr, params))
+        t = self.trame(sid, instr, params)
+        self.ser.write(t)
         if sid == DIFFUSION or not reponse:
             return None
-        return self._lire_reponse(sid, delai)
+        return self._lire_reponse(sid, delai, t)
 
     # ── opérations ────────────────────────────────────────────────────────────
     def ping(self, sid):
@@ -279,6 +288,8 @@ def main():
             t = scanner(bus, range(0, a.max + 1))
             doublons = sorted({i for i in t if t.count(i) > 1})
             uniques = sorted(set(t))
+            if bus.echo:
+                print("⚠ l'adaptateur renvoie les trames envoyées (écho) : cavalier sur A au lieu de B, ou Pico encore branché sur TX/RX ?")
             print(f"{len(t)} servo(s) : {uniques}" if t else "Aucun servo. Alimentation 12 V branchée ? Cavalier sur B ? Câble dans le bon sens ?")
             if doublons:
                 print(f"⚠ plusieurs servos partagent l'ID {doublons} : branche-les un par un et utilise « installer » ou « id »")

@@ -68,7 +68,11 @@ class FauxSerie:
     def close(self):
         pass
 
+    echo = False
+
     def write(self, b):
+        if self.echo:
+            self.sortie += b                             # adaptateur qui renvoie la trame émise
         assert b[:2] == b"\xff\xff"
         sid, lg, instr, params = b[2], b[3], b[4], b[5:5 + b[3] - 2]
         assert (~sum(b[2:-1])) & 0xFF == b[-1], "somme de contrôle de la trame envoyée"
@@ -164,6 +168,13 @@ def test():
     with contextlib.redirect_stdout(f):
         S.main()
     assert "il en faut exactement un" in f.getvalue() and all(s.sid == 1 for s in doublon)
+    # adaptateur qui renvoie l'écho des trames : il ne doit pas faire apparaître de faux servos
+    FauxSerie.echo = True
+    out = lancer([FauxServo(1), FauxServo(2)], "scan", "--max", "10")
+    assert "2 servo(s) : [1, 2]" in out and "écho" in out, out
+    out = lancer([], "scan", "--max", "10")
+    assert "Aucun servo" in out, out
+    FauxSerie.echo = False
     print("tous les tests passent")
 
 
