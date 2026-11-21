@@ -171,8 +171,8 @@ def jouer(bus, S, r, ids, q_de_t, duree, hz=50):
     return pics
 
 
-def afficher_pics(pics, ids):
-    for artic, sid in zip(ARTIC, ids):
+def afficher_pics(pics, ids, noms=ARTIC):
+    for artic, sid in zip(noms, ids):
         c, i, t = pics[sid]
         alerte = "  ⚠ force beaucoup" if c > 60 else ("  ⚠ chaud" if t > 50 else "")
         print(f"  {artic:9s} (ID {sid}) : charge max {c:5.1f} %, courant max {i:5d} mA, {t} °C{alerte}")
@@ -228,9 +228,10 @@ def cmd_cycle(bus, S, r, ids):
             return q
         q0 = q_de_t(0)
         aller_doucement(bus, S, r, ids, q0)
-        afficher_pics(jouer(bus, S, r, ids, q_de_t, 8.0), [sid])
+        afficher_pics(jouer(bus, S, r, ids, q_de_t, 8.0), [sid], [artic])
     aller_doucement(bus, S, r, ids, {k: 0.0 for k in ARTIC})
-    print("✓ Cycle fini. Attendu à vide : charge < 20 %, rien qui frotte ni qui accroche.")
+    print("✓ Cycle fini. Normal : 30–50 % de charge (la jambe est soulevée, les ressorts tirent au genou) ;\n"
+          "  à surveiller : un pic soudain, un claquement, ou plus de 50 °C.")
 
 
 def cmd_pied(bus, S, r, ids, dx, dz, dy):
