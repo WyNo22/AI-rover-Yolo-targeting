@@ -111,4 +111,10 @@ Rythmes : `marche --rythme lent|moyen|max` (moyen par défaut), en vrai comme en
 | max | 0,92 s (calculée) | 60 mm | ≈ 0,39 km/h | genou 200°/s (limite fixée à ~75 % du servo) |
 
 Les options `--periode --pas --levee --roulis --cycles` remplacent celles du rythme.
+
+**Endurance** : `python jambe_banc.py endurance` (5 min au rythme moyen ; `--minutes 10 --rythme max` pour varier).
+La jambe marche dans le vide ; le script enregistre consigne et position mesurée, charge, courant, température et
+tension 5 fois par seconde dans `endurance_D_….csv`, affiche un bilan par minute et la dérive entre la première et
+la dernière minute (une charge qui monte = frottement ou pièce qui se déforme, un écart qui grandit = jeu qui
+apparaît), et trace `endurance_D_….png`. Il s'arrête seul à 60 °C ou sous 10,5 V.
 `python test_jambe_banc.py` teste le script sans matériel.

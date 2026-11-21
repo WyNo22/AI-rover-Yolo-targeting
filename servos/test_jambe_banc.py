@@ -99,6 +99,13 @@ def test():
     assert "Rythme max" in out and "genou 200°/s" in out and "Marche finie" in out, out
     out = lancer(jambe, "rythmes", "--cycles", "1", entrees=["", "", "s"])
     assert "Rythme lent" in out and "Rythme moyen" in out and out.count("Marche finie") == 2, out
+    out = lancer(jambe, "endurance", "--minutes", "0.05", "--rythme", "moyen")
+    assert "Dérive entre" in out and "endurance_D_moyen" in out and "Aucune dérive" in out, out
+    d = os.path.dirname(os.path.abspath(JB.__file__))
+    faits = [n for n in os.listdir(d) if n.startswith("endurance_D_")]
+    assert any(n.endswith(".csv") for n in faits) and any(n.endswith(".png") for n in faits), faits
+    for n in faits:
+        os.remove(os.path.join(d, n))
     out = lancer(jambe, "cycle")
     assert "Cycle fini" in out, out
     out = lancer(jambe, "charge", "--minutes", "0.02", entrees=[""])

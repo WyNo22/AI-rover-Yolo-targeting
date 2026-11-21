@@ -13,6 +13,7 @@ Jambe fixée par le haut au bord d'une table, pied dans le vide (sauf « charge 
   python jambe_banc.py marche               la vraie jambe joue son rôle dans la marche (pied dans le vide)
   python jambe_banc.py marche --rythme max  rythmes : lent, moyen (défaut), max (le plus vite que les servos suivent)
   python jambe_banc.py rythmes              enchaîne lent → moyen → max sur la vraie jambe
+  python jambe_banc.py endurance            marche dans le vide 5 min (rythme moyen) : CSV, bilan par minute, graphique
   python jambe_banc.py charge               pied posé : flexions 0→60° pendant 5 min, mesures dans un CSV
   python jambe_banc.py repos                couple coupé sur la jambe
 
@@ -303,6 +304,138 @@ def cmd_marche_reelle(bus, S, r, ids, cote, a):
     print("✓ Marche finie, jambe en position debout.")
 
 
+def cmd_endurance(bus, S, r, ids, cote, a):
+    """Marche dans le vide pendant a.minutes : consignes à 50 Hz, mesures des 4 servos ~5 fois par seconde,
+    CSV complet, bilan par minute, dérive début → fin, graphique PNG."""
+    regler_rythme(a)
+    base = os.path.join(os.path.dirname(os.path.abspath(__file__)), f"endurance_{cote}_{a.rythme}_{time.strftime('%Y%m%d_%H%M%S')}")
+    q_de_t = lambda t: pose_marche(t / a.periode, a.pas, a.levee, a.roulis, cote)
+    print(f"Endurance {a.minutes:g} min, jambe dans le vide. Ctrl+C pour arrêter (les mesures sont gardées).")
+    aller_doucement(bus, S, r, ids, q_de_t(0.0))
+    for sid in ids:
+        bus.ecrire8(sid, S.ACCEL, 0)
+    lignes = []                                    # (t, {artic: (consigne, mesure, charge, courant, temp)}, tension)
+    t0 = time.monotonic()
+    duree = a.minutes * 60
+    n, hz, arret = 0, 50, None
+    try:
+        while True:
+            t = time.monotonic() - t0
+            if t >= duree:
+                break
+            q = q_de_t(t)
+            envoyer(bus, S, r, ids, q)
+            n += 1
+            if n % 10 == 0:
+                mes, tension = {}, None
+                for artic, sid in zip(ARTIC, ids):
+                    try:
+                        e = bus.etat(sid)
+                    except S.ErreurBus:
+                        continue
+                    mes[artic] = (borne(r, artic, q[artic]), vers_deg(r, artic, e["position"]), abs(e["charge_%"]),
+                                  abs(e["courant_mA"]), e["temp_C"])
+                    tension = e["tension_V"] if tension is None else min(tension, e["tension_V"])
+                lignes.append((t, mes, tension))
+                if mes and max(m[4] for m in mes.values()) >= 60:
+                    arret = "un servo atteint 60 °C"
+                    break
+                if tension is not None and tension < 10.5:
+                    arret = f"batterie faible ({tension:.1f} V)"
+                    break
+                if n % 250 == 0:                       # toutes les 5 s
+                    print(f"  {t:5.0f} s / {duree:.0f} s · " + " | ".join(
+                        f"{k} {m[2]:.0f} % {m[4]} °C" for k, m in mes.items()) + f" · {tension:.1f} V   ", end="\r")
+            time.sleep(max(0.0, n / hz - (time.monotonic() - t0)))
+    except KeyboardInterrupt:
+        arret = "Ctrl+C"
+    aller_doucement(bus, S, r, ids, cinematique_inverse(0, H_DEBOUT))
+    print()
+    if arret:
+        print(f"⚠ arrêt avant la fin : {arret}")
+    if not lignes:
+        print("Aucune mesure.")
+        return None
+
+    # CSV complet
+    with open(base + ".csv", "w", newline="") as f:
+        w = csv.writer(f)
+        w.writerow(["t_s", "tension_V"] + [f"{k}_{c}" for k in ARTIC for c in ("consigne_deg", "mesure_deg", "ecart_deg", "charge_%", "courant_mA", "temp_C")])
+        for t, mes, v in lignes:
+            ligne = [round(t, 2), v]
+            for k in ARTIC:
+                if k in mes:
+                    c, m, ch, i, tp = mes[k]
+                    ligne += [round(c, 2), round(m, 2), round(m - c, 2), ch, i, tp]
+                else:
+                    ligne += [""] * 6
+            w.writerow(ligne)
+
+    # bilan par minute
+    def stats(sel):
+        out = {}
+        for k in ARTIC:
+            v = [mes[k] for _, mes, _ in sel if k in mes]
+            if v:
+                out[k] = {"charge_moy": sum(x[2] for x in v) / len(v), "charge_max": max(x[2] for x in v),
+                          "courant_moy": sum(x[3] for x in v) / len(v), "temp_max": max(x[4] for x in v),
+                          "ecart_max": max(abs(x[1] - x[0]) for x in v)}
+        return out
+    print("\nMinute | " + " | ".join(f"{k:^24s}" for k in ARTIC))
+    print("       | " + " | ".join(f"{'charge moy/max  °C écart':^24s}" for _ in ARTIC))
+    nb_min = int(lignes[-1][0] // 60) + 1
+    for mi in range(nb_min):
+        st = stats([l for l in lignes if mi * 60 <= l[0] < (mi + 1) * 60])
+        print(f"  {mi + 1:4d} | " + " | ".join(
+            f"{st[k]['charge_moy']:5.1f}/{st[k]['charge_max']:5.1f} %  {st[k]['temp_max']:3d}  {st[k]['ecart_max']:4.1f}°"
+            if k in st else f"{'—':^24s}" for k in ARTIC))
+    debut = stats([l for l in lignes if l[0] < 60])
+    fin = stats([l for l in lignes if l[0] >= lignes[-1][0] - 60])
+    tensions = [v for _, _, v in lignes if v is not None]
+    print(f"\nBatterie : {max(tensions):.1f} V → {min(tensions):.1f} V")
+    print("Dérive entre la 1re et la dernière minute :")
+    alertes = []
+    for k in ARTIC:
+        if k in debut and k in fin:
+            dch = fin[k]["charge_moy"] - debut[k]["charge_moy"]
+            dtp = fin[k]["temp_max"] - debut[k]["temp_max"]
+            dec = fin[k]["ecart_max"] - debut[k]["ecart_max"]
+            print(f"  {k:9s} charge {dch:+5.1f} pts · température {dtp:+3d} °C · écart de suivi {dec:+4.1f}°")
+            if dch > 5:
+                alertes.append(f"{k} : la charge monte (frottement qui augmente, pièce qui se déforme, vis qui se desserre ?)")
+            if fin[k]["temp_max"] > 50:
+                alertes.append(f"{k} : chauffe au-delà de 50 °C")
+            if dec > 2:
+                alertes.append(f"{k} : le suivi se dégrade (jeu qui apparaît ?)")
+    print("\n".join("⚠ " + x for x in alertes) if alertes else "✓ Aucune dérive notable.")
+
+    # graphique
+    try:
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+        fig, axs = plt.subplots(3, 1, figsize=(11, 9), sharex=True)
+        for k in ARTIC:
+            tt = [t for t, mes, _ in lignes if k in mes]
+            axs[0].plot(tt, [mes[k][2] for _, mes, _ in lignes if k in mes], lw=0.8, label=k)
+            axs[1].plot(tt, [mes[k][4] for _, mes, _ in lignes if k in mes], lw=1.2, label=k)
+            axs[2].plot(tt, [mes[k][1] - mes[k][0] for _, mes, _ in lignes if k in mes], lw=0.8, label=k)
+        for ax, y in zip(axs, ("charge (%)", "température (°C)", "écart mesure − consigne (°)")):
+            ax.set_ylabel(y); ax.grid(alpha=0.3); ax.legend(fontsize=8, ncol=4)
+        axs[2].set_xlabel("temps (s)")
+        fig.suptitle(f"Endurance jambe {cote} · rythme {a.rythme} · {a.periode:.2f} s par pas")
+        fig.tight_layout(); fig.savefig(base + ".png"); plt.close(fig)
+        print(f"\nMesures : {os.path.basename(base)}.csv · graphique : {os.path.basename(base)}.png")
+    except ImportError:
+        print(f"\nMesures : {os.path.basename(base)}.csv (pip install matplotlib pour le graphique)")
+    print("\nÀ regarder maintenant sur la jambe (et à me renvoyer) :\n"
+          "  • traces blanches sur le PETG (genou, bras de servo, levier de talon) = matière qui fatigue\n"
+          "  • jeu nouveau : secoue doucement le pied, le genou, la hanche\n"
+          "  • vis desserrées (palonniers, rotules des bielles), roulements qui accrochent\n"
+          "  • fissure, pièce chaude au toucher, odeur")
+    return base
+
+
 def cmd_rythmes(bus, S, r, ids, cote, cycles, saisie=None):
     saisie = saisie or input
     for nom in RYTHMES:
@@ -432,6 +565,11 @@ def main():
     s = sp.add_parser("rythmes", help="la jambe enchaîne lent, moyen et max (Entrée entre chaque)")
     s.add_argument("--cycles", type=int, default=5)
     s = sp.add_parser("charge"); s.add_argument("--minutes", type=float, default=5.0)
+    s = sp.add_parser("endurance", help="marche dans le vide pendant N minutes, mesures + graphique")
+    s.add_argument("--minutes", type=float, default=5.0)
+    s.add_argument("--rythme", choices=list(RYTHMES), default="moyen")
+    for k in ("periode", "pas", "levee", "roulis"):
+        s.add_argument("--" + k, type=float)
     a = ap.parse_args()
 
     if a.cmd == "marche":
@@ -460,6 +598,8 @@ def main():
             cmd_pied(bus, S, r, ids, a.dx, a.dz, a.dy)
         elif a.cmd == "marche":
             cmd_marche_reelle(bus, S, r, ids, a.jambe, a)
+        elif a.cmd == "endurance":
+            cmd_endurance(bus, S, r, ids, a.jambe, a)
         elif a.cmd == "rythmes":
             cmd_rythmes(bus, S, r, ids, a.jambe, a.cycles)
         elif a.cmd == "charge":
