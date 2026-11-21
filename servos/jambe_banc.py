@@ -318,6 +318,7 @@ def cmd_endurance(bus, S, r, ids, cote, a):
     t0 = time.monotonic()
     duree = a.minutes * 60
     n, hz, arret = 0, 50, None
+    derniere_temp, aberrantes, chaud = {}, {k: 0 for k in ARTIC}, {k: 0 for k in ARTIC}
     try:
         while True:
             t = time.monotonic() - t0
@@ -333,12 +334,18 @@ def cmd_endurance(bus, S, r, ids, cote, a):
                         e = bus.etat(sid)
                     except S.ErreurBus:
                         continue
+                    tp = e["temp_C"]
+                    if artic in derniere_temp and abs(tp - derniere_temp[artic]) > 8:
+                        aberrantes[artic] += 1                 # saut impossible en 0,2 s : lecture fausse, ignorée
+                        tp = derniere_temp[artic]
+                    derniere_temp[artic] = tp
                     mes[artic] = (borne(r, artic, q[artic]), vers_deg(r, artic, e["position"]), abs(e["charge_%"]),
-                                  abs(e["courant_mA"]), e["temp_C"])
+                                  abs(e["courant_mA"]), tp)
                     tension = e["tension_V"] if tension is None else min(tension, e["tension_V"])
+                    chaud[artic] = chaud[artic] + 1 if tp >= 60 else 0
                 lignes.append((t, mes, tension))
-                if mes and max(m[4] for m in mes.values()) >= 60:
-                    arret = "un servo atteint 60 °C"
+                if any(c >= 2 for c in chaud.values()):    # deux lectures de suite à 60 °C ou plus
+                    arret = "un servo atteint 60 °C (" + ", ".join(k for k, c in chaud.items() if c >= 2) + ")"
                     break
                 if tension is not None and tension < 10.5:
                     arret = f"batterie faible ({tension:.1f} V)"
@@ -393,6 +400,10 @@ def cmd_endurance(bus, S, r, ids, cote, a):
     fin = stats([l for l in lignes if l[0] >= lignes[-1][0] - 60])
     tensions = [v for _, _, v in lignes if v is not None]
     print(f"\nBatterie : {max(tensions):.1f} V → {min(tensions):.1f} V")
+    if any(aberrantes.values()):
+        print("Lectures de température aberrantes ignorées : " + ", ".join(f"{k} {v}" for k, v in aberrantes.items() if v))
+    if lignes[-1][0] < 120:
+        print("(test de moins de 2 min : pas de dérive à calculer)")
     print("Dérive entre la 1re et la dernière minute :")
     alertes = []
     for k in ARTIC:

@@ -106,6 +106,22 @@ def test():
     assert any(n.endswith(".csv") for n in faits) and any(n.endswith(".png") for n in faits), faits
     for n in faits:
         os.remove(os.path.join(d, n))
+    # une lecture de température aberrante (64 °C) au milieu ne doit pas arrêter le test
+    lect = {"n": 0}
+    orig = S.Bus.etat
+    def etat_bruite(self, sid):
+        e = orig(self, sid)
+        lect["n"] += 1
+        if lect["n"] == 12:
+            e["temp_C"] = 64
+        return e
+    S.Bus.etat = etat_bruite
+    out = lancer(jambe, "endurance", "--minutes", "0.05")
+    S.Bus.etat = orig
+    assert "arrêt avant la fin" not in out and "aberrantes ignorées" in out, out
+    for n in os.listdir(d):
+        if n.startswith("endurance_D_"):
+            os.remove(os.path.join(d, n))
     out = lancer(jambe, "cycle")
     assert "Cycle fini" in out, out
     out = lancer(jambe, "charge", "--minutes", "0.02", entrees=[""])
