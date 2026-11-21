@@ -206,7 +206,9 @@ def cmd_sens(bus, S, r, ids, cote, saisie=None):
         rep = saisie(f"→ {artic} : est-ce que {SENS_ATTENDU[artic]} ? (o/n) ").strip().lower()
         if rep == "n":
             r["sens"][artic] *= -1
-            print(f"  sens de {artic} inversé")
+            lo, hi = r["butees"][artic]
+            r["butees"][artic] = [-hi, -lo]                     # mêmes butées physiques, dans le nouveau sens
+            print(f"  sens de {artic} inversé (butées : {-hi:+.1f}° → {-lo:+.1f}°)")
         aller_doucement(bus, S, r, ids, {k: 0.0 for k in ARTIC}, vitesse=300)
     sauver(cote, r)
     print("✓ Sens enregistrés.")

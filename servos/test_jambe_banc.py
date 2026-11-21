@@ -87,6 +87,8 @@ def test():
 
     out = lancer(jambe, "sens", entrees=["o", "o", "n", "o"])
     assert "sens de genou inversé" in out and JB.charger("D")["sens"]["genou"] == -1, out
+    lo, hi = JB.charger("D")["butees"]["genou"]
+    assert lo < -100 and abs(hi) < 0.2, (lo, hi)            # butées retournées avec le sens
     out = lancer(jambe, "pied", "40", "30")
     assert "angles" in out and "✓" in out, out
     qv = JB.cinematique_inverse(40, JB.H_DEBOUT - 30)
