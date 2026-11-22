@@ -31,6 +31,37 @@ class FauxSerieSync(FauxSerie):
         super().write(b)
 
 
+class FauxServoRetard(FauxServo):
+    """Servo qui atteint sa consigne avec un retard fixe (pour tester la mesure des retards)."""
+    def __init__(self, sid, retard):
+        super().__init__(sid, 2048)
+        self.retard, self.hist = retard, []
+
+    def ecrire(self, adr, data):
+        err = super().ecrire(adr, data)
+        import time as _t
+        self.hist.append((_t.monotonic(), self.brut))
+        self.hist = self.hist[-400:]
+        return err
+
+    def avant_lecture(self):
+        import time as _t
+        cible = _t.monotonic() - self.retard
+        vieux = [b for (t, b) in self.hist if t <= cible]
+        if vieux:
+            sauve = self.brut
+            self.brut = vieux[-1]; self.maj(); self.brut = sauve
+
+
+class FauxSerieRetard(FauxSerieSync):
+    def write(self, b):
+        if b[4] == 0x02:
+            for s in self.servos:
+                if s.sid == b[2] and hasattr(s, "avant_lecture"):
+                    s.avant_lecture()
+        super().write(b)
+
+
 def lancer(servos, *args, entrees=()):
     S.serial.Serial = lambda port, baud, timeout: FauxSerieSync(servos, timeout)
     reps = iter(entrees)
@@ -122,6 +153,29 @@ def test():
     for n in os.listdir(d):
         if n.startswith("endurance_D_"):
             os.remove(os.path.join(d, n))
+    # anticipation : par défaut celle mesurée le 22/11 ; « retards » la remesure. Avec de faux servos sans
+    # retard, la mesure doit trouver qu'il ne faut plus d'avance (≈ 0 ms partout).
+    out = lancer(jambe, "marche", "--cycles", "1", "--periode", "0.6")
+    assert "Anticipation : roulis 80 ms" in out and "genou 215 ms" in out, out
+    out = lancer(jambe, "marche", "--cycles", "1", "--periode", "0.6", "--sans-avance")
+    assert "Sans anticipation" in out, out
+    out = lancer(jambe, "retards", "--cycles", "4", "--periode", "0.6")
+    assert "Anticipation du rythme moyen enregistrée" in out, out
+    nouv = JB.charger("D")["avance_ms_par_rythme"]["moyen"]
+    assert all(v <= 25 for v in nouv.values()), nouv
+    out = lancer(jambe, "marche", "--cycles", "1", "--periode", "0.6")
+    assert "Anticipation : roulis" in out and "genou 215" not in out, out
+    # servos réellement en retard : roulis 60 ms, hanche 120, genou 200, cheville 80 → retards doit les retrouver
+    rr = JB.charger("D"); rr["sens"]["genou"] = 1; rr["butees"]["genou"] = [0.0, 110.0]; JB.sauver("D", rr)
+    lents = [FauxServoRetard(i, d) for i, d in zip((1, 2, 3, 4), (0.06, 0.12, 0.20, 0.08))]
+    S.serial.Serial = lambda port, baud, timeout: FauxSerieRetard(lents, timeout)
+    sys.argv = ["jambe_banc.py", "--port", "FAUX", "retards", "--cycles", "6", "--periode", "1.0"]
+    f = io.StringIO()
+    with contextlib.redirect_stdout(f):
+        JB.main()
+    trouve = JB.charger("D")["avance_ms_par_rythme"]["moyen"]
+    for k, d in zip(JB.ARTIC, (60, 120, 200, 80)):
+        assert abs(trouve[k] - d) <= 30, (k, trouve, f.getvalue())
     out = lancer(jambe, "cycle")
     assert "Cycle fini" in out, out
     out = lancer(jambe, "charge", "--minutes", "0.02", entrees=[""])

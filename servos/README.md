@@ -112,6 +112,13 @@ Rythmes : `marche --rythme lent|moyen|max` (moyen par défaut), en vrai comme en
 
 Les options `--periode --pas --levee --roulis --cycles` remplacent celles du rythme.
 
+**Anticipation (pied à plat pendant le pas)** : chaque articulation met un certain temps à suivre sa consigne, et le
+genou est le plus lent (vidéo du 22/11 : genou ~215 ms, hanche ~130, cheville ~90, roulis ~80). Sans correction, le
+pied bascule de −10° à +14° pendant le pas. La marche envoie donc à chaque articulation sa consigne **en avance de
+son propre retard**, pour que toutes arrivent ensemble. `python jambe_banc.py retards` mesure ces retards en marche
+et les enregistre dans `jambe_D.json` (un réglage par rythme : `--rythme lent|moyen|max`) ; relance-le une fois pour
+vérifier que le reste est sous ±20 ms. `--sans-avance` sur `marche` ou `endurance` pour comparer.
+
 **Endurance** : `python jambe_banc.py endurance` (5 min au rythme moyen ; `--minutes 10 --rythme max` pour varier).
 La jambe marche dans le vide ; le script enregistre consigne et position mesurée, charge, courant, température et
 tension 5 fois par seconde dans `endurance_D_….csv`, affiche un bilan par minute et la dérive entre la première et

@@ -13,6 +13,8 @@ Jambe fixée par le haut au bord d'une table, pied dans le vide (sauf « charge 
   python jambe_banc.py marche               la vraie jambe joue son rôle dans la marche (pied dans le vide)
   python jambe_banc.py marche --rythme max  rythmes : lent, moyen (défaut), max (le plus vite que les servos suivent)
   python jambe_banc.py rythmes              enchaîne lent → moyen → max sur la vraie jambe
+  python jambe_banc.py retards              mesure le retard de chaque articulation et règle l'anticipation
+                                            (marche et endurance l'utilisent ; --sans-avance pour comparer)
   python jambe_banc.py endurance            marche dans le vide 5 min (rythme moyen) : CSV, bilan par minute, graphique
   python jambe_banc.py charge               pied posé : flexions 0→60° pendant 5 min, mesures dans un CSV
   python jambe_banc.py repos                couple coupé sur la jambe
@@ -144,6 +146,36 @@ def regler_rythme(a):
           f"→ ≈ {vitesse_robot(a.periode, a.pas):.2f} km/h")
     print("  vitesses max : " + ", ".join(f"{k} {v[k]:.0f}°/s" for k in ARTIC) + f"  (limite {VITESSE_MAX:.0f}°/s)")
     return a
+
+
+# ── Anticipation : chaque articulation reçoit sa consigne en avance de son propre retard ─────────────────
+# Mesuré le 22/11 (rythme moyen, servos + vidéo) : sans ça le genou arrive ~0,1 s après les autres et le pied
+# bascule de −10° à +14° pendant le pas au lieu de rester à plat. « retards » remesure et corrige ces valeurs.
+AVANCE_DEFAUT_MS = {"roulis": 80, "hanche": 130, "genou": 215, "cheville": 90}
+
+
+def avance_ms(r, rythme):
+    return r.get("avance_ms_par_rythme", {}).get(rythme) or r.get("avance_ms") or AVANCE_DEFAUT_MS
+
+
+def pose_commande(t, a, cote, avance):
+    """Consigne envoyée à l'instant t : chaque articulation vise la pose voulue à t + son retard."""
+    q = {}
+    for k in ARTIC:
+        q[k] = pose_marche((t + avance[k] / 1000) / a.periode, a.pas, a.levee, a.roulis, cote)[k]
+    return q
+
+
+def pose_voulue(t, a, cote):
+    return pose_marche(t / a.periode, a.pas, a.levee, a.roulis, cote)
+
+
+def commande_marche(r, a, cote):
+    """Fonction t → consigne, avec ou sans anticipation selon a.sans_avance."""
+    if getattr(a, "sans_avance", False):
+        return lambda t: pose_voulue(t, a, cote)
+    av = avance_ms(r, a.rythme)
+    return lambda t: pose_commande(t, a, cote, av)
 
 
 # ── Réglages de la jambe ──────────────────────────────────────────────────────
@@ -296,7 +328,12 @@ def cmd_pied(bus, S, r, ids, dx, dz, dy):
 
 
 def cmd_marche_reelle(bus, S, r, ids, cote, a):
-    q_de_t = lambda t: pose_marche(t / a.periode, a.pas, a.levee, a.roulis, cote)
+    q_de_t = commande_marche(r, a, cote)
+    if getattr(a, "sans_avance", False):
+        print("Sans anticipation (consignes brutes).")
+    else:
+        av = avance_ms(r, a.rythme)
+        print("Anticipation : " + ", ".join(f"{k} {av[k]:.0f} ms" for k in ARTIC))
     print(f"Position de départ (lentement)… puis {a.cycles} pas de {a.periode:.2f} s. Ctrl+C pour arrêter.")
     aller_doucement(bus, S, r, ids, q_de_t(0.0))
     afficher_pics(jouer(bus, S, r, ids, q_de_t, a.cycles * a.periode), ids)
@@ -309,8 +346,9 @@ def cmd_endurance(bus, S, r, ids, cote, a):
     CSV complet, bilan par minute, dérive début → fin, graphique PNG."""
     regler_rythme(a)
     base = os.path.join(os.path.dirname(os.path.abspath(__file__)), f"endurance_{cote}_{a.rythme}_{time.strftime('%Y%m%d_%H%M%S')}")
-    q_de_t = lambda t: pose_marche(t / a.periode, a.pas, a.levee, a.roulis, cote)
-    print(f"Endurance {a.minutes:g} min, jambe dans le vide. Ctrl+C pour arrêter (les mesures sont gardées).")
+    q_de_t = commande_marche(r, a, cote)
+    print(f"Endurance {a.minutes:g} min, jambe dans le vide, " + ("sans anticipation" if getattr(a, "sans_avance", False) else "avec anticipation")
+          + ". Ctrl+C pour arrêter (les mesures sont gardées).")
     aller_doucement(bus, S, r, ids, q_de_t(0.0))
     for sid in ids:
         bus.ecrire8(sid, S.ACCEL, 0)
@@ -324,8 +362,8 @@ def cmd_endurance(bus, S, r, ids, cote, a):
             t = time.monotonic() - t0
             if t >= duree:
                 break
-            q = q_de_t(t)
-            envoyer(bus, S, r, ids, q)
+            envoyer(bus, S, r, ids, q_de_t(t))
+            q = pose_voulue(t, a, cote)                 # ce que la jambe DOIT faire : l'écart mesuré porte là-dessus
             n += 1
             if n % 10 == 0:
                 mes, tension = {}, None
@@ -447,10 +485,74 @@ def cmd_endurance(bus, S, r, ids, cote, a):
     return base
 
 
+def cmd_retards(bus, S, r, ids, cote, a):
+    """Marche avec l'anticipation actuelle, lit une articulation à chaque consigne (chacune à 12,5 Hz),
+    mesure le retard qui reste sur chaque articulation, et corrige l'anticipation de ce reste."""
+    regler_rythme(a)
+    av = dict(avance_ms(r, a.rythme))
+    a.sans_avance = False
+    print("Anticipation actuelle : " + ", ".join(f"{k} {av[k]:.0f} ms" for k in ARTIC))
+    q_de_t = lambda t: pose_commande(t, a, cote, av)
+    aller_doucement(bus, S, r, ids, q_de_t(0.0))
+    for sid in ids:
+        bus.ecrire8(sid, S.ACCEL, 0)
+    mes = {k: [] for k in ARTIC}
+    duree, hz, n = a.cycles * a.periode, 50, 0
+    t0 = time.monotonic()
+    while True:
+        t = time.monotonic() - t0
+        if t >= duree:
+            break
+        envoyer(bus, S, r, ids, q_de_t(t))
+        k = ARTIC[n % 4]
+        try:
+            p = bus.lire16(ids[n % 4], S.POSITION)
+            mes[k].append((time.monotonic() - t0, vers_deg(r, k, p)))
+        except S.ErreurBus:
+            pass
+        n += 1
+        time.sleep(max(0.0, n / hz - (time.monotonic() - t0)))
+    aller_doucement(bus, S, r, ids, cinematique_inverse(0, H_DEBOUT))
+    print(f"\n{'articulation':12s} {'avance':>8s} {'reste':>8s} {'nouvelle':>9s} {'amplitude':>10s}")
+    nouv = {}
+    for k in ARTIC:
+        pts = [(t, d) for t, d in mes[k] if t > a.periode]          # on ignore le premier pas (mise en route)
+        if len(pts) < 20:
+            print(f"{k:12s} pas assez de mesures, avance inchangée")
+            nouv[k] = av[k]
+            continue
+        tt = [p[0] for p in pts]; dd = [p[1] for p in pts]
+        best = None
+        for retard in range(0, 451, 5):                              # retard réel du servo (ms) : mesure ≈ consigne(t − retard)
+            v = [pose_voulue(x + (av[k] - retard) / 1000, a, cote)[k] for x in tt]
+            mv, md = sum(v) / len(v), sum(dd) / len(dd)
+            sv = sum((x - mv) ** 2 for x in v)
+            if sv < 1e-9:
+                continue
+            gain = sum((x - mv) * (y - md) for x, y in zip(v, dd)) / sv
+            err = sum((y - md - gain * (x - mv)) ** 2 for x, y in zip(v, dd)) / len(v)
+            if best is None or err < best[0]:
+                best = (err, retard, gain)
+        if best is None:                                              # articulation immobile à ce rythme
+            nouv[k] = av[k]
+            continue
+        err, retard, gain = best
+        reste = retard - av[k]
+        nouv[k] = retard
+        print(f"{k:12s} {av[k]:6.0f} ms {reste:+6.0f} ms {nouv[k]:6.0f} ms {gain * 100:8.0f} %")
+    r.setdefault("avance_ms_par_rythme", {})[a.rythme] = nouv
+    sauver(cote, r)
+    restes = [abs(nouv[k] - av[k]) for k in ARTIC]
+    print(f"\n✓ Anticipation du rythme {a.rythme} enregistrée.")
+    print("  Relance « retards » une fois pour vérifier : le reste doit être à moins de ±20 ms partout."
+          if max(restes) > 20 else "  Les restes sont sous ±20 ms : réglage bon.")
+    return nouv
+
+
 def cmd_rythmes(bus, S, r, ids, cote, cycles, saisie=None):
     saisie = saisie or input
     for nom in RYTHMES:
-        a = argparse.Namespace(rythme=nom, cycles=cycles, periode=None, pas=None, levee=None, roulis=None)
+        a = argparse.Namespace(rythme=nom, cycles=cycles, periode=None, pas=None, levee=None, roulis=None, sans_avance=False)
         print()
         regler_rythme(a)
         if saisie(f"Entrée pour lancer le rythme {nom}, « s » + Entrée pour arrêter là : ").strip().lower() == "s":
@@ -573,6 +675,12 @@ def main():
     s.add_argument("--pas", type=float, help="longueur du pas (mm)")
     s.add_argument("--levee", type=float, help="hauteur de levée du pied (mm)")
     s.add_argument("--roulis", type=float, help="bascule du bassin (degrés)")
+    s.add_argument("--sans-avance", action="store_true", help="consignes brutes, sans anticipation (pour comparer)")
+    s = sp.add_parser("retards", help="mesure le retard de chaque articulation en marche et règle l'anticipation")
+    s.add_argument("--rythme", choices=list(RYTHMES), default="moyen")
+    s.add_argument("--cycles", type=int, default=8)
+    for k in ("periode", "pas", "levee", "roulis"):
+        s.add_argument("--" + k, type=float)
     s = sp.add_parser("rythmes", help="la jambe enchaîne lent, moyen et max (Entrée entre chaque)")
     s.add_argument("--cycles", type=int, default=5)
     s = sp.add_parser("charge"); s.add_argument("--minutes", type=float, default=5.0)
@@ -581,6 +689,7 @@ def main():
     s.add_argument("--rythme", choices=list(RYTHMES), default="moyen")
     for k in ("periode", "pas", "levee", "roulis"):
         s.add_argument("--" + k, type=float)
+    s.add_argument("--sans-avance", action="store_true")
     a = ap.parse_args()
 
     if a.cmd == "marche":
@@ -609,6 +718,8 @@ def main():
             cmd_pied(bus, S, r, ids, a.dx, a.dz, a.dy)
         elif a.cmd == "marche":
             cmd_marche_reelle(bus, S, r, ids, a.jambe, a)
+        elif a.cmd == "retards":
+            cmd_retards(bus, S, r, ids, a.jambe, a)
         elif a.cmd == "endurance":
             cmd_endurance(bus, S, r, ids, a.jambe, a)
         elif a.cmd == "rythmes":
